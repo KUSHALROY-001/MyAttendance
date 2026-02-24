@@ -31,12 +31,13 @@ const studentSchema = new mongoose.Schema(
     contactNumber: {
       type: String,
     },
-    attendancePercentage: {
-      type: Number,
-      default: 0,
-    },
+    courses: [
+      { type: mongoose.Schema.Types.ObjectId, ref: "Course" },
+    ],
   },
   { timestamps: true },
 );
+
+studentSchema.index({ user: 1 });
 
 module.exports = mongoose.model("Student", studentSchema);

@@ -1,14 +1,8 @@
-const mongoose = require("mongoose");
-const dotenv = require("dotenv");
-const path = require("path");
-
-// Load env vars
-dotenv.config({ path: path.resolve(__dirname, "../.env") });
+const mongoose = require('mongoose');
 
 const connectDB = async () => {
   try {
     const conn = await mongoose.connect(process.env.MONGO_URI);
-
     console.log(`MongoDB Connected: ${conn.connection.host}`);
   } catch (error) {
     console.error(`Error: ${error.message}`);
