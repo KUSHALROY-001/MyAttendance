@@ -1,45 +1,11 @@
+import { Link } from "react-router-dom";
+import Navbar from "../layout/Navbar.jsx";
+import Footer from "../layout/Footer.jsx";
+
 function Home() {
   return (
     <div className="min-h-screen flex flex-col bg-slate-50 text-slate-900">
-      <header className="sticky top-0 z-20 border-b bg-white/80 backdrop-blur">
-        <nav className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 sm:px-6">
-          <div className="flex items-center gap-2">
-            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-indigo-600 text-sm font-semibold text-white">
-              AP
-            </div>
-            <div>
-              <p className="text-sm font-semibold tracking-tight text-slate-900">
-                MyAttendance
-              </p>
-              <p className="text-xs text-slate-500">
-                Smart attendance tracking
-              </p>
-            </div>
-          </div>
-
-          <div className="hidden items-center gap-6 text-sm font-medium text-slate-700 md:flex">
-            <a href="#hero" className="hover:text-indigo-600">
-              Home
-            </a>
-            <a href="#features" className="hover:text-indigo-600">
-              Features
-            </a>
-            <a href="#about" className="hover:text-indigo-600">
-              About
-            </a>
-            <a href="#cta" className="hover:text-indigo-600">
-              Get Started
-            </a>
-          </div>
-
-          <a
-            href="#cta"
-            className="inline-flex items-center rounded-full border border-indigo-600 px-4 py-1.5 text-xs font-semibold text-indigo-600 hover:bg-indigo-50 sm:text-sm"
-          >
-            Login
-          </a>
-        </nav>
-      </header>
+      <Navbar />
 
       <main className="flex-1">
         <section
@@ -60,12 +26,12 @@ function Home() {
                 who is present.
               </p>
               <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-                <a
-                  href="#cta"
+                <Link
+                  to="/login"
                   className="inline-flex items-center justify-center rounded-full bg-indigo-600 px-6 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-700"
                 >
                   Get Started
-                </a>
+                </Link>
                 <a
                   href="#features"
                   className="inline-flex items-center justify-center rounded-full border border-slate-300 px-6 py-2.5 text-sm font-semibold text-slate-700 hover:bg-white"
@@ -275,12 +241,12 @@ function Home() {
                 </p>
               </div>
               <div className="flex flex-col gap-3 sm:flex-row">
-                <button
-                  type="button"
+                <Link
+                  to="/login"
                   className="inline-flex items-center justify-center rounded-full bg-white px-6 py-2.5 text-sm font-semibold text-indigo-700 shadow-sm hover:bg-indigo-50"
                 >
                   Go to login
-                </button>
+                </Link>
                 <button
                   type="button"
                   className="inline-flex items-center justify-center rounded-full border border-indigo-100 px-6 py-2.5 text-sm font-semibold text-white hover:bg-indigo-500/40"
@@ -293,24 +259,7 @@ function Home() {
         </section>
       </main>
 
-      <footer className="mt-auto border-t bg-white">
-        <div className="mx-auto flex max-w-6xl flex-col gap-4 px-4 py-6 text-xs text-slate-500 sm:flex-row sm:items-center sm:justify-between sm:text-sm">
-          <p>
-            © {new Date().getFullYear()} MyAttendance. All rights reserved.
-          </p>
-          <div className="flex gap-4">
-            <a href="#about" className="hover:text-indigo-600">
-              About
-            </a>
-            <a href="#features" className="hover:text-indigo-600">
-              Features
-            </a>
-            <a href="#cta" className="hover:text-indigo-600">
-              Get started
-            </a>
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </div>
   )
 }
