@@ -17,18 +17,18 @@ function Navbar() {
         </div>
 
         <div className="hidden items-center gap-6 text-sm font-medium text-slate-700 md:flex">
-          <a href="#hero" className="hover:text-indigo-600">
+          <Link to="/" className="hover:text-indigo-600">
             Home
-          </a>
-          <a href="#features" className="hover:text-indigo-600">
+          </Link>
+          <Link to="/" href="#features" className="hover:text-indigo-600">
             Features
-          </a>
-          <a href="#about" className="hover:text-indigo-600">
+          </Link>
+          <Link to="/" href="#about" className="hover:text-indigo-600">
             About
-          </a>
-          <a href="#cta" className="hover:text-indigo-600">
+          </Link>
+          <Link to="/" href="#cta" className="hover:text-indigo-600">
             Get Started
-          </a>
+          </Link>
         </div>
 
         <Link

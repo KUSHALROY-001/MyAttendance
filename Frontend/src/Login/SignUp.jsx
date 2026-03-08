@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import Navbar from "../layout/Navbar.jsx";
-import Footer from "../layout/Footer.jsx";
+import Navbar from "../Layout/Navbar.jsx";
+import Footer from "../Layout/Footer.jsx";
 
 const inputClass =
   "block w-full rounded-lg border border-slate-600 bg-slate-900/70 px-3 py-2 text-sm text-slate-50 placeholder:text-slate-500 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/60";
@@ -47,21 +47,25 @@ function SignUp() {
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
       <Navbar />
 
-      <main className="flex-1 flex items-center justify-center px-4">
-        <div className="w-full max-w-md rounded-2xl bg-slate-900/60 border border-slate-700 shadow-xl shadow-slate-900/40 backdrop-blur-md p-8">
-          <div className="mb-6 text-center">
+      <main className="flex-1 flex items-center justify-center px-4 py-12">
+        {/* Adjusted Container: Takes full width with margin on large screens, max-width keeps it contained */}
+        <div className="w-full max-w-md min-[950px]:max-w-4xl rounded-2xl bg-slate-900/60 border border-slate-700 shadow-xl shadow-slate-900/40 backdrop-blur-md p-8 min-[950px]:p-10">
+          
+          <div className="mb-8 text-center min-[950px]:mb-10">
             <p className="text-xs font-semibold uppercase tracking-[0.2em] text-indigo-400">
               Get started
             </p>
-            <h1 className="mt-2 text-2xl font-semibold tracking-tight text-slate-50">
+            <h1 className="mt-2 text-2xl font-semibold tracking-tight text-slate-50 min-[950px]:text-3xl">
               Create your account
             </h1>
-            <p className="mt-1 text-xs text-slate-400">
+            <p className="mt-2 text-xs text-slate-400 min-[950px]:text-sm">
               Sign up to start managing attendance for your class or team.
             </p>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-4">
+          {/* Form wrapper changed to a CSS Grid */}
+          <form onSubmit={handleSubmit} className="grid grid-cols-1 min-[950px]:grid-cols-2 gap-5 min-[950px]:gap-6">
+            
             {/* 1. Name */}
             <div className="space-y-1.5">
               <label htmlFor="name" className={labelClass}>
@@ -94,7 +98,24 @@ function SignUp() {
               />
             </div>
 
-            {/* 3. Role */}
+            {/* 3. Password (Moved up to visually balance the 2-column grid alongside Role) */}
+            <div className="space-y-1.5">
+              <label htmlFor="password" className={labelClass}>
+                Password
+              </label>
+              <input
+                id="password"
+                name="password"
+                type="password"
+                required
+                minLength={6}
+                autoComplete="new-password"
+                className={inputClass}
+                placeholder="Create a secure password (min 6 characters)"
+              />
+            </div>
+
+            {/* 4. Role */}
             <div className="space-y-1.5">
               <label htmlFor="role" className={labelClass}>
                 Role
@@ -113,133 +134,65 @@ function SignUp() {
               </select>
             </div>
 
-            {/* 4. Role-based fields */}
+            {/* 5. Role-based fields (Spans full width so it drops to a new row) */}
             {role === "student" && (
-              <div className="space-y-4 rounded-lg border border-slate-600/60 bg-slate-800/40 p-4">
-                <p className="text-xs font-medium text-indigo-300">
+              <div className="col-span-1 min-[950px]:col-span-2 space-y-4 rounded-lg border border-slate-600/60 bg-slate-800/40 p-5 mt-2">
+                <p className="text-sm font-medium text-indigo-300">
                   Student details
                 </p>
-                <div className="space-y-3">
+                {/* Internal Grid for sub-fields - Plural items per line on large screens */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 min-[950px]:grid-cols-2 gap-4">
                   <div className="space-y-1.5">
-                    <label htmlFor="rollNumber" className={labelClass}>
-                      Roll number
-                    </label>
-                    <input
-                      id="rollNumber"
-                      name="rollNumber"
-                      type="text"
-                      required
-                      className={inputClass}
-                      placeholder="e.g., 21CS001"
-                    />
+                    <label htmlFor="rollNumber" className={labelClass}>Roll number</label>
+                    <input id="rollNumber" name="rollNumber" type="text" required className={inputClass} placeholder="e.g., 21CS001" />
                   </div>
                   <div className="space-y-1.5">
-                    <label htmlFor="branch" className={labelClass}>
-                      Branch
-                    </label>
-                    <input
-                      id="branch"
-                      name="branch"
-                      type="text"
-                      required
-                      className={inputClass}
-                      placeholder="e.g., CSE, ECE"
-                    />
+                    <label htmlFor="branch" className={labelClass}>Branch</label>
+                    <input id="branch" name="branch" type="text" required className={inputClass} placeholder="e.g., CSE, ECE" />
                   </div>
                   <div className="space-y-1.5">
-                    <label htmlFor="year" className={labelClass}>
-                      Year
-                    </label>
-                    <input
-                      id="year"
-                      name="year"
-                      type="number"
-                      required
-                      min={1}
-                      max={6}
-                      className={inputClass}
-                      placeholder="e.g., 1, 2, 3, 4"
-                    />
+                    <label htmlFor="year" className={labelClass}>Year</label>
+                    <input id="year" name="year" type="number" required min={1} max={6} className={inputClass} placeholder="e.g., 1, 2, 3, 4" />
                   </div>
                   <div className="space-y-1.5">
-                    <label htmlFor="section" className={labelClass}>
-                      Section
-                    </label>
-                    <input
-                      id="section"
-                      name="section"
-                      type="text"
-                      required
-                      className={inputClass}
-                      placeholder="e.g., A, B"
-                    />
+                    <label htmlFor="section" className={labelClass}>Section</label>
+                    <input id="section" name="section" type="text" required className={inputClass} placeholder="e.g., A, B" />
                   </div>
                 </div>
               </div>
             )}
 
             {role === "teacher" && (
-              <div className="space-y-4 rounded-lg border border-slate-600/60 bg-slate-800/40 p-4">
-                <p className="text-xs font-medium text-indigo-300">
+              <div className="col-span-1 min-[950px]:col-span-2 space-y-4 rounded-lg border border-slate-600/60 bg-slate-800/40 p-5 mt-2">
+                <p className="text-sm font-medium text-indigo-300">
                   Teacher details
                 </p>
-                <div className="space-y-3">
+                {/* Internal Grid for Teacher fields */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="space-y-1.5">
-                    <label htmlFor="department" className={labelClass}>
-                      Department
-                    </label>
-                    <input
-                      id="department"
-                      name="department"
-                      type="text"
-                      required
-                      className={inputClass}
-                      placeholder="e.g., Computer Science"
-                    />
+                    <label htmlFor="department" className={labelClass}>Department</label>
+                    <input id="department" name="department" type="text" required className={inputClass} placeholder="e.g., Computer Science" />
                   </div>
                   <div className="space-y-1.5">
-                    <label htmlFor="designation" className={labelClass}>
-                      Designation
-                    </label>
-                    <input
-                      id="designation"
-                      name="designation"
-                      type="text"
-                      required
-                      className={inputClass}
-                      placeholder="e.g., Assistant Professor"
-                    />
+                    <label htmlFor="designation" className={labelClass}>Designation</label>
+                    <input id="designation" name="designation" type="text" required className={inputClass} placeholder="e.g., Assistant Professor" />
                   </div>
                 </div>
               </div>
             )}
 
-            {/* 5. Password */}
-            <div className="space-y-1.5">
-              <label htmlFor="password" className={labelClass}>
-                Password
-              </label>
-              <input
-                id="password"
-                name="password"
-                type="password"
-                required
-                minLength={6}
-                autoComplete="new-password"
-                className={inputClass}
-                placeholder="Create a secure password (min 6 characters)"
-              />
+            {/* 6. Submit Button (Spans full width at the bottom) */}
+            <div className="col-span-1 min-[950px]:col-span-2 mt-4">
+              <button
+                type="submit"
+                className="inline-flex w-full items-center justify-center rounded-lg bg-indigo-500 px-4 py-3 text-sm font-bold tracking-wide text-white shadow-md shadow-indigo-900/40 transition hover:bg-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-400/80"
+              >
+                Sign up
+              </button>
             </div>
-
-            <button
-              type="submit"
-              className="mt-2 inline-flex w-full items-center justify-center rounded-lg bg-indigo-500 px-4 py-2.5 text-sm font-semibold text-white shadow-md shadow-indigo-900/40 transition hover:bg-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-400/80"
-            >
-              Sign up
-            </button>
           </form>
 
-          <p className="mt-5 text-center text-xs text-slate-400">
+          <p className="mt-6 text-center text-sm text-slate-400">
             Already have an account?{" "}
             <button
               type="button"
@@ -249,6 +202,7 @@ function SignUp() {
               Login
             </button>
           </p>
+
         </div>
       </main>
 
