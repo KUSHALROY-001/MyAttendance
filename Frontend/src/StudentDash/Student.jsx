@@ -1,62 +1,11 @@
 import React, { useState, useMemo } from "react";
 import { MOCK_COURSES, MOCK_ATTENDANCE, MOCK_STUDENT } from "../mockData";
-import { Link } from "react-router-dom";
 import Navbar from "../Layout/Navbar";
 import Footer from "../layout/Footer";
-
-const AttendanceCircle = ({ periods }) => {
-  const getColor = (status) => {
-    switch (status) {
-      case "PRESENT":
-        return "#22c55e"; // Green
-      case "LATE":
-        return "#f59e0b"; // Orange
-      case "ABSENT":
-        return "#ef4444"; // Red
-      default:
-        return "#f1f5f9"; // Light Gray
-    }
-  };
-
-  return (
-    <svg
-      width="36"
-      height="36"
-      viewBox="0 0 100 100"
-      className="drop-shadow-sm group-hover:scale-110 transition-transform"
-    >
-      {/* 1st Period: Top-Right (Clock 12 to 3) */}
-      <path
-        d="M 50 50 L 50 0 A 50 50 0 0 1 100 50 Z"
-        fill={getColor(periods[0])}
-        stroke="white"
-        strokeWidth="2"
-      />
-      {/* 2nd Period: Bottom-Right (Clock 3 to 6) */}
-      <path
-        d="M 50 50 L 100 50 A 50 50 0 0 1 50 100 Z"
-        fill={getColor(periods[1])}
-        stroke="white"
-        strokeWidth="2"
-      />
-      {/* 3rd Period: Bottom-Left (Clock 6 to 9) */}
-      <path
-        d="M 50 50 L 50 100 A 50 50 0 0 1 0 50 Z"
-        fill={getColor(periods[2])}
-        stroke="white"
-        strokeWidth="2"
-      />
-      {/* 4th Period: Top-Left (Clock 9 to 12) */}
-      <path
-        d="M 50 50 L 0 50 A 50 50 0 0 1 50 0 Z"
-        fill={getColor(periods[3])}
-        stroke="white"
-        strokeWidth="2"
-      />
-      <circle cx="50" cy="50" r="12" fill="white" />
-    </svg>
-  );
-};
+import AttendanceCalendar from "./components/AttendanceCalendar";
+import CourseCard from "./components/CourseCard";
+import RecentAttendanceList from "./components/RecentAttendanceList";
+import StatCard from "./components/StatCard";
 
 const StudentDashboard = ({ user = MOCK_STUDENT }) => {
   const [calendarMonth, setCalendarMonth] = useState(() => {
@@ -89,11 +38,13 @@ const StudentDashboard = ({ user = MOCK_STUDENT }) => {
     });
   }, [userId, isMockUser]);
 
-  const recentHistory = useMemo(() => {
-    return [...MOCK_ATTENDANCE]
-      .filter((r) => r.studentId === userId)
-      .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
-      .slice(0, 15);
+  const attendanceByDate = useMemo(() => {
+    const map = {};
+    MOCK_ATTENDANCE.filter((r) => r.studentId === userId).forEach((rec) => {
+      if (!map[rec.date]) map[rec.date] = [];
+      map[rec.date].push(rec);
+    });
+    return map;
   }, [userId]);
 
   const calendarDays = useMemo(() => {
@@ -121,9 +72,7 @@ const StudentDashboard = ({ user = MOCK_STUDENT }) => {
       if (d.getDay() === 0) continue;
 
       const dStr = d.toISOString().split("T")[0];
-      const dayRecords = MOCK_ATTENDANCE.filter(
-        (r) => r.date === dStr && r.studentId === userId,
-      );
+      const dayRecords = attendanceByDate[dStr] || [];
       const periods = [null, null, null, null];
       dayRecords.forEach((rec) => {
         const pNum = parseInt(rec.sessionId.split("-").pop() || "1");
@@ -132,7 +81,7 @@ const StudentDashboard = ({ user = MOCK_STUDENT }) => {
       days.push({ date: d, periods, isCurrentMonth: d.getMonth() === month });
     }
     return days;
-  }, [userId, calendarMonth]);
+  }, [attendanceByDate, calendarMonth]);
 
   const goToPreviousMonth = () =>
     setCalendarMonth(
@@ -260,140 +209,18 @@ const StudentDashboard = ({ user = MOCK_STUDENT }) => {
 
           {/* Attendance Calendar & Recent History Grid */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {/* Calendar Section */}
-            <div className="lg:col-span-2 bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
-              <div className="flex justify-between items-center mb-6">
-                <h2 className="text-xl font-bold text-gray-900">
-                  Attendance Calendar
-                </h2>
-                <div className="flex items-center space-x-4">
-                  <button
-                    onClick={goToPreviousMonth}
-                    className="p-1 hover:bg-gray-100 rounded-full transition-colors"
-                    aria-label="Previous month"
-                  >
-                    <svg
-                      className="w-5 h-5"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path d="M15 19l-7-7 7-7" strokeWidth="2" />
-                    </svg>
-                  </button>
-                  <span className="text-sm font-bold text-gray-900">
-                    {calendarMonth.toLocaleString("default", { month: "long" })}{" "}
-                    {calendarMonth.getFullYear()}
-                  </span>
-                  <button
-                    onClick={goToNextMonth}
-                    className="p-1 hover:bg-gray-100 rounded-full transition-colors"
-                    aria-label="Next month"
-                  >
-                    <svg
-                      className="w-5 h-5"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path d="M9 5l7 7-7 7" strokeWidth="2" />
-                    </svg>
-                  </button>
-                </div>
-              </div>
-
-              <div className="flex flex-wrap justify-between gap-4 text-[10px] font-bold text-gray-500 mb-4 uppercase tracking-widest">
-                <div className="flex items-center space-x-1">
-                  <div className="w-2 h-2 rounded-full bg-green-500" />
-                  <span>Present</span>
-                </div>
-                <div className="flex items-center space-x-1">
-                  <div className="w-2 h-2 rounded-full bg-orange-500" />
-                  <span>Late</span>
-                </div>
-                <div className="flex items-center space-x-1">
-                  <div className="w-2 h-2 rounded-full bg-red-500" />
-                  <span>Absent</span>
-                </div>
-                <div className="flex items-center space-x-1">
-                  <div className="w-2 h-2 rounded-full bg-gray-100" />
-                  <span>No class</span>
-                </div>
-                <span className="text-[10px] font-medium text-gray-400">
-                  Periods clockwise: 1st • 2nd • 3rd • 4th
-                </span>
-              </div>
-
-              <div className="grid grid-cols-6 gap-y-5 gap-x-2 text-center">
-                {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((d) => (
-                  <div
-                    key={d}
-                    className="text-[10px] font-black text-gray-400 uppercase tracking-widest"
-                  >
-                    {d}
-                  </div>
-                ))}
-                {calendarDays.map((day, idx) => (
-                  <div
-                    key={idx}
-                    className={`flex flex-col items-center group relative cursor-pointer ${!day.isCurrentMonth ? "opacity-40" : ""}`}
-                  >
-                    <div className="relative w-10 h-10">
-                      <div
-                        className={`absolute inset-0 rounded-full bg-gray-100 ${!day.isCurrentMonth ? "opacity-60" : ""}`}
-                      />
-                      <div className="absolute inset-0 flex items-center justify-center">
-                        <AttendanceCircle
-                          periods={day.periods}
-                          className="w-6 h-6"
-                        />
-                      </div>
-                      <span
-                        className={`absolute inset-0 flex items-center justify-center text-[14px] font-bold ${day.isCurrentMonth ? "text-gray-700" : "text-gray-400"}`}
-                      >
-                        {day.date.getDate()}
-                      </span>
-                    </div>
-
-                    {/* Tooltip on Hover */}
-                    <div className="absolute -bottom-16 opacity-0 group-hover:opacity-100 transition-all z-20 bg-gray-900 text-white text-[10px] p-2 rounded shadow-xl whitespace-nowrap pointer-events-none">
-                      P1: {day.periods[0] || "-"} | P2: {day.periods[1] || "-"}{" "}
-                      <br />
-                      P3: {day.periods[2] || "-"} | P4: {day.periods[3] || "-"}
-                    </div>
-                  </div>
-                ))}
-              </div>
+            <div className="lg:col-span-2">
+              <AttendanceCalendar
+                month={calendarMonth}
+                days={calendarDays}
+                onPreviousMonth={goToPreviousMonth}
+                onNextMonth={goToNextMonth}
+              />
             </div>
-
-            {/* Side Section: Quick Stats */}
-            <div className="space-y-6">
-              <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-                <h2 className="text-lg font-bold text-gray-900 mb-4">
-                  Quick Stats
-                </h2>
-                <div className="space-y-4">
-                  {summaries.map((sub) => (
-                    <div
-                      key={sub.courseId}
-                      className="flex justify-between items-center group"
-                    >
-                      <div>
-                        <p className="text-[1rem] font-black text-gray-900 tracking-tight">
-                          {sub.courseCode}
-                        </p>
-                        <p className="text-s text-gray-400">{sub.courseName}</p>
-                      </div>
-                      <span
-                        className={`text-sm font-black ${sub.percentage < 75 ? "text-red-500" : "text-green-500"}`}
-                      >
-                        {sub.percentage.toFixed(0)}%
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
+            <RecentAttendanceList
+              records={attendanceByDate}
+              getCourseById={(id) => MOCK_COURSES.find((c) => c.id === id)}
+            />
           </div>
 
           {/* My Courses Progress Cards */}
@@ -403,131 +230,12 @@ const StudentDashboard = ({ user = MOCK_STUDENT }) => {
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {summaries.map((course) => (
-                <Link
+                <CourseCard
                   key={course.courseId}
+                  course={course}
                   to={`/student/course/${course.courseId}`}
-                  className={`group block bg-white rounded-2xl p-6 border transition-all ${course.percentage < 75 ? "border-red-100 shadow-red-50/50 shadow-md" : "border-gray-100 shadow-sm"}`}
-                >
-                  <div className="flex justify-between items-start mb-4">
-                    <div className="flex items-center space-x-3">
-                      <div
-                        className={`w-10 h-10 rounded-xl flex items-center justify-center ${course.percentage < 75 ? "bg-red-50 text-red-500" : "bg-indigo-50 text-indigo-500"}`}
-                      >
-                        <svg
-                          className="w-5 h-5"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
-                            strokeWidth="2"
-                          />
-                        </svg>
-                      </div>
-                      <div>
-                        <h3 className="text-sm font-bold text-gray-900">
-                          {course.courseName}
-                        </h3>
-                        <p className="text-[10px] text-gray-400 uppercase font-black">
-                          {course.courseCode}
-                        </p>
-                      </div>
-                    </div>
-                    {course.percentage < 75 && (
-                      <span className="text-[10px] font-black text-red-600 bg-red-50 px-2 py-1 rounded border border-red-100 uppercase tracking-tight flex items-center">
-                        <svg
-                          className="w-3 h-3 mr-1"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
-                            strokeWidth="2"
-                          />
-                        </svg>
-                        Low
-                      </span>
-                    )}
-                  </div>
-
-                  <div className="mt-6">
-                    <div className="flex justify-between items-center mb-2">
-                      <span className="text-xs font-bold text-gray-400">
-                        Attendance
-                      </span>
-                      <span
-                        className={`text-sm font-black ${course.percentage < 75 ? "text-red-500" : "text-green-500"}`}
-                      >
-                        {course.percentage.toFixed(1)}%
-                      </span>
-                    </div>
-                    <div className="w-full h-2 bg-gray-100 rounded-full overflow-hidden">
-                      <div
-                        className={`h-full rounded-full transition-all duration-1000 ${course.percentage < 75 ? "bg-red-500" : "bg-green-500"}`}
-                        style={{ width: `${course.percentage}%` }}
-                      />
-                    </div>
-                    <p className="text-[10px] text-gray-400 mt-2 font-medium">
-                      {course.attendedClasses} / {course.totalClasses} classes
-                      attended
-                    </p>
-                  </div>
-
-                  <div className="mt-6 pt-4 border-t border-gray-50 flex items-center space-x-2">
-                    <img
-                      src={`https://i.pravatar.cc/150?u=${course.courseId}`}
-                      className="w-6 h-6 rounded-full border border-gray-100"
-                    />
-                    <span className="text-[10px] font-bold text-gray-500">
-                      Dr. Smith
-                    </span>
-                  </div>
-                </Link>
+                />
               ))}
-            </div>
-          </div>
-          {/* Recent Attendance History (Always at end) */}
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mt-6">
-            <h2 className="text-lg font-bold text-gray-900 mb-4">
-              Recent Attendance History
-            </h2>
-            <div className="space-y-4">
-              {recentHistory.map((rec, i) => {
-                const course = MOCK_COURSES.find((c) => c.id === rec.courseId);
-                return (
-                  <div key={i} className="flex items-center justify-between">
-                    <div className="flex items-center space-x-3">
-                      <div
-                        className={`w-1.5 h-1.5 rounded-full ${rec.status === "PRESENT" ? "bg-green-500" : rec.status === "LATE" ? "bg-orange-500" : "bg-red-500"}`}
-                      />
-                      <div>
-                        <p className="text-[1rem] font-bold text-gray-900">
-                          {course?.name}
-                        </p>
-                        <p className="text-[13px] text-gray-400 uppercase tracking-tighter">
-                          {course?.code}
-                        </p>
-                      </div>
-                    </div>
-                    <div className="text-right">
-                      <p
-                        className={`text-[15px] font-black ${rec.status === "PRESENT" ? "text-green-600" : rec.status === "LATE" ? "text-orange-600" : "text-red-600"}`}
-                      >
-                        {rec.status}
-                      </p>
-                      <p className="text-[13px] text-gray-400">
-                        {new Date(rec.date).toLocaleDateString("en-US", {
-                          month: "short",
-                          day: "numeric",
-                          year: "numeric",
-                        })}
-                      </p>
-                    </div>
-                  </div>
-                );
-              })}
             </div>
           </div>
         </div>
@@ -537,19 +245,5 @@ const StudentDashboard = ({ user = MOCK_STUDENT }) => {
     </>
   );
 };
-
-const StatCard = ({ title, value, icon }) => (
-  <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex justify-between items-center transition-transform hover:translate-y-[-2px]">
-    <div>
-      <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">
-        {title}
-      </p>
-      <p className="text-2xl font-black text-gray-900">{value}</p>
-    </div>
-    <div className="w-12 h-12 rounded-xl bg-gray-50 flex items-center justify-center text-xl shadow-inner border border-gray-100">
-      {icon}
-    </div>
-  </div>
-);
 
 export default StudentDashboard;
