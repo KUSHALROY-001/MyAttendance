@@ -403,9 +403,10 @@ const StudentDashboard = ({ user = MOCK_STUDENT }) => {
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {summaries.map((course) => (
-                <div
+                <Link
                   key={course.courseId}
-                  className={`bg-white rounded-2xl p-6 border transition-all ${course.percentage < 75 ? "border-red-100 shadow-red-50/50 shadow-md" : "border-gray-100 shadow-sm"}`}
+                  to={`/student/course/${course.courseId}`}
+                  className={`group block bg-white rounded-2xl p-6 border transition-all ${course.percentage < 75 ? "border-red-100 shadow-red-50/50 shadow-md" : "border-gray-100 shadow-sm"}`}
                 >
                   <div className="flex justify-between items-start mb-4">
                     <div className="flex items-center space-x-3">
@@ -483,7 +484,7 @@ const StudentDashboard = ({ user = MOCK_STUDENT }) => {
                       Dr. Smith
                     </span>
                   </div>
-                </div>
+                </Link>
               ))}
             </div>
           </div>

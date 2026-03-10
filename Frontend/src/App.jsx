@@ -2,9 +2,10 @@ import "./App.css";
 
 import Home from "./landingPage/Home.jsx";
 import SignUp from "./Login/SignUp.jsx";
-import Login from "./Login/Login.jsx"; 
+import Login from "./Login/Login.jsx";
 import { Routes, Route } from "react-router-dom";
 import StudentDashboard from "./StudentDash/Student.jsx";
+import CourseDetail from "./StudentDash/CourseDetail.jsx";
 
 function App() {
   return (
@@ -13,6 +14,7 @@ function App() {
       <Route path="/login" element={<Login />} />
       <Route path="/signup" element={<SignUp />} />
       <Route path="/student" element={<StudentDashboard />} />
+      <Route path="/student/course/:courseId" element={<CourseDetail />} />
     </Routes>
   );
 }
