@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import Navbar from "../Layout/Navbar.jsx";
-import Footer from "../Layout/Footer.jsx";
+import Navbar from "../Components/Layout/Navbar.js";
+import Footer from "../Components/Layout/Footer.jsx";
 
 const inputClass =
   "block w-full rounded-lg border border-slate-600 bg-slate-900/70 px-3 py-2 text-sm text-slate-50 placeholder:text-slate-500 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/60";
@@ -50,7 +50,6 @@ function SignUp() {
       <main className="flex-1 flex items-center justify-center px-4 py-12">
         {/* Adjusted Container: Takes full width with margin on large screens, max-width keeps it contained */}
         <div className="w-full max-w-md min-[950px]:max-w-4xl rounded-2xl bg-slate-900/60 border border-slate-700 shadow-xl shadow-slate-900/40 backdrop-blur-md p-8 min-[950px]:p-10">
-          
           <div className="mb-8 text-center min-[950px]:mb-10">
             <p className="text-xs font-semibold uppercase tracking-[0.2em] text-indigo-400">
               Get started
@@ -64,8 +63,10 @@ function SignUp() {
           </div>
 
           {/* Form wrapper changed to a CSS Grid */}
-          <form onSubmit={handleSubmit} className="grid grid-cols-1 min-[950px]:grid-cols-2 gap-5 min-[950px]:gap-6">
-            
+          <form
+            onSubmit={handleSubmit}
+            className="grid grid-cols-1 min-[950px]:grid-cols-2 gap-5 min-[950px]:gap-6"
+          >
             {/* 1. Name */}
             <div className="space-y-1.5">
               <label htmlFor="name" className={labelClass}>
@@ -143,20 +144,58 @@ function SignUp() {
                 {/* Internal Grid for sub-fields - Plural items per line on large screens */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 min-[950px]:grid-cols-2 gap-4">
                   <div className="space-y-1.5">
-                    <label htmlFor="rollNumber" className={labelClass}>Roll number</label>
-                    <input id="rollNumber" name="rollNumber" type="text" required className={inputClass} placeholder="e.g., 21CS001" />
+                    <label htmlFor="rollNumber" className={labelClass}>
+                      Roll number
+                    </label>
+                    <input
+                      id="rollNumber"
+                      name="rollNumber"
+                      type="text"
+                      required
+                      className={inputClass}
+                      placeholder="e.g., 21CS001"
+                    />
                   </div>
                   <div className="space-y-1.5">
-                    <label htmlFor="branch" className={labelClass}>Branch</label>
-                    <input id="branch" name="branch" type="text" required className={inputClass} placeholder="e.g., CSE, ECE" />
+                    <label htmlFor="branch" className={labelClass}>
+                      Branch
+                    </label>
+                    <input
+                      id="branch"
+                      name="branch"
+                      type="text"
+                      required
+                      className={inputClass}
+                      placeholder="e.g., CSE, ECE"
+                    />
                   </div>
                   <div className="space-y-1.5">
-                    <label htmlFor="year" className={labelClass}>Year</label>
-                    <input id="year" name="year" type="number" required min={1} max={6} className={inputClass} placeholder="e.g., 1, 2, 3, 4" />
+                    <label htmlFor="year" className={labelClass}>
+                      Year
+                    </label>
+                    <input
+                      id="year"
+                      name="year"
+                      type="number"
+                      required
+                      min={1}
+                      max={6}
+                      className={inputClass}
+                      placeholder="e.g., 1, 2, 3, 4"
+                    />
                   </div>
                   <div className="space-y-1.5">
-                    <label htmlFor="section" className={labelClass}>Section</label>
-                    <input id="section" name="section" type="text" required className={inputClass} placeholder="e.g., A, B" />
+                    <label htmlFor="section" className={labelClass}>
+                      Section
+                    </label>
+                    <input
+                      id="section"
+                      name="section"
+                      type="text"
+                      required
+                      className={inputClass}
+                      placeholder="e.g., A, B"
+                    />
                   </div>
                 </div>
               </div>
@@ -170,12 +209,30 @@ function SignUp() {
                 {/* Internal Grid for Teacher fields */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="space-y-1.5">
-                    <label htmlFor="department" className={labelClass}>Department</label>
-                    <input id="department" name="department" type="text" required className={inputClass} placeholder="e.g., Computer Science" />
+                    <label htmlFor="department" className={labelClass}>
+                      Department
+                    </label>
+                    <input
+                      id="department"
+                      name="department"
+                      type="text"
+                      required
+                      className={inputClass}
+                      placeholder="e.g., Computer Science"
+                    />
                   </div>
                   <div className="space-y-1.5">
-                    <label htmlFor="designation" className={labelClass}>Designation</label>
-                    <input id="designation" name="designation" type="text" required className={inputClass} placeholder="e.g., Assistant Professor" />
+                    <label htmlFor="designation" className={labelClass}>
+                      Designation
+                    </label>
+                    <input
+                      id="designation"
+                      name="designation"
+                      type="text"
+                      required
+                      className={inputClass}
+                      placeholder="e.g., Assistant Professor"
+                    />
                   </div>
                 </div>
               </div>
@@ -202,7 +259,6 @@ function SignUp() {
               Login
             </button>
           </p>
-
         </div>
       </main>
 

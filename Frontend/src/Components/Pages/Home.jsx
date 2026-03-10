@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
-import Navbar from "../layout/Navbar.jsx";
-import Footer from "../layout/Footer.jsx";
+import Navbar from "../Components/Layout/Navbar.js";
+import Footer from "../Components/Layout/Footer.jsx";
 
 function Home() {
   return (
@@ -261,8 +261,7 @@ function Home() {
 
       <Footer />
     </div>
-  )
+  );
 }
 
-export default Home
-
+export default Home;

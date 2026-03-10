@@ -5,12 +5,12 @@ import {
   MOCK_ATTENDANCE,
   MOCK_STUDENT,
   MOCK_TEACHER,
-} from "../mockData";
+} from "../../mockData";
 import Navbar from "../Layout/Navbar";
-import Footer from "../layout/Footer";
-import AttendanceCalendar from "./components/AttendanceCalendar";
-import RecentAttendanceList from "./components/RecentAttendanceList";
-import StatCard from "./components/StatCard";
+import Footer from "../Layout/Footer";
+import AttendanceCalendar from "../UI/AttendanceCalendar";
+import RecentAttendanceList from "../UI/RecentAttendanceList";
+import StatCard from "../UI/StatCard";
 
 const CourseDetail = () => {
   const { courseId } = useParams();

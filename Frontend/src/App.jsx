@@ -4,8 +4,8 @@ import Home from "./landingPage/Home.jsx";
 import SignUp from "./Login/SignUp.jsx";
 import Login from "./Login/Login.jsx";
 import { Routes, Route } from "react-router-dom";
-import StudentDashboard from "./StudentDash/Student.jsx";
-import CourseDetail from "./StudentDash/CourseDetail.jsx";
+import StudentDashboard from "./Components/Pages/Student/StudentDash.jsx";
+import CourseDetail from "./Components/Pages/CourseDetail.jsx";
 
 function App() {
   return (

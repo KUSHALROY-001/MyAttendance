@@ -1,11 +1,11 @@
 import React, { useState, useMemo } from "react";
-import { MOCK_COURSES, MOCK_ATTENDANCE, MOCK_STUDENT } from "../mockData";
-import Navbar from "../Layout/Navbar";
-import Footer from "../layout/Footer";
-import AttendanceCalendar from "./components/AttendanceCalendar";
-import CourseCard from "./components/CourseCard";
-import RecentAttendanceList from "./components/RecentAttendanceList";
-import StatCard from "./components/StatCard";
+import { MOCK_COURSES, MOCK_ATTENDANCE, MOCK_STUDENT } from "../../../mockData";
+import Navbar from "../../Layout/Navbar";
+import Footer from "../../Layout/Footer";
+import AttendanceCalendar from "../../UI/AttendanceCalendar";
+import CourseCard from "../../UI/CourseCard";
+import RecentAttendanceList from "../../UI/RecentAttendanceList";
+import StatCard from "../../UI/StatCard";
 
 const StudentDashboard = ({ user = MOCK_STUDENT }) => {
   const [calendarMonth, setCalendarMonth] = useState(() => {
