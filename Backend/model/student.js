@@ -31,11 +31,11 @@ const studentSchema = new mongoose.Schema(
     contactNumber: {
       type: String,
     },
-    courses: [
-      { type: mongoose.Schema.Types.ObjectId, ref: "Course" },
-    ],
+    courses: [{ type: mongoose.Schema.Types.ObjectId, ref: "Course" }],
   },
-  { timestamps: true },
+  {
+    timestamps: true,
+  },
 );
 
 studentSchema.index({ user: 1 });

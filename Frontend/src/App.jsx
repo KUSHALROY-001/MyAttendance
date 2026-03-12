@@ -1,11 +1,11 @@
 import "./App.css";
 
-import Home from "./landingPage/Home.jsx";
-import SignUp from "./Login/SignUp.jsx";
-import Login from "./Login/Login.jsx";
+import Home from "./Components/Pages/Home.jsx";
+import SignUp from "./Components/Pages/SignUp.jsx";
+import Login from "./Components/Pages/Login.jsx";
 import { Routes, Route } from "react-router-dom";
 import StudentDashboard from "./Components/Pages/Student/StudentDash.jsx";
-import CourseDetail from "./Components/Pages/CourseDetail.jsx";
+import CourseDetail from "./Components/Pages/Student/CourseDetail.jsx";
 
 function App() {
   return (
