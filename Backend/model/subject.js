@@ -13,9 +13,15 @@ const courseSchema = new mongoose.Schema(
       unique: true,
       uppercase: true, // e.g., "BCA-101"
     },
-    department: {
-      type: String,
-      required: true, // e.g., "BCA"
+    info: {
+      department: {
+        type: String,
+        required: true, // e.g., "BCA"
+      },
+      semester: {
+        type: Number,
+        required: true, // e.g., 1 to 8
+      },
     },
     credits: {
       type: Number,

@@ -6,8 +6,6 @@ import {
   MOCK_STUDENT,
   MOCK_TEACHER,
 } from "../../../mockData";
-import Navbar from "../../Layout/Navbar";
-import Footer from "../../Layout/Footer";
 import AttendanceCalendar from "../../UI/AttendanceCalendar";
 import RecentAttendanceList from "../../UI/RecentAttendanceList";
 import StatCard from "../../UI/StatCard";
@@ -118,7 +116,6 @@ const CourseDetail = () => {
   if (!course) {
     return (
       <div className="min-h-screen flex flex-col">
-        <Navbar />
         <main className="flex-1 flex items-center justify-center p-8">
           <div className="text-center">
             <h1 className="text-2xl font-bold">Course not found</h1>
@@ -134,14 +131,12 @@ const CourseDetail = () => {
             </Link>
           </div>
         </main>
-        <Footer />
       </div>
     );
   }
 
   return (
     <>
-      <Navbar />
       <div className="mx-4">
         <div className="max-w-6xl mx-auto space-y-6 animate-fadeIn pb-12">
           <div className="flex items-start justify-between gap-4">
@@ -202,7 +197,6 @@ const CourseDetail = () => {
         </div>
       </div>
 
-      <Footer />
     </>
   );
 };

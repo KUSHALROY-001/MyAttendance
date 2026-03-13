@@ -1,7 +1,6 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
+import axios from "axios";
 import { MOCK_COURSES, MOCK_ATTENDANCE, MOCK_STUDENT } from "../../../mockData";
-import Navbar from "../../Layout/Navbar";
-import Footer from "../../Layout/Footer";
 import AttendanceCalendar from "../../UI/AttendanceCalendar";
 import CourseCard from "../../UI/CourseCard";
 import RecentAttendanceList from "../../UI/RecentAttendanceList";
@@ -110,18 +109,31 @@ const StudentDashboard = ({ user = MOCK_STUDENT }) => {
 
   const safeUserName = user?.name ? user.name.split(" ")[0] : "Student";
 
+  const [stuData, setStuData] = useState({});
+
+  useEffect(() => {
+    axios
+      .get("/api/student/dashboard/BCA-002")
+      .then((res) => {
+        setStuData(res.data);
+        console.log(res.data);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }, []);
+
   return (
     <>
-      <Navbar />
       <div className="mx-4">
         <div className="max-w-6xl mx-auto space-y-6 animate-fadeIn pb-12">
           {/* Header */}
           <div className="mb-4">
             <h1 className="text-3xl font-bold text-gray-900">
-              Welcome back, {safeUserName}
+              Welcome back, {stuData.user?.name}
             </h1>
             <p className="text-gray-500 font-medium text-sm mt-1">
-              Enrollment: {enrollmentNo} • {department} • {semester}
+              Enrollment: {stuData.rollNumber} • {stuData.branch} • {stuData.year}
             </p>
           </div>
 
@@ -240,8 +252,6 @@ const StudentDashboard = ({ user = MOCK_STUDENT }) => {
           </div>
         </div>
       </div>
-
-      <Footer />
     </>
   );
 };

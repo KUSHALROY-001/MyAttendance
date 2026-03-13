@@ -26,7 +26,7 @@ function Navbar() {
           <Link to="/" href="#about" className="hover:text-indigo-600">
             About
           </Link>
-          <Link to="/" href="#cta" className="hover:text-indigo-600">
+          <Link to="/student" className="hover:text-indigo-600">
             Get Started
           </Link>
         </div>
@@ -43,4 +43,3 @@ function Navbar() {
 }
 
 export default Navbar;
-

@@ -1,7 +1,5 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import Navbar from "../Layout/Navbar.jsx";
-import Footer from "../Layout/Footer.jsx";
 
 const inputClass =
   "block w-full rounded-lg border border-slate-600 bg-slate-900/70 px-3 py-2 text-sm text-slate-50 placeholder:text-slate-500 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/60";
@@ -45,7 +43,6 @@ function SignUp() {
 
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
-      <Navbar />
 
       <main className="flex-1 flex items-center justify-center px-4 py-12">
         {/* Adjusted Container: Takes full width with margin on large screens, max-width keeps it contained */}
@@ -262,7 +259,6 @@ function SignUp() {
         </div>
       </main>
 
-      <Footer />
     </div>
   );
 }

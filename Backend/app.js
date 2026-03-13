@@ -23,12 +23,12 @@ app.get("/api", function (req, res) {
 });
 
 app.get("/api/student/dashboard/:roll", async (req, res) => {
-  console.log(req.params);
   const { roll } = req.params;
-  console.log("Fetching dashboard for roll number:", roll);
+  console.log(roll);
   const studentData = await Student.findOne({ rollNumber: roll }).populate(
     "courses",
-  );
+    "name code",
+  ).populate("user", "name email").populate("attendance", "date status");
 
   if (!studentData) {
     return res.status(404).json({ message: "Student not found" });

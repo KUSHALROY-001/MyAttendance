@@ -32,6 +32,7 @@ const studentSchema = new mongoose.Schema(
       type: String,
     },
     courses: [{ type: mongoose.Schema.Types.ObjectId, ref: "Course" }],
+    attendance: [{ type: mongoose.Schema.Types.ObjectId, ref: "Attendance" }],
   },
   {
     timestamps: true,

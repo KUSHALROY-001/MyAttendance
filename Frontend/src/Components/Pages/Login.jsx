@@ -1,6 +1,4 @@
 import { useNavigate } from "react-router-dom";
-import Navbar from "../Layout/Navbar.jsx";
-import Footer from "../Layout/Footer.jsx";
 
 function Login() {
   const navigate = useNavigate();
@@ -13,7 +11,6 @@ function Login() {
 
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
-      <Navbar />
 
       <main className="flex-1 flex items-center justify-center px-4">
         <div className="w-full max-w-md rounded-2xl bg-slate-900/60 border border-slate-700 shadow-xl shadow-slate-900/40 backdrop-blur-md p-8">
@@ -87,7 +84,6 @@ function Login() {
         </div>
       </main>
 
-      <Footer />
     </div>
   );
 }
