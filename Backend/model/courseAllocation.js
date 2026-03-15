@@ -35,8 +35,6 @@ const courseAllocationSchema = new mongoose.Schema(
 
 // A teacher cannot be assigned the exact same subject for the exact same section twice
 courseAllocationSchema.index(
-  { teacher: 1, course: 1, department: 1, semester: 1, section: 1 },
-  { unique: true },
-);
+  { teacher: 1, course: 1, department: 1, semester: 1, section: 1 });
 
 module.exports = mongoose.model("CourseAllocation", courseAllocationSchema);

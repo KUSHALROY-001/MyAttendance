@@ -31,6 +31,13 @@ const attendanceSchema = new mongoose.Schema(
 );
 
 // Prevent taking attendance twice for the exact same class on the exact same day
-attendanceSchema.index({ courseAllocation: 1, date: -1 }, { unique: true });
+// .index() is used to create an index on the specified fields which helps to query the data faster
+// { courseAllocation: 1, date: -1 } means that the index will be created on the courseAllocation field in ascending order and on the date field in descending order
+// { unique: true } means that the index will be unique
+attendanceSchema.index({ courseAllocation: 1, date: -1 });
+
+// Make searching for a specific student's attendance history lightning fast
+attendanceSchema.index({ "records.student": 1 });
+// Search - Attendance.find({ "records.student": studentId })
 
 module.exports = mongoose.model("Attendance", attendanceSchema);

@@ -4,6 +4,7 @@ import { MOCK_COURSES, MOCK_ATTENDANCE, MOCK_STUDENT } from "../../../mockData";
 import AttendanceCalendar from "../../UI/AttendanceCalendar";
 import CourseCard from "../../UI/CourseCard";
 import RecentAttendanceList from "../../UI/RecentAttendanceList";
+import QuickStats from "../../UI/QuickStats";
 import StatCard from "../../UI/StatCard";
 
 const StudentDashboard = ({ user = MOCK_STUDENT }) => {
@@ -133,7 +134,8 @@ const StudentDashboard = ({ user = MOCK_STUDENT }) => {
               Welcome back, {stuData.user?.name}
             </h1>
             <p className="text-gray-500 font-medium text-sm mt-1">
-              Enrollment: {stuData.rollNumber} • {stuData.branch} • {stuData.year}
+              Enrollment: {stuData.rollNumber} • {stuData.department} •{" "}
+              {stuData.batch}
             </p>
           </div>
 
@@ -204,7 +206,7 @@ const StudentDashboard = ({ user = MOCK_STUDENT }) => {
             />
             <StatCard
               title="ENROLLED COURSES"
-              value={summaries.length.toString()}
+              value={stuData.courses?.length}
               icon="📚"
             />
             <StatCard
@@ -229,10 +231,7 @@ const StudentDashboard = ({ user = MOCK_STUDENT }) => {
                 onNextMonth={goToNextMonth}
               />
             </div>
-            <RecentAttendanceList
-              records={attendanceByDate}
-              getCourseById={(id) => MOCK_COURSES.find((c) => c.id === id)}
-            />
+            <QuickStats summaries={summaries} />
           </div>
 
           {/* My Courses Progress Cards */}
@@ -250,6 +249,10 @@ const StudentDashboard = ({ user = MOCK_STUDENT }) => {
               ))}
             </div>
           </div>
+          <RecentAttendanceList
+            records={attendanceByDate}
+            getCourseById={(id) => MOCK_COURSES.find((c) => c.id === id)}
+          />
         </div>
       </div>
     </>

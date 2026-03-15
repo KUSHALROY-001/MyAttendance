@@ -3,7 +3,8 @@ const dotenv = require("dotenv");
 const path = require("path");
 const bcrypt = require("bcryptjs");
 const connectDB = require("./config/db");
-const { Student } = require("./model");
+const { Student, Attendance } = require("./model");
+const { log } = require("console");
 
 // Load environment variables (looks for .env in project root)
 dotenv.config({ path: path.resolve(__dirname, "../.env") });
@@ -25,16 +26,98 @@ app.get("/api", function (req, res) {
 app.get("/api/student/dashboard/:roll", async (req, res) => {
   const { roll } = req.params;
   console.log(roll);
-  const studentData = await Student.findOne({ rollNumber: roll }).populate(
-    "courses",
-    "name code",
-  ).populate("user", "name email").populate("attendance", "date status");
+  let studentData = await Student.findOne({ rollNumber: roll }, { createdAt: 0, updatedAt: 0, __v: 0 })
+    .populate("courses", "-_id name code") //In Mongoose, when you are selecting fields or populating, you can put a minus sign (-) in front of a field name to forcefully exclude it
+    .populate("user", "-_id name email");
 
   if (!studentData) {
     return res.status(404).json({ message: "Student not found" });
-  } else {
-    return res.status(200).json(studentData);
   }
+
+  // Find all attendance documents for this specific student
+  const attendances = await Attendance.find({
+    "records.student": studentData._id,
+  }).populate({
+    path: "courseAllocation",
+    select: "-_id course teacher", // Only bring in course and teacher IDs from CourseAllocation
+    populate: [
+      { path: "course", select: "-_id name code" }, // Only bring in name and code from Course
+      { path: "teacher", select: "-_id user", populate: { path: "user", select: "-_id name" } } // Assuming teacher has a name, adjust if needed
+    ]
+  });
+
+  studentData = studentData.toObject();
+
+  // Create an object to track totals for each course
+  const courseStatsMap = {};
+
+  // Initialize stats for every course the student is officially enrolled in
+  if (studentData.courses) {
+    studentData.courses.forEach((c) => {
+      courseStatsMap[c.code] = {
+        courseId: c.code, // Frontend uses course code or DB id, we'll use code for easier mapping
+        courseCode: c.code,
+        courseName: c.name,
+        totalClasses: 0,
+        attendedClasses: 0,
+      };
+    });
+  }
+
+  // Create a clean attendance array for the frontend with only this student's status
+  studentData.attendance = attendances.map((att) => {
+    const myRecord = att.records.find(
+      (r) => r.student.toString() === studentData._id.toString(),
+    );
+    
+    const status = myRecord ? myRecord.status : "Absent";
+    const courseCode = att.courseAllocation?.course?.code;
+
+    // Build the course statistics
+    if (courseCode) {
+      if (!courseStatsMap[courseCode]) {
+        // If they attended a class they aren't fully enrolled in, track it anyway
+        courseStatsMap[courseCode] = {
+          courseId: courseCode,
+          courseCode: courseCode,
+          courseName: att.courseAllocation?.course?.name || "Unknown",
+          totalClasses: 0,
+          attendedClasses: 0,
+        };
+      }
+      
+      courseStatsMap[courseCode].totalClasses += 1;
+      
+      if (status === "Present" || status === "Late") {
+        courseStatsMap[courseCode].attendedClasses += 1;
+      }
+    }
+
+    return {
+      date: att.date,
+      teacher: {
+        name: att.courseAllocation?.teacher?.user?.name || "Unknown Teacher",
+      },
+      course: {
+        name: att.courseAllocation?.course?.name || "Unknown Course",
+        code: courseCode || "Unknown Code",
+      },
+      status: status, // Only send this student's status
+    };
+  });
+
+  // Calculate the final percentage exactly as the frontend expects
+  studentData.summaries = Object.values(courseStatsMap).map((stat) => { //Object.values() is a built-in Javascript tool that takes an object, rips off all the outer keys (like "BCA-101" and "BCA-102"), and turns everything inside into a clean Array.
+    return {
+      ...stat,
+      percentage: stat.totalClasses > 0 ? (stat.attendedClasses / stat.totalClasses) * 100 : 0
+    };
+  });
+
+  // Final cleanup: remove internal DB IDs before sending to frontend
+  delete studentData._id;
+
+  return res.status(200).json(studentData);
 });
 
 const PORT = process.env.PORT || 8080;

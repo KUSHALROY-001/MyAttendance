@@ -45,7 +45,7 @@ const AttendanceCircle = ({ periods }) => {
         stroke="white"
         strokeWidth="2"
       />
-      <circle cx="50" cy="50" r="12" fill="white" />
+      <circle cx="50" cy="50" r="30" fill="white" />
     </svg>
   );
 };

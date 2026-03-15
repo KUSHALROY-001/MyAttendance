@@ -39,6 +39,6 @@ const studentSchema = new mongoose.Schema(
   },
 );
 
-studentSchema.index({ user: 1 });
+studentSchema.index({ user: 1 });  // This line is used to find the student by user id which is very fast
 
 module.exports = mongoose.model("Student", studentSchema);
