@@ -54,3 +54,96 @@ const generateMockAttendance = () => {
 };
 
 export const MOCK_ATTENDANCE = generateMockAttendance();
+
+// --- Teacher Dashboard Mock Data ---
+export const MOCK_TEACHER_SCHEDULE = [
+  {
+    id: "ts1",
+    time: "11:30 AM - 01:00 PM",
+    courseId: "c2",
+    courseName: "Data Structure",
+    section: "BCA SEM 2 Section B",
+    room: "Room 101",
+    type: "class"
+  },
+  {
+    id: "ts2",
+    time: "01:00 PM - 02:00 PM",
+    courseId: "c2",
+    courseName: "Data Structure",
+    section: "BCA SEM 2 Section A",
+    room: "Room 102",
+    type: "class"
+  },
+  {
+    id: "ts3",
+    time: "02:00 PM - 02:50 PM",
+    type: "free"
+  },
+  {
+    id: "ts4",
+    time: "02:50 PM - 03:40 PM",
+    type: "free"
+  },
+  {
+    id: "ts5",
+    time: "03:40 PM - 04:30 PM",
+    courseId: "l1",
+    courseName: "Lab Session",
+    section: "BCA SEM 2 Section B",
+    room: "Lab 1",
+    type: "lab"
+  },
+  {
+    id: "ts6",
+    time: "04:30 PM - 05:20 PM",
+    type: "free"
+  }
+];
+
+export const MOCK_TEACHER_TIMETABLE = {
+  "11:30 AM - 01:00 PM": {
+    "Monday": { name: "Data Structure", section: "BCA SEM 2 Section B", room: "Room 101", color: "bg-red-50" },
+    "Wednesday": { name: "Data Structure", section: "BCA SEM 2 Section B", room: "Room 101", color: "bg-yellow-50" },
+    "Friday": { name: "Data Structure", section: "BCA SEM 2 Section A", room: "Room 101", color: "bg-indigo-50" }
+  },
+  "01:00 PM - 02:00 PM": {
+    "Monday": { name: "Data Structure", section: "BCA SEM 2 Section A", room: "Room 102", color: "bg-red-50" },
+    "Thursday": { name: "Data Structure", section: "BCA SEM 2 Section B", room: "Room 101", color: "bg-green-50" },
+    "Saturday": { name: "Tutorial", section: "BCA SEM 2 All Sections", room: "Room 201", color: "bg-purple-50" }
+  },
+  "02:00 PM - 02:50 PM": {
+    "Tuesday": { name: "Data Structure", section: "BCA SEM 2 Section B", room: "Room 101", color: "bg-orange-50" },
+    "Friday": { name: "Data Structure", section: "BCA SEM 2 Section B", room: "Room 103", color: "bg-indigo-50" }
+  },
+  "02:50 PM - 03:40 PM": {
+    "Wednesday": { name: "Lab Session", section: "BCA SEM 2 Section A", room: "Lab 2", color: "bg-yellow-50", colSpan: 2 }
+  },
+  "03:40 PM - 04:30 PM": {
+    "Monday": { name: "Lab Session", section: "BCA SEM 2 Section B", room: "Lab 1", color: "bg-red-50" },
+    "Tuesday": { name: "Data Structure", section: "BCA SEM 2 Section A", room: "Room 103", color: "bg-orange-50" },
+    "Friday": { name: "Lab Session", section: "Combined Lab", room: "Lab 1", color: "bg-indigo-50", colSpan: 2 }
+  },
+  "04:30 PM - 05:20 PM": {
+    "Thursday": { name: "Data Structure", section: "BCA SEM 2 Section A", room: "Room 102", color: "bg-green-50" }
+  }
+};
+
+export const MOCK_TEACHER_COURSES = [
+  {
+    id: "tc1",
+    name: "Operating System",
+    code: "CS202",
+    department: "Computer Science",
+    semester: "Sem 2",
+    classesConducted: 0
+  },
+  {
+    id: "tc2",
+    name: "Data Structure",
+    code: "CS201",
+    department: "Computer Science",
+    semester: "Sem 2",
+    classesConducted: 5
+  }
+];
