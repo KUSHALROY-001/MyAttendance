@@ -1,41 +1,51 @@
-import React, { useMemo, useState } from "react";
-import { Link, useParams } from "react-router-dom";
-import {
-  MOCK_COURSES,
-  MOCK_ATTENDANCE,
-  MOCK_STUDENT,
-  MOCK_TEACHER,
-} from "../../../mockData";
+import React, { useMemo, useState, useEffect } from "react";
+import { Link, useParams, useLocation } from "react-router-dom";
+import axios from "axios";
 import AttendanceCalendar from "../../UI/AttendanceCalendar";
 import RecentAttendanceList from "../../UI/RecentAttendanceList";
 import StatCard from "../../UI/StatCard";
 
 const CourseDetail = () => {
   const { courseId } = useParams();
-  const userId = MOCK_STUDENT.id;
+  const location = useLocation();
+  const [stuData, setStuData] = useState(location.state?.user || null);
 
-  const course = useMemo(
-    () => MOCK_COURSES.find((c) => c.id === courseId),
-    [courseId],
-  );
+  useEffect(() => {
+    if (!stuData) {
+      axios
+        .get("/api/student/dashboard/BCA-002")
+        .then((res) => {
+          setStuData(res.data);
+        })
+        .catch((err) =>
+          console.error("Error fetching fallback student data", err),
+        );
+    }
+  }, [stuData]);
 
-  const teacher = useMemo(() => {
-    if (!course) return null;
-    return MOCK_TEACHER.id === course.teacherId ? MOCK_TEACHER : null;
-  }, [course]);
+  const courseSummary = useMemo(() => {
+    return stuData?.summaries?.find((c) => c.courseId === courseId) || null;
+  }, [stuData, courseId]);
 
   const courseRecords = useMemo(() => {
-    if (!course) return [];
-    return MOCK_ATTENDANCE.filter(
-      (r) => r.courseId === course.id && r.studentId === userId,
-    );
-  }, [course, userId]);
+    if (!stuData?.attendance) return [];
+    return stuData.attendance.filter((r) => r.course.code === courseId);
+  }, [stuData, courseId]);
+
+  const teacher = useMemo(() => {
+    if (courseRecords.length > 0 && courseRecords[0].teacher) {
+      return courseRecords[0].teacher;
+    }
+    return { name: "Instructor" };
+  }, [courseRecords]);
 
   const attendanceByDate = useMemo(() => {
     const byDate = {};
     courseRecords.forEach((rec) => {
-      if (!byDate[rec.date]) byDate[rec.date] = [];
-      byDate[rec.date].push(rec);
+      const dateObj = new Date(rec.date);
+      const dateStr = dateObj.toISOString().split("T")[0];
+      if (!byDate[dateStr]) byDate[dateStr] = [];
+      byDate[dateStr].push(rec);
     });
     return byDate;
   }, [courseRecords]);
@@ -51,9 +61,13 @@ const CourseDetail = () => {
 
     dates.forEach((date) => {
       const records = attendanceByDate[date];
-      const hasAbsent = records.some((r) => r.status === "ABSENT");
+      const hasAbsent = records.some(
+        (r) => r.status.toUpperCase() === "ABSENT",
+      );
       const hasPresent = records.some(
-        (r) => r.status === "PRESENT" || r.status === "LATE",
+        (r) =>
+          r.status.toUpperCase() === "PRESENT" ||
+          r.status.toUpperCase() === "LATE",
       );
       if (hasAbsent) absentDays += 1;
       else if (hasPresent) presentDays += 1;
@@ -95,10 +109,12 @@ const CourseDetail = () => {
       const dStr = d.toISOString().split("T")[0];
       const dayRecords = attendanceByDate[dStr] || [];
       const periods = [null, null, null, null];
-      dayRecords.forEach((rec) => {
-        const pNum = parseInt(rec.sessionId.split("-").pop() || "1");
-        if (pNum >= 1 && pNum <= 4) periods[pNum - 1] = rec.status;
+
+      // Assign periods sequentially up to 4 like in dash
+      dayRecords.slice(0, 4).forEach((rec, index) => {
+        periods[index] = rec.status.toUpperCase();
       });
+
       days.push({ date: d, periods, isCurrentMonth: d.getMonth() === month });
     }
     return days;
@@ -113,7 +129,15 @@ const CourseDetail = () => {
       (prev) => new Date(prev.getFullYear(), prev.getMonth() + 1, 1),
     );
 
-  if (!course) {
+  if (!stuData) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
+      </div>
+    );
+  }
+
+  if (!courseSummary) {
     return (
       <div className="min-h-screen flex flex-col">
         <main className="flex-1 flex items-center justify-center p-8">
@@ -142,10 +166,10 @@ const CourseDetail = () => {
           <div className="flex items-start justify-between gap-4">
             <div>
               <h1 className="text-3xl font-bold text-gray-900">
-                {course.name}
+                {courseSummary.courseName}
               </h1>
               <p className="text-gray-500 font-medium text-sm mt-1">
-                {course.code} • {teacher?.name ?? "Instructor"}
+                {courseSummary.courseCode} • {teacher?.name ?? "Instructor"}
               </p>
             </div>
             <Link
@@ -189,14 +213,10 @@ const CourseDetail = () => {
               />
             </div>
 
-            <RecentAttendanceList
-              records={attendanceByDate}
-              getCourseById={(id) => MOCK_COURSES.find((c) => c.id === id)}
-            />
+            <RecentAttendanceList records={attendanceByDate} />
           </div>
         </div>
       </div>
-
     </>
   );
 };

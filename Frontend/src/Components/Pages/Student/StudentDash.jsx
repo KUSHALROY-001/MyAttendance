@@ -1,51 +1,54 @@
 import React, { useState, useMemo, useEffect } from "react";
 import axios from "axios";
-import { MOCK_COURSES, MOCK_ATTENDANCE, MOCK_STUDENT } from "../../../mockData";
+import { useLocation } from "react-router-dom";
 import AttendanceCalendar from "../../UI/AttendanceCalendar";
 import CourseCard from "../../UI/CourseCard";
 import RecentAttendanceList from "../../UI/RecentAttendanceList";
 import QuickStats from "../../UI/QuickStats";
 import StatCard from "../../UI/StatCard";
 
-const StudentDashboard = ({ user = MOCK_STUDENT }) => {
+const StudentDashboard = () => {
+  const location = useLocation();
+  const [stuData, setStuData] = useState(location.state?.user || null);
+
   const [calendarMonth, setCalendarMonth] = useState(() => {
     const today = new Date();
     return new Date(today.getFullYear(), today.getMonth(), 1);
   });
 
-  const userId = user?.id ?? "s1";
-  const isMockUser = userId === "s1";
+  useEffect(() => {
+    if (!stuData) {
+      axios
+        .get("/api/student/dashboard/BCA-002")
+        .then((res) => {
+          setStuData(res.data);
+        })
+        .catch((err) => {
+          console.error("Error fetching fallback student data", err);
+        });
+    }
+  }, [stuData]);
 
   const summaries = useMemo(() => {
-    return MOCK_COURSES.filter((c) =>
-      isMockUser ? c.studentIds.includes(userId) : true,
-    ).map((course) => {
-      const courseRecords = MOCK_ATTENDANCE.filter(
-        (r) => r.courseId === course.id && r.studentId === userId,
-      );
-      const attended = courseRecords.filter(
-        (r) => r.status === "PRESENT" || r.status === "LATE",
-      ).length;
-      const total = Math.max(courseRecords.length, 12); // Minimum sessions for UI density
-      return {
-        courseId: course.id,
-        courseCode: course.code,
-        courseName: course.name,
-        totalClasses: total,
-        attendedClasses: attended,
-        percentage: (attended / total) * 100,
-      };
-    });
-  }, [userId, isMockUser]);
+    return stuData?.summaries || [];
+  }, [stuData]);
 
   const attendanceByDate = useMemo(() => {
     const map = {};
-    MOCK_ATTENDANCE.filter((r) => r.studentId === userId).forEach((rec) => {
-      if (!map[rec.date]) map[rec.date] = [];
-      map[rec.date].push(rec);
+    if (!stuData?.attendance) return map;
+
+    // Group records by ISO date
+    stuData.attendance.forEach((rec) => {
+      // Create a clean date string in local YYYY-MM-DD
+      const dateObj = new Date(rec.date);
+      // We assume date comes back closely matching ISO formats without timezone shifts breaking days
+      const dateStr = dateObj.toISOString().split("T")[0];
+
+      if (!map[dateStr]) map[dateStr] = [];
+      map[dateStr].push(rec);
     });
     return map;
-  }, [userId]);
+  }, [stuData]);
 
   const calendarDays = useMemo(() => {
     const year = calendarMonth.getFullYear();
@@ -74,10 +77,12 @@ const StudentDashboard = ({ user = MOCK_STUDENT }) => {
       const dStr = d.toISOString().split("T")[0];
       const dayRecords = attendanceByDate[dStr] || [];
       const periods = [null, null, null, null];
-      dayRecords.forEach((rec) => {
-        const pNum = parseInt(rec.sessionId.split("-").pop() || "1");
-        if (pNum >= 1 && pNum <= 4) periods[pNum - 1] = rec.status;
+
+      // Since backend doesn't provide explicit P1/P2/P3/P4, we assign them sequentially up to 4
+      dayRecords.slice(0, 4).forEach((rec, index) => {
+        periods[index] = rec.status.toUpperCase();
       });
+
       days.push({ date: d, periods, isCurrentMonth: d.getMonth() === month });
     }
     return days;
@@ -92,10 +97,9 @@ const StudentDashboard = ({ user = MOCK_STUDENT }) => {
       (prev) => new Date(prev.getFullYear(), prev.getMonth() + 1, 1),
     );
 
-  // Derived user details for the header UI (simulated fallback)
-  const enrollmentNo = user.enrollmentNo || "006CSE2024";
-  const department = user.department || "Computer Science";
-  const semester = user.semester || "Semester 2";
+  const enrollmentNo = stuData?.rollNumber || "Loading...";
+  const department = stuData?.department || "Loading...";
+  const semester = stuData?.batch || "Loading...";
 
   const lowAttendanceSubjects = summaries.filter((s) => s.percentage < 75);
   const overallAttended = summaries.reduce(
@@ -108,34 +112,28 @@ const StudentDashboard = ({ user = MOCK_STUDENT }) => {
   );
   const overallPercentage = (overallAttended / overallTotal) * 100;
 
-  const safeUserName = user?.name ? user.name.split(" ")[0] : "Student";
+  const safeUserName = stuData?.user?.name
+    ? stuData.user.name.split(" ")[0]
+    : "Student";
 
-  const [stuData, setStuData] = useState({});
-
-  useEffect(() => {
-    axios
-      .get("/api/student/dashboard/BCA-002")
-      .then((res) => {
-        setStuData(res.data);
-        console.log(res.data);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  }, []);
+  if (!stuData) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
+      </div>
+    );
+  }
 
   return (
     <>
       <div className="mx-4">
         <div className="max-w-6xl mx-auto space-y-6 animate-fadeIn pb-12">
-          {/* Header */}
           <div className="mb-4">
             <h1 className="text-3xl font-bold text-gray-900">
-              Welcome back, {stuData.user?.name}
+              Welcome back, {safeUserName}
             </h1>
             <p className="text-gray-500 font-medium text-sm mt-1">
-              Enrollment: {stuData.rollNumber} • {stuData.department} •{" "}
-              {stuData.batch}
+              Enrollment: {enrollmentNo} • {department} • {semester}
             </p>
           </div>
 
@@ -245,14 +243,12 @@ const StudentDashboard = ({ user = MOCK_STUDENT }) => {
                   key={course.courseId}
                   course={course}
                   to={`/student/course/${course.courseId}`}
+                  state={{ user: stuData }}
                 />
               ))}
             </div>
           </div>
-          <RecentAttendanceList
-            records={attendanceByDate}
-            getCourseById={(id) => MOCK_COURSES.find((c) => c.id === id)}
-          />
+          <RecentAttendanceList records={attendanceByDate} />
         </div>
       </div>
     </>

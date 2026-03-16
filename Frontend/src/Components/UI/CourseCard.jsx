@@ -1,12 +1,13 @@
 import React from "react";
 import { Link } from "react-router-dom";
 
-const CourseCard = ({ course, to }) => {
+const CourseCard = ({ course, to, state }) => {
   const isLow = course.percentage < 75;
 
   return (
     <Link
       to={to}
+      state={state}
       className={`group block bg-white rounded-2xl p-6 border transition-all ${
         isLow
           ? "border-red-100 shadow-red-50/50 shadow-md"

@@ -1,13 +1,13 @@
 import React from "react";
 
 const getStatus = (records) => {
-  if (records.some((r) => r.status === "ABSENT")) return "ABSENT";
-  if (records.some((r) => r.status === "PRESENT" || r.status === "LATE"))
+  if (records.some((r) => r.status === "Absent")) return "ABSENT";
+  if (records.some((r) => r.status === "Present" || r.status === "Late"))
     return "PRESENT";
   return "NO CLASS";
 };
 
-const RecentAttendanceList = ({ records, getCourseById }) => {
+const RecentAttendanceList = ({ records }) => {
   const sortedDates = Object.keys(records).sort(
     (a, b) => new Date(b).getTime() - new Date(a).getTime(),
   );
@@ -21,9 +21,7 @@ const RecentAttendanceList = ({ records, getCourseById }) => {
         {sortedDates.slice(0, 10).map((date) => {
           const dateRecords = records[date] || [];
           const status = getStatus(dateRecords);
-          const course = getCourseById
-            ? getCourseById(dateRecords[0]?.courseId)
-            : null;
+          const course = dateRecords[0]?.course || null;
 
           return (
             <div key={date} className="flex items-center justify-between">
