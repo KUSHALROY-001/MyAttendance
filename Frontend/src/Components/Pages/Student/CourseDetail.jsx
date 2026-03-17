@@ -1,9 +1,9 @@
 import React, { useMemo, useState, useEffect } from "react";
 import { Link, useParams, useLocation } from "react-router-dom";
 import axios from "axios";
-import AttendanceCalendar from "../../UI/AttendanceCalendar";
-import RecentAttendanceList from "../../UI/RecentAttendanceList";
-import StatCard from "../../UI/StatCard";
+import AttendanceCalendar from "./Component/AttendanceCalendar";
+import RecentAttendanceList from "./Component/RecentAttendanceList";
+import StatCard from "./Component/StatCard";
 
 const CourseDetail = () => {
   const { courseId } = useParams();

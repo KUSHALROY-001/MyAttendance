@@ -1,5 +1,3 @@
-import React from "react";
-
 const AttendanceCircle = ({ periods }) => {
   const getColor = (status) => {
     switch (status) {

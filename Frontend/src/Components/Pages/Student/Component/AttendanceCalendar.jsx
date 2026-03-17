@@ -1,4 +1,3 @@
-import React from "react";
 import AttendanceCircle from "./AttendanceCircle";
 
 const WEEKDAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];

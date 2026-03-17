@@ -1,5 +1,3 @@
-import React from "react";
-
 const QuickStats = ({ summaries }) => {
   return (
     <div className="lg:col-span-1 bg-white rounded-2xl shadow-sm border border-gray-100 p-6 flex flex-col h-full">
@@ -8,7 +6,10 @@ const QuickStats = ({ summaries }) => {
         {summaries.map((subject, idx) => {
           const isLow = subject.percentage < 75;
           return (
-            <div key={idx} className="flex justify-between items-center transition-all hover:bg-gray-50 -mx-2 px-2 py-1 rounded-lg">
+            <div
+              key={idx}
+              className="flex justify-between items-center transition-all hover:bg-gray-50 -mx-2 px-2 py-1 rounded-lg"
+            >
               <div>
                 <p className="text-[15px] font-bold text-gray-900 leading-tight mb-1">
                   {subject.courseCode}

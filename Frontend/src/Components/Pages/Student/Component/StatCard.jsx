@@ -1,5 +1,3 @@
-import React from "react";
-
 const StatCard = ({ title, value, icon }) => (
   <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex justify-between items-center transition-transform hover:translate-y-[-2px]">
     <div>

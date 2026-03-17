@@ -1,5 +1,3 @@
-import React from "react";
-
 const getStatus = (records) => {
   if (records.some((r) => r.status === "Absent")) return "ABSENT";
   if (records.some((r) => r.status === "Present" || r.status === "Late"))

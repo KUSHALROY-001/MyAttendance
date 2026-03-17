@@ -1,6 +1,6 @@
 import React from "react";
 
-const TeacherHeader = ({ teacherName }) => {
+const TeacherHeader = ({ teacherName, onStartAttendance }) => {
   return (
     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-2">
       <div>
@@ -11,7 +11,10 @@ const TeacherHeader = ({ teacherName }) => {
           Manage your classes and track attendance
         </p>
       </div>
-      <button className="inline-flex items-center justify-center rounded-lg bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-indigo-700 transition shadow-sm">
+      <button 
+        onClick={onStartAttendance}
+        className="inline-flex items-center justify-center rounded-lg bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-indigo-700 transition shadow-sm"
+      >
         <svg
           className="w-4 h-4 mr-2"
           fill="none"

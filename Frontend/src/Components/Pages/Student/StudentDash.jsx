@@ -1,11 +1,11 @@
 import React, { useState, useMemo, useEffect } from "react";
 import axios from "axios";
 import { useLocation } from "react-router-dom";
-import AttendanceCalendar from "../../UI/AttendanceCalendar";
-import CourseCard from "../../UI/CourseCard";
-import RecentAttendanceList from "../../UI/RecentAttendanceList";
-import QuickStats from "../../UI/QuickStats";
-import StatCard from "../../UI/StatCard";
+import AttendanceCalendar from "./Component/AttendanceCalendar";
+import CourseCard from "./Component/CourseCard";
+import RecentAttendanceList from "./Component/RecentAttendanceList";
+import QuickStats from "./Component/QuickStats";
+import StatCard from "./Component/StatCard";
 
 const StudentDashboard = () => {
   const location = useLocation();

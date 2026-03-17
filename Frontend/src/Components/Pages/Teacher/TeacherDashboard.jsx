@@ -5,6 +5,7 @@ import TodaysClasses from "./components/TodaysClasses";
 import WeeklySchedule from "./components/WeeklySchedule";
 import AttendanceSessions from "./components/AttendanceSessions";
 import TeacherCourses from "./components/TeacherCourses";
+import StartAttendanceModal from "./components/StartAttendanceModal";
 import {
   MOCK_TEACHER,
   MOCK_TEACHER_SCHEDULE,
@@ -13,6 +14,8 @@ import {
 } from "../../../mockData";
 
 const TeacherDashboard = () => {
+  const [isModalOpen, setIsModalOpen] = React.useState(false);
+
   const teacherName = useMemo(() => {
     return MOCK_TEACHER.name ? MOCK_TEACHER.name.replace("Dr. ", "") : "Teacher";
   }, []);
@@ -20,7 +23,10 @@ const TeacherDashboard = () => {
   return (
     <div className="mx-4">
       <div className="max-w-6xl mx-auto space-y-6 animate-fadeIn pb-12 mt-6">
-        <TeacherHeader teacherName={teacherName} />
+        <TeacherHeader 
+          teacherName={teacherName} 
+          onStartAttendance={() => setIsModalOpen(true)} 
+        />
 
         <div className="grid grid-cols-1 gap-6">
           <TodaysClasses classes={MOCK_TEACHER_SCHEDULE} />
@@ -37,6 +43,11 @@ const TeacherDashboard = () => {
           </div>
         </div>
       </div>
+
+      <StartAttendanceModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+      />
     </div>
   );
 };
