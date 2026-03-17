@@ -3,7 +3,7 @@ const dotenv = require("dotenv");
 const path = require("path");
 const bcrypt = require("bcryptjs");
 const connectDB = require("./config/db");
-const { Student, Attendance } = require("./model");
+const { Student, Attendance, Teacher, CourseAllocation } = require("./model");
 const { log } = require("console");
 
 // Load environment variables (looks for .env in project root)
@@ -14,7 +14,6 @@ connectDB();
 
 // Body parser middleware
 app.use(express.json());
-
 app.use(express.urlencoded({ extended: true }));
 
 // Routes
@@ -26,7 +25,10 @@ app.get("/api", function (req, res) {
 app.get("/api/student/dashboard/:roll", async (req, res) => {
   const { roll } = req.params;
   console.log(roll);
-  let studentData = await Student.findOne({ rollNumber: roll }, { createdAt: 0, updatedAt: 0, __v: 0 })
+  let studentData = await Student.findOne(
+    { rollNumber: roll },
+    { createdAt: 0, updatedAt: 0, __v: 0 },
+  )
     .populate("courses", "-_id name code") //In Mongoose, when you are selecting fields or populating, you can put a minus sign (-) in front of a field name to forcefully exclude it
     .populate("user", "-_id name email");
 
@@ -39,11 +41,15 @@ app.get("/api/student/dashboard/:roll", async (req, res) => {
     "records.student": studentData._id,
   }).populate({
     path: "courseAllocation",
-    select: "-_id course teacher", // Only bring in course and teacher IDs from CourseAllocation
+    select: "-_id course teacher",
     populate: [
-      { path: "course", select: "-_id name code" }, // Only bring in name and code from Course
-      { path: "teacher", select: "-_id user", populate: { path: "user", select: "-_id name" } } // Assuming teacher has a name, adjust if needed
-    ]
+      { path: "course", select: "-_id name code" },
+      {
+        path: "teacher",
+        select: "-_id user",
+        populate: { path: "user", select: "-_id name" },
+      },
+    ],
   });
 
   studentData = studentData.toObject();
@@ -68,8 +74,8 @@ app.get("/api/student/dashboard/:roll", async (req, res) => {
   studentData.attendance = attendances.map((att) => {
     const myRecord = att.records.find(
       (r) => r.student.toString() === studentData._id.toString(),
-    );
-    
+    ); //Find the specific student's record in the attendance document
+
     const status = myRecord ? myRecord.status : "Absent";
     const courseCode = att.courseAllocation?.course?.code;
 
@@ -85,9 +91,9 @@ app.get("/api/student/dashboard/:roll", async (req, res) => {
           attendedClasses: 0,
         };
       }
-      
+
       courseStatsMap[courseCode].totalClasses += 1;
-      
+
       if (status === "Present" || status === "Late") {
         courseStatsMap[courseCode].attendedClasses += 1;
       }
@@ -107,10 +113,14 @@ app.get("/api/student/dashboard/:roll", async (req, res) => {
   });
 
   // Calculate the final percentage exactly as the frontend expects
-  studentData.summaries = Object.values(courseStatsMap).map((stat) => { //Object.values() is a built-in Javascript tool that takes an object, rips off all the outer keys (like "BCA-101" and "BCA-102"), and turns everything inside into a clean Array.
+  studentData.summaries = Object.values(courseStatsMap).map((stat) => {
+    //Object.values() is a built-in Javascript tool that takes an object, rips off all the outer keys (like "BCA-101" and "BCA-102"), and turns everything inside into a clean Array.
     return {
       ...stat,
-      percentage: stat.totalClasses > 0 ? (stat.attendedClasses / stat.totalClasses) * 100 : 0
+      percentage:
+        stat.totalClasses > 0
+          ? (stat.attendedClasses / stat.totalClasses) * 100
+          : 0,
     };
   });
 
@@ -118,6 +128,59 @@ app.get("/api/student/dashboard/:roll", async (req, res) => {
   delete studentData._id;
 
   return res.status(200).json(studentData);
+});
+
+app.get("/api/teacher/dashboard/:teacherId", async (req, res) => {
+  const { teacherId } = req.params;
+  let teacher = await Teacher.findOne(
+    { employeeId: teacherId },
+    { createdAt: 0, updatedAt: 0, __v: 0 },
+  ).populate({
+    path: "user",
+    select: "-_id name email",
+  });
+
+  if (!teacher) {
+    return res.status(404).json({ message: "Teacher not found" });
+  }
+
+  console.log(teacher);
+  // 1. Find all courses this specific teacher is assigned to teach
+  const teacherAllocations = await CourseAllocation.find({
+    teacher: teacher._id,
+  });
+  const allocationIds = teacherAllocations.map((alloc) => alloc._id);
+  console.log(allocationIds);
+
+  // 2. Find all attendance sheets that belong to any of those courses, dropping internal DB fields
+  const attendances = await Attendance.find(
+    { courseAllocation: { $in: allocationIds } },
+    { createdAt: 0, updatedAt: 0, __v: 0, _id: 0 },
+  ).populate({
+    path: "courseAllocation",
+    select: "-_id course department semester section",
+    populate: { path: "course", select: "-_id name code" },
+  });
+
+  // Attach the attendance history to the teacher's data payload, flattened for the frontend
+  teacher = teacher.toObject();
+  
+  teacher.recentAttendance = attendances.map(att => {
+    return {
+      name: att.courseAllocation?.course?.name,
+      code: att.courseAllocation?.course?.code,
+      department: att.courseAllocation?.department,
+      semester: att.courseAllocation?.semester,
+      section: att.courseAllocation?.section,
+      date: att.date,
+      records: att.records
+    };
+  });
+
+  // Final cleanup: remove the teacher's internal DB ID before sending
+  delete teacher._id;
+
+  return res.status(200).json(teacher);
 });
 
 const PORT = process.env.PORT || 8080;

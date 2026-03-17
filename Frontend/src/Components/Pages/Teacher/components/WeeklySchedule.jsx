@@ -12,7 +12,7 @@ const WeeklySchedule = ({ timetable }) => {
   ];
 
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 overflow-hidden">
+    <div className="bg-white rounded-xl shadow-sm border border-gray-300 p-6 overflow-hidden">
       <div className="flex items-center space-x-2 mb-6">
         <svg
           className="w-5 h-5 text-indigo-500"
@@ -34,13 +34,13 @@ const WeeklySchedule = ({ timetable }) => {
         <table className="w-full border-collapse min-w-[800px]">
           <thead>
             <tr>
-              <th className="p-3 text-left border-b border-r border-gray-100 text-[10px] uppercase font-bold text-gray-500 bg-gray-50/50 w-32">
+              <th className="p-3 text-left border-b border-r border-gray-300 text-[10px] uppercase font-bold text-gray-500 bg-gray-200 w-32">
                 Day / Time
               </th>
               {times.map((time) => (
                 <th
                   key={time}
-                  className="p-3 text-center border-b border-gray-100 text-[12px] uppercase font-bold text-gray-600 bg-gray-50/50 min-w-[120px]"
+                  className="p-3 text-center border-b border-gray-300 text-[12px] uppercase font-bold text-gray-600 bg-gray-200 min-w-[120px]"
                 >
                   {time}
                 </th>
@@ -49,8 +49,8 @@ const WeeklySchedule = ({ timetable }) => {
           </thead>
           <tbody>
             {days.map((day) => (
-              <tr key={day} className="border-b border-gray-50 hover:bg-gray-50/20">
-                <td className="p-3 border-r border-gray-100 bg-white">
+              <tr key={day} className="border-b border-gray-300 hover:bg-gray-50/20">
+                <td className="p-3 border-r border-gray-300 bg-white">
                   <div className="flex items-center space-x-2">
                     <span className="text-sm font-bold text-gray-900">{day}</span>
                     {day === "Monday" && (
@@ -75,7 +75,7 @@ const WeeklySchedule = ({ timetable }) => {
                     <td
                       key={`${day}-${time}`}
                       colSpan={cellData?.colSpan || 1}
-                      className={`p-2 border border-gray-50 text-center ${
+                      className={`p-2 border border-gray-300 text-center ${
                         cellData ? cellData.color : "bg-white"
                       }`}
                     >

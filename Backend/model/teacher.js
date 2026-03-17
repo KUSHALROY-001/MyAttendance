@@ -20,6 +20,17 @@ const teacherSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    schedule: [
+      {
+        day: String,
+        startTime: String,
+        endTime: String,
+        subject: String,
+        department: String,
+        semester: String,
+        section: String,
+      },
+    ],
     // List of subjects this teacher is allowed to take attendance for
     subjects: [
       {
