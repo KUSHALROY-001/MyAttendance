@@ -1,7 +1,14 @@
 import React from "react";
 
-const WeeklySchedule = ({ timetable }) => {
-  const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+const WeeklySchedule = ({ schedule }) => {
+  const days = [
+    "Monday",
+    "Tuesday",
+    "Wednesday",
+    "Thursday",
+    "Friday",
+    "Saturday",
+  ];
   const times = [
     "11:30 AM - 01:00 PM",
     "01:00 PM - 02:00 PM",
@@ -10,6 +17,42 @@ const WeeklySchedule = ({ timetable }) => {
     "03:40 PM - 04:30 PM",
     "04:30 PM - 05:20 PM",
   ];
+
+  const colors = [
+    "bg-red-50", "bg-blue-50", "bg-green-50", 
+    "bg-yellow-50", "bg-purple-50", "bg-orange-50", 
+    "bg-indigo-50", "bg-pink-50", "bg-teal-50"
+  ];
+
+  const timetable = React.useMemo(() => {
+    const map = {};
+    times.forEach(t => map[t] = {});
+    
+    if (!schedule || schedule.length === 0) return map;
+
+    schedule.forEach((cls) => {
+      const slots = cls.slots || [];
+      if (slots.length === 0) return;
+      
+      const sortedSlots = [...slots].sort((a,b) => a - b);
+      const startSlot = sortedSlots[0];
+      const timeLabel = times[startSlot - 1]; // slots are 1-indexed
+      
+      if (timeLabel && cls.day) {
+        const randomColor = colors[Math.floor(Math.random() * colors.length)];
+        
+        map[timeLabel][cls.day] = {
+          name: cls.subject,
+          section: `${cls.department} Sem ${cls.semester} Sec ${cls.section}`,
+          room: cls.room || "TBA",
+          color: randomColor,
+          colSpan: sortedSlots.length
+        };
+      }
+    });
+    
+    return map;
+  }, [schedule]);
 
   return (
     <div className="bg-white rounded-xl shadow-sm border border-gray-300 p-6 overflow-hidden">
@@ -49,10 +92,15 @@ const WeeklySchedule = ({ timetable }) => {
           </thead>
           <tbody>
             {days.map((day) => (
-              <tr key={day} className="border-b border-gray-300 hover:bg-gray-50/20">
+              <tr
+                key={day}
+                className="border-b border-gray-300 hover:bg-gray-50/20"
+              >
                 <td className="p-3 border-r border-gray-300 bg-white">
                   <div className="flex items-center space-x-2">
-                    <span className="text-sm font-bold text-gray-900">{day}</span>
+                    <span className="text-sm font-bold text-gray-900">
+                      {day}
+                    </span>
                     {day === "Monday" && (
                       <span className="bg-indigo-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">
                         Today
@@ -62,7 +110,7 @@ const WeeklySchedule = ({ timetable }) => {
                 </td>
                 {times.map((time, index) => {
                   const cellData = timetable[time]?.[day];
-                  
+
                   // Skip rendering cell if standard slot but has colSpan covered by previous slot
                   if (
                     index > 0 &&

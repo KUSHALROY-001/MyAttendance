@@ -1,6 +1,67 @@
-import React from "react";
+import React, { useMemo } from "react";
 
-const TodaysClasses = ({ classes }) => {
+const TodaysClasses = ({ schedule }) => {
+  const times = [
+    "11:30 AM - 01:00 PM",
+    "01:00 PM - 02:00 PM",
+    "02:00 PM - 02:50 PM",
+    "02:50 PM - 03:40 PM",
+    "03:40 PM - 04:30 PM",
+    "04:30 PM - 05:20 PM",
+  ];
+
+  const todayStr = new Date().toLocaleDateString("en-US", { weekday: "long" });
+
+  const classes = useMemo(() => {
+    if (!schedule || schedule.length === 0) return [];
+    
+    const todaysClasses = schedule.filter(c => c.day === todayStr);
+    const map = {};
+    
+    todaysClasses.forEach(c => {
+      (c.slots || []).forEach(s => {
+        map[s] = c;
+      });
+    });
+    
+    const parsedClasses = [];
+    let i = 0;
+    while (i < times.length) {
+      const slotNum = i + 1;
+      const c = map[slotNum];
+      
+      if (c) {
+        let span = 1;
+        while ((i + span) < times.length && map[slotNum + span] === c) {
+          span++;
+        }
+        
+        const startLabel = times[i].split(" - ")[0];
+        const endLabel = times[i + span - 1].split(" - ")[1];
+        
+        parsedClasses.push({
+          id: `ts-${slotNum}`,
+          time: `${startLabel} - ${endLabel}`,
+          courseName: c.subject,
+          section: `${c.department} Sem ${c.semester} Sec ${c.section}`,
+          room: c.room || "TBA",
+          type: c.type || "class"
+        });
+        
+        i += span;
+      } else {
+        parsedClasses.push({
+          id: `ts-${slotNum}`,
+          time: times[i],
+          type: "free"
+        });
+        i++;
+      }
+    }
+    
+    return parsedClasses;
+  }, [schedule, todayStr]);
+
   return (
     <div className="bg-indigo-50 rounded-xl shadow-sm border border-indigo-200 p-6">
       <div className="flex items-center space-x-2 mb-6">
@@ -18,7 +79,7 @@ const TodaysClasses = ({ classes }) => {
           />
         </svg>
         <h2 className="text-lg font-bold text-gray-900">
-          Today's Classes (Monday)
+          Today's Classes ({todayStr})
         </h2>
       </div>
 

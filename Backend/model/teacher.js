@@ -23,12 +23,21 @@ const teacherSchema = new mongoose.Schema(
     schedule: [
       {
         day: String,
-        startTime: String,
-        endTime: String,
+        slots: [{
+          type: Number,
+          min: 1,
+          max: 6,
+        }],
         subject: String,
         department: String,
         semester: String,
         section: String,
+        room: String,
+        type: {
+          type: String,
+          enum: ["class", "lab"],
+          default: "class",
+        },
       },
     ],
     // List of subjects this teacher is allowed to take attendance for
