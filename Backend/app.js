@@ -155,7 +155,7 @@ app.get("/api/teacher/dashboard/:teacherId", async (req, res) => {
   // 2. Find all attendance sheets that belong to any of those courses, dropping internal DB fields
   const attendances = await Attendance.find(
     { courseAllocation: { $in: allocationIds } },
-    { createdAt: 0, updatedAt: 0, __v: 0, _id: 0 },
+    { createdAt: 0, updatedAt: 0, __v: 0 },
   ).populate({
     path: "courseAllocation",
     select: "-_id course department semester section",
@@ -167,6 +167,7 @@ app.get("/api/teacher/dashboard/:teacherId", async (req, res) => {
   
   teacher.recentAttendance = attendances.map(att => {
     return {
+      id: att._id,
       name: att.courseAllocation?.course?.name,
       code: att.courseAllocation?.course?.code,
       department: att.courseAllocation?.department,
@@ -181,6 +182,48 @@ app.get("/api/teacher/dashboard/:teacherId", async (req, res) => {
   delete teacher._id;
 
   return res.status(200).json(teacher);
+});
+
+app.get("/api/teacher/attendance/:sessionId", async (req, res) => {
+  try {
+    const { sessionId } = req.params;
+    const attendance = await Attendance.findById(sessionId)
+      .populate({
+        path: "courseAllocation",
+        populate: { path: "course", select: "-_id name code" }
+      })
+      .populate({
+        path: "records.student",
+        select: "rollNumber user",
+        populate: { path: "user", select: "name avatar" }
+      });
+
+    if (!attendance) {
+      return res.status(404).json({ message: "Session not found" });
+    }
+
+    // Format for frontend
+    const payload = {
+      id: attendance._id,
+      date: attendance.date,
+      courseName: attendance.courseAllocation?.course?.name || "Unknown Course",
+      courseCode: attendance.courseAllocation?.course?.code || "Unknown Code",
+      department: attendance.courseAllocation?.department,
+      semester: attendance.courseAllocation?.semester,
+      section: attendance.courseAllocation?.section,
+      students: attendance.records.map((record) => ({
+        id: record.student._id,
+        name: record.student.user?.name || "Unknown Student",
+        rollNumber: record.student.rollNumber,
+        status: record.status,
+      }))
+    };
+
+    return res.status(200).json(payload);
+  } catch (error) {
+    console.error("Error fetching session:", error);
+    return res.status(500).json({ message: "Server error" });
+  }
 });
 
 const PORT = process.env.PORT || 8080;

@@ -9,6 +9,7 @@ import { Routes, Route } from "react-router-dom";
 import StudentDashboard from "./Components/Pages/Student/StudentDash.jsx";
 import CourseDetail from "./Components/Pages/Student/CourseDetail.jsx";
 import TeacherDashboard from "./Components/Pages/Teacher/TeacherDashboard.jsx";
+import SessionHistory from "./Components/Pages/Teacher/SessionHistory.jsx";
 
 function App() {
   return (
@@ -21,6 +22,7 @@ function App() {
         <Route path="/student" element={<StudentDashboard />} />
         <Route path="/student/course/:courseId" element={<CourseDetail />} />
         <Route path="/teacher" element={<TeacherDashboard />} />
+        <Route path="/teacher/session/:sessionId" element={<SessionHistory />} />
       </Routes>
       <Footer />
     </>
