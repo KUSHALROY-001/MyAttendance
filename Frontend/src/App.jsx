@@ -10,6 +10,7 @@ import StudentDashboard from "./Components/Pages/Student/StudentDash.jsx";
 import CourseDetail from "./Components/Pages/Student/CourseDetail.jsx";
 import TeacherDashboard from "./Components/Pages/Teacher/TeacherDashboard.jsx";
 import SessionHistory from "./Components/Pages/Teacher/SessionHistory.jsx";
+import TeacherCourseDetail from "./Components/Pages/Teacher/TeacherCourseDetail.jsx";
 
 function App() {
   return (
@@ -23,6 +24,7 @@ function App() {
         <Route path="/student/course/:courseId" element={<CourseDetail />} />
         <Route path="/teacher" element={<TeacherDashboard />} />
         <Route path="/teacher/session/:sessionId" element={<SessionHistory />} />
+        <Route path="/teacher/course/:courseId" element={<TeacherCourseDetail />} />
       </Routes>
       <Footer />
     </>

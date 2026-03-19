@@ -164,8 +164,8 @@ app.get("/api/teacher/dashboard/:teacherId", async (req, res) => {
 
   // Attach the attendance history to the teacher's data payload, flattened for the frontend
   teacher = teacher.toObject();
-  
-  teacher.recentAttendance = attendances.map(att => {
+
+  teacher.recentAttendance = attendances.map((att) => {
     return {
       id: att._id,
       name: att.courseAllocation?.course?.name,
@@ -174,7 +174,7 @@ app.get("/api/teacher/dashboard/:teacherId", async (req, res) => {
       semester: att.courseAllocation?.semester,
       section: att.courseAllocation?.section,
       date: att.date,
-      records: att.records
+      records: att.records,
     };
   });
 
@@ -190,12 +190,12 @@ app.get("/api/teacher/attendance/:sessionId", async (req, res) => {
     const attendance = await Attendance.findById(sessionId)
       .populate({
         path: "courseAllocation",
-        populate: { path: "course", select: "-_id name code" }
+        populate: { path: "course", select: "-_id name code" },
       })
       .populate({
         path: "records.student",
         select: "rollNumber user",
-        populate: { path: "user", select: "name avatar" }
+        populate: { path: "user", select: "name avatar" },
       });
 
     if (!attendance) {
@@ -216,12 +216,90 @@ app.get("/api/teacher/attendance/:sessionId", async (req, res) => {
         name: record.student.user?.name || "Unknown Student",
         rollNumber: record.student.rollNumber,
         status: record.status,
-      }))
+      })),
     };
 
     return res.status(200).json(payload);
   } catch (error) {
     console.error("Error fetching session:", error);
+    return res.status(500).json({ message: "Server error" });
+  }
+});
+
+app.get("/api/teacher/:teacherId/course/:courseCode", async (req, res) => {
+  try {
+    const { teacherId, courseCode } = req.params;
+
+    const teacher = await Teacher.findOne({ employeeId: teacherId });
+    if (!teacher) return res.status(404).json({ message: "Teacher not found" });
+
+    // Find Allocations for this Teacher, then filter by courseCode
+    const allocations = await CourseAllocation.find({
+      teacher: teacher._id,
+    }).populate("course");
+
+    // Find the allocation matching the courseCode
+    const courseAllocations = allocations.filter(
+      (a) => a.course && a.course.code === courseCode,
+    );
+
+    if (courseAllocations.length === 0) {
+      return res
+        .status(404)
+        .json({ message: "Course not found for this teacher" });
+    }
+
+    const allocationIds = courseAllocations.map((a) => a._id);
+    const courseDetail = courseAllocations[0].course; // Metadata from populated field
+
+    // Find Attendances for these allocations
+    const attendances = await Attendance.find({
+      courseAllocation: { $in: allocationIds },
+    })
+      .populate({
+        path: "courseAllocation",
+        select: "department semester section",
+      })
+      .sort({ date: -1 });
+
+    // Calculate Stats
+    const totalSessions = attendances.length;
+    let totalPresent = 0;
+    let totalStudentsAgg = 0;
+
+    const formattedSessions = attendances.map((att) => {
+      const presentCount = att.records.filter(
+        (r) => r.status === "Present" || r.status === "Late",
+      ).length;
+      const totalCount = att.records.length;
+
+      totalPresent += presentCount;
+      totalStudentsAgg += totalCount;
+
+      return {
+        id: att._id,
+        date: att.date,
+        name: courseDetail.name,
+        department: att.courseAllocation?.department,
+        semester: att.courseAllocation?.semester,
+        section: att.courseAllocation?.section,
+        presentCount,
+        totalCount,
+      };
+    });
+
+    const overallAttendance =
+      totalStudentsAgg > 0 ? (totalPresent / totalStudentsAgg) * 100 : 0;
+
+    return res.status(200).json({
+      courseCode: courseDetail.code,
+      courseName: courseDetail.name,
+      totalSessions,
+      overallAttendance: Math.round(overallAttendance),
+      sessions: formattedSessions,
+    });
+  } catch (error) {
+    console.error("Error fetching course details:", error);
     return res.status(500).json({ message: "Server error" });
   }
 });

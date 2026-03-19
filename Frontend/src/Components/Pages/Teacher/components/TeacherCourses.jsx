@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 
 const TeacherCourses = ({ courses }) => {
   return (
@@ -9,9 +10,10 @@ const TeacherCourses = ({ courses }) => {
 
       <div className="flex-1 flex flex-col gap-4 overflow-y-auto pr-2">
         {courses.map((course) => (
-          <div
+          <Link
+            to={`/teacher/course/${course.id}`}
             key={course.id}
-            className="flex-1 bg-white border border-gray-100 shadow-sm rounded-xl p-5 hover:border-indigo-100 transition-colors group cursor-pointer"
+            className="flex-1 block bg-white border border-gray-100 shadow-sm rounded-xl p-5 hover:border-indigo-200 transition-colors group cursor-pointer"
           >
             <div className="flex justify-between items-start mb-4">
               <div>
@@ -34,7 +36,7 @@ const TeacherCourses = ({ courses }) => {
                 </p>
               </div>
             </div>
-          </div>
+          </Link>
         ))}
 
         {courses.length === 0 && (

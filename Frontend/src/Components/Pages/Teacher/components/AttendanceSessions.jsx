@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
+import SessionCard from "./SessionCard";
 
 const AttendanceSessions = ({ sessions = [] }) => {
   const [activeTab, setActiveTab] = useState("completed");
@@ -40,34 +41,9 @@ const AttendanceSessions = ({ sessions = [] }) => {
       <div className="flex-1 overflow-y-auto pr-2 max-h-[350px]">
         {activeTab === "completed" && sortedSessions.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {sortedSessions.map((session, index) => {
-              const presentCount = session.records?.filter(r => r.status === "Present" || r.status === "Late").length || 0;
-              const totalCount = session.records?.length || 0;
-              
-              return (
-                <Link 
-                  to={`/teacher/session/${session.id}`}
-                  key={index} 
-                  className="flex flex-col p-3 border border-gray-100 rounded-xl hover:border-indigo-200 hover:shadow-sm cursor-pointer transition-all bg-white"
-                >
-                  <div className="flex justify-between items-start mb-2">
-                    <div>
-                      <h4 className="text-sm font-bold text-gray-900">{session.name}</h4>
-                      <p className="text-[13px] font-semibold text-gray-400 mt-0.5">
-                        {session.department} • Sem {session.semester} • Sec {session.section}
-                      </p>
-                    </div>
-                    <span className="text-[12px] font-bold text-indigo-600 bg-indigo-50 px-2 py-1 rounded-md">
-                       {new Date(session.date).toLocaleDateString("en-US", { month: "short", day: "numeric" })}
-                    </span>
-                  </div>
-                  <div className="flex justify-between items-center text-[13px] font-bold text-gray-500">
-                    <span>{totalCount} Students</span>
-                    <span className="text-green-600">{presentCount} Present</span>
-                  </div>
-                </Link>
-              )
-            })}
+            {sortedSessions.map((session, index) => (
+              <SessionCard key={index} session={session} />
+            ))}
           </div>
         ) : (
           <div className="h-full flex flex-col justify-center items-center text-center py-6">
