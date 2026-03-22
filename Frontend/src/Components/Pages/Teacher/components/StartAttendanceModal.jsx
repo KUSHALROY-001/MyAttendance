@@ -1,6 +1,77 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
+import { useNavigate } from "react-router-dom";
 
-const StartAttendanceModal = ({ isOpen, onClose }) => {
+const StartAttendanceModal = ({ isOpen, onClose, allocations = [] }) => {
+  const navigate = useNavigate();
+  const [selectedDept, setSelectedDept] = useState("");
+  const [selectedSem, setSelectedSem] = useState("");
+  const [selectedSec, setSelectedSec] = useState("");
+  const [selectedCourseId, setSelectedCourseId] = useState("");
+
+  // Step 1: Unique Departments
+  const departments = useMemo(() => {
+    const depts = new Set(allocations.map((a) => a.department));
+    return Array.from(depts).sort();
+  }, [allocations]);
+
+  // Step 2: Unique Semesters for selected Department
+  const semesters = useMemo(() => {
+    if (!selectedDept) return [];
+    const sems = new Set(
+      allocations
+        .filter((a) => a.department === selectedDept && a.semester != null)
+        .map((a) => a.semester)
+    );
+    return Array.from(sems).sort((a, b) => a - b);
+  }, [allocations, selectedDept]);
+
+  // Step 3: Unique Sections for selected Department + Semester
+  const sections = useMemo(() => {
+    if (!selectedDept || !selectedSem) return [];
+    const secs = new Set(
+      allocations
+        .filter(
+          (a) =>
+            a.department === selectedDept &&
+            a.semester?.toString() === selectedSem &&
+            a.section != null
+        )
+        .map((a) => a.section)
+    );
+    return Array.from(secs).sort();
+  }, [allocations, selectedDept, selectedSem]);
+
+  // Step 4: Unique Courses for selected Department + Semester + Section
+  const availableCourses = useMemo(() => {
+    if (!selectedDept || !selectedSem || !selectedSec) return [];
+    return allocations.filter(
+      (a) =>
+        a.department === selectedDept &&
+        a.semester?.toString() === selectedSem &&
+        a.section === selectedSec &&
+        a.course
+    );
+  }, [allocations, selectedDept, selectedSem, selectedSec]);
+
+  // Handlers to clear dependent downstream fields
+  const handleDeptChange = (e) => {
+    setSelectedDept(e.target.value);
+    setSelectedSem("");
+    setSelectedSec("");
+    setSelectedCourseId("");
+  };
+
+  const handleSemChange = (e) => {
+    setSelectedSem(e.target.value);
+    setSelectedSec("");
+    setSelectedCourseId("");
+  };
+
+  const handleSecChange = (e) => {
+    setSelectedSec(e.target.value);
+    setSelectedCourseId("");
+  };
+
   if (!isOpen) return null;
 
   return (
@@ -27,28 +98,124 @@ const StartAttendanceModal = ({ isOpen, onClose }) => {
           Select department, course, and section to begin taking attendance.
         </p>
 
-        <div className="mb-8">
-          <label className="block text-sm font-bold text-[#1e293b] mb-2">
-            Department
-          </label>
-          <div className="relative">
-            <select
-              className="w-full appearance-none border border-gray-200 text-gray-500 text-sm rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 hover:border-gray-300 transition"
-              defaultValue=""
-            >
-              <option value="" disabled hidden>
-                Select department
-              </option>
-              <option value="bca">BCA</option>
-              <option value="mca">MCA</option>
-              <option value="btech">B.Tech</option>
-            </select>
-            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-gray-400">
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
-              </svg>
+        <div className="space-y-4 mb-8">
+          {/* 1. Department */}
+          <div>
+            <label className="block text-sm font-bold text-[#1e293b] mb-2">
+              Department
+            </label>
+            <div className="relative">
+              <select
+                className="w-full appearance-none border border-gray-200 text-gray-700 text-sm font-medium rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 hover:border-gray-300 transition"
+                value={selectedDept}
+                onChange={handleDeptChange}
+              >
+                <option value="" disabled hidden>
+                  Select department
+                </option>
+                {departments.map((dept) => (
+                  <option key={dept} value={dept}>
+                    {dept}
+                  </option>
+                ))}
+              </select>
+              <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-gray-400">
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                </svg>
+              </div>
             </div>
           </div>
+
+          {/* 2. Semester */}
+          {selectedDept && (
+            <div className="animate-fadeIn">
+              <label className="block text-sm font-bold text-[#1e293b] mb-2">
+                Semester
+              </label>
+              <div className="relative">
+                <select
+                  className="w-full appearance-none border border-gray-200 text-gray-700 text-sm font-medium rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 hover:border-gray-300 transition"
+                  value={selectedSem}
+                  onChange={handleSemChange}
+                >
+                  <option value="" disabled hidden>
+                    Select semester
+                  </option>
+                  {semesters.map((sem) => (
+                    <option key={sem} value={sem?.toString()}>
+                      Semester {sem}
+                    </option>
+                  ))}
+                </select>
+                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-gray-400">
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                  </svg>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* 3. Section */}
+          {selectedSem && (
+            <div className="animate-fadeIn">
+              <label className="block text-sm font-bold text-[#1e293b] mb-2">
+                Section
+              </label>
+              <div className="relative">
+                <select
+                  className="w-full appearance-none border border-gray-200 text-gray-700 text-sm font-medium rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 hover:border-gray-300 transition"
+                  value={selectedSec}
+                  onChange={handleSecChange}
+                >
+                  <option value="" disabled hidden>
+                    Select section
+                  </option>
+                  {sections.map((sec) => (
+                    <option key={sec} value={sec}>
+                      Section {sec}
+                    </option>
+                  ))}
+                </select>
+                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-gray-400">
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                  </svg>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* 4. Subject */}
+          {selectedSec && (
+            <div className="animate-fadeIn">
+              <label className="block text-sm font-bold text-[#1e293b] mb-2">
+                Subject
+              </label>
+              <div className="relative">
+                <select
+                  className="w-full appearance-none border border-gray-200 text-gray-700 text-sm font-medium rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 hover:border-gray-300 transition"
+                  value={selectedCourseId}
+                  onChange={(e) => setSelectedCourseId(e.target.value)}
+                >
+                  <option value="" disabled hidden>
+                    Select subject
+                  </option>
+                  {availableCourses.map((alloc) => (
+                    <option key={alloc._id} value={alloc._id}>
+                      {alloc.course?.name || "Unknown"} ({alloc.course?.code || "N/A"})
+                    </option>
+                  ))}
+                </select>
+                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-gray-400">
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                  </svg>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
 
         <div className="flex items-center justify-end gap-3 mt-6">
@@ -59,7 +226,28 @@ const StartAttendanceModal = ({ isOpen, onClose }) => {
             Cancel
           </button>
           <button
-            className="px-5 py-2.5 rounded-lg bg-[#a5b4fc] text-white text-sm font-bold flex items-center gap-2 hover:bg-indigo-400 transition"
+            disabled={!selectedCourseId}
+            onClick={() => {
+              if (!selectedCourseId) return;
+              const alloc = availableCourses.find((a) => a._id === selectedCourseId);
+              // Persist the session so the dashboard can show it as active
+              localStorage.setItem("activeSession", JSON.stringify({
+                allocationId: alloc._id,
+                courseName: alloc.course?.name || "Unknown Subject",
+                courseCode: alloc.course?.code || "N/A",
+                department: alloc.department,
+                semester: alloc.semester,
+                section: alloc.section,
+                startedAt: new Date().toISOString()
+              }));
+              navigate(`/teacher/attendance/live/${alloc._id}`);
+              onClose();
+            }}
+            className={`px-5 py-2.5 rounded-lg text-sm font-bold flex items-center gap-2 transition ${
+              selectedCourseId 
+                ? "bg-[#818cf8] text-white hover:bg-indigo-500 shadow-sm cursor-pointer" 
+                : "bg-gray-100 text-gray-400 cursor-not-allowed"
+            }`}
           >
             <svg
               className="w-4 h-4"

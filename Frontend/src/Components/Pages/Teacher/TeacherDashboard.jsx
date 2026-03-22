@@ -115,6 +115,7 @@ const TeacherDashboard = () => {
       <StartAttendanceModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
+        allocations={teacherData?.allocations || []}
       />
     </div>
   );

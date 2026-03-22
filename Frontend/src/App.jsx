@@ -11,6 +11,7 @@ import CourseDetail from "./Components/Pages/Student/CourseDetail.jsx";
 import TeacherDashboard from "./Components/Pages/Teacher/TeacherDashboard.jsx";
 import SessionHistory from "./Components/Pages/Teacher/SessionHistory.jsx";
 import TeacherCourseDetail from "./Components/Pages/Teacher/TeacherCourseDetail.jsx";
+import TakeAttendance from "./Components/Pages/Teacher/TakeAttendance.jsx";
 
 function App() {
   return (
@@ -25,6 +26,7 @@ function App() {
         <Route path="/teacher" element={<TeacherDashboard />} />
         <Route path="/teacher/session/:sessionId" element={<SessionHistory />} />
         <Route path="/teacher/course/:courseId" element={<TeacherCourseDetail />} />
+        <Route path="/teacher/attendance/live/:allocationId" element={<TakeAttendance />} />
       </Routes>
       <Footer />
     </>

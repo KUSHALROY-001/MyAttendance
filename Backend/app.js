@@ -148,7 +148,7 @@ app.get("/api/teacher/dashboard/:teacherId", async (req, res) => {
   // 1. Find all courses this specific teacher is assigned to teach
   const teacherAllocations = await CourseAllocation.find({
     teacher: teacher._id,
-  });
+  }).populate({ path: "course", select: "-_id name code" });
   const allocationIds = teacherAllocations.map((alloc) => alloc._id);
   console.log(allocationIds);
 
@@ -177,6 +177,9 @@ app.get("/api/teacher/dashboard/:teacherId", async (req, res) => {
       records: att.records,
     };
   });
+
+  // Attach all assigned subjects directly to the teacher payload for the new Modal logic
+  teacher.allocations = teacherAllocations;
 
   // Final cleanup: remove the teacher's internal DB ID before sending
   delete teacher._id;
@@ -300,6 +303,52 @@ app.get("/api/teacher/:teacherId/course/:courseCode", async (req, res) => {
     });
   } catch (error) {
     console.error("Error fetching course details:", error);
+    return res.status(500).json({ message: "Server error" });
+  }
+});
+
+app.get("/api/teacher/attendance/live/:allocationId", async (req, res) => {
+  try {
+    const { allocationId } = req.params;
+    const alloc = await CourseAllocation.findById(allocationId).populate("course");
+    if (!alloc) return res.status(404).json({ message: "Course Allocation not found" });
+
+    // Find all students exactly matching this allocation's demographics
+    const students = await Student.find({
+      department: alloc.department,
+      semester: alloc.semester,
+      section: alloc.section,
+    }).populate("user", "name avatar");
+
+    return res.status(200).json({
+      allocation: alloc,
+      students: students.map(s => ({
+        id: s._id,
+        name: s.user?.name || "Unknown",
+        rollNumber: s.rollNumber,
+        avatar: s.user?.avatar
+      }))
+    });
+  } catch (error) {
+    console.error("Error fetching live attendance roster:", error);
+    return res.status(500).json({ message: "Server error" });
+  }
+});
+
+app.post("/api/teacher/attendance/submit", async (req, res) => {
+  try {
+    const { courseAllocationId, date, records } = req.body;
+    
+    const attendance = new Attendance({
+      courseAllocation: courseAllocationId,
+      date: date || new Date(),
+      records: records,
+    });
+    
+    await attendance.save();
+    return res.status(201).json({ message: "Attendance properly saved", id: attendance._id });
+  } catch (error) {
+    console.error("Error saving attendance:", error);
     return res.status(500).json({ message: "Server error" });
   }
 });
