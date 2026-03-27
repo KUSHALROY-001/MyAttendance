@@ -1,69 +1,68 @@
 const express = require("express");
 const dotenv = require("dotenv");
 const path = require("path");
-const bcrypt = require("bcryptjs");
-const connectDB = require("./config/db");
-const { Student, Attendance, Teacher, CourseAllocation } = require("./model");
-const { log } = require("console");
+const { PrismaClient } = require("@prisma/client");
 
 // Load environment variables (looks for .env in project root)
 dotenv.config({ path: path.resolve(__dirname, "../.env") });
 
 const app = express();
-connectDB();
+const prisma = new PrismaClient();
 
 // Body parser middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Routes
-app.get("/api", function (req, res) {
-  console.log(req.body);
-  res.send("Hello World");
-});
-
 app.get("/api/student/dashboard/:roll", async (req, res) => {
   const { roll } = req.params;
   console.log(roll);
-  let studentData = await Student.findOne(
-    { rollNumber: roll },
-    { createdAt: 0, updatedAt: 0, __v: 0 },
-  )
-    .populate("courses", "-_id name code") //In Mongoose, when you are selecting fields or populating, you can put a minus sign (-) in front of a field name to forcefully exclude it
-    .populate("user", "-_id name email");
+  
+  const studentData = await prisma.student.findUnique({
+    where: { rollNumber: roll },
+    include: {
+      user: { select: { name: true, email: true } },
+      enrolledCourses: {
+        include: {
+          course: true
+        }
+      }
+    }
+  });
 
   if (!studentData) {
     return res.status(404).json({ message: "Student not found" });
   }
 
-  // Find all attendance documents for this specific student
-  const attendances = await Attendance.find({
-    "records.student": studentData._id,
-  }).populate({
-    path: "courseAllocation",
-    select: "-_id course teacher",
-    populate: [
-      { path: "course", select: "-_id name code" },
-      {
-        path: "teacher",
-        select: "-_id user",
-        populate: { path: "user", select: "-_id name" },
-      },
-    ],
+  // Find all attendance records for this specific student
+  const attendances = await prisma.attendanceRecord.findMany({
+    where: { studentId: studentData.id },
+    include: {
+      session: {
+        include: {
+          courseAllocation: {
+            include: {
+              course: true,
+              teacher: {
+                include: { user: { select: { name: true } } }
+              }
+            }
+          }
+        }
+      }
+    }
   });
-
-  studentData = studentData.toObject();
 
   // Create an object to track totals for each course
   const courseStatsMap = {};
 
   // Initialize stats for every course the student is officially enrolled in
-  if (studentData.courses) {
-    studentData.courses.forEach((c) => {
-      courseStatsMap[c.code] = {
-        courseId: c.code, // Frontend uses course code or DB id, we'll use code for easier mapping
-        courseCode: c.code,
-        courseName: c.name,
+  if (studentData.enrolledCourses) {
+    studentData.enrolledCourses.forEach((c) => {
+      courseStatsMap[c.course.code] = {
+        courseId: c.course.code, // Frontend uses course code or DB id, we'll use code for easier mapping
+        courseCode: c.course.code,
+        courseName: c.course.name,
         totalClasses: 0,
         attendedClasses: 0,
       };
@@ -71,13 +70,9 @@ app.get("/api/student/dashboard/:roll", async (req, res) => {
   }
 
   // Create a clean attendance array for the frontend with only this student's status
-  studentData.attendance = attendances.map((att) => {
-    const myRecord = att.records.find(
-      (r) => r.student.toString() === studentData._id.toString(),
-    ); //Find the specific student's record in the attendance document
-
-    const status = myRecord ? myRecord.status : "Absent";
-    const courseCode = att.courseAllocation?.course?.code;
+  const attendanceFormatted = attendances.map((record) => {
+    const status = record.status;
+    const courseCode = record.session.courseAllocation.course.code;
 
     // Build the course statistics
     if (courseCode) {
@@ -86,7 +81,7 @@ app.get("/api/student/dashboard/:roll", async (req, res) => {
         courseStatsMap[courseCode] = {
           courseId: courseCode,
           courseCode: courseCode,
-          courseName: att.courseAllocation?.course?.name || "Unknown",
+          courseName: record.session.courseAllocation.course.name || "Unknown",
           totalClasses: 0,
           attendedClasses: 0,
         };
@@ -94,27 +89,26 @@ app.get("/api/student/dashboard/:roll", async (req, res) => {
 
       courseStatsMap[courseCode].totalClasses += 1;
 
-      if (status === "Present" || status === "Late") {
+      if (status === "PRESENT" || status === "LATE") {
         courseStatsMap[courseCode].attendedClasses += 1;
       }
     }
 
     return {
-      date: att.date,
+      date: record.session.date,
       teacher: {
-        name: att.courseAllocation?.teacher?.user?.name || "Unknown Teacher",
+        name: record.session.courseAllocation.teacher.user?.name || "Unknown Teacher",
       },
       course: {
-        name: att.courseAllocation?.course?.name || "Unknown Course",
+        name: record.session.courseAllocation.course.name || "Unknown Course",
         code: courseCode || "Unknown Code",
       },
-      status: status, // Only send this student's status
+      status: status === "PRESENT" ? "Present" : status === "LATE" ? "Late" : status === "ABSENT" ? "Absent" : "Leave", 
     };
   });
 
   // Calculate the final percentage exactly as the frontend expects
-  studentData.summaries = Object.values(courseStatsMap).map((stat) => {
-    //Object.values() is a built-in Javascript tool that takes an object, rips off all the outer keys (like "BCA-101" and "BCA-102"), and turns everything inside into a clean Array.
+  const summaries = Object.values(courseStatsMap).map((stat) => {
     return {
       ...stat,
       percentage:
@@ -124,20 +118,29 @@ app.get("/api/student/dashboard/:roll", async (req, res) => {
     };
   });
 
-  // Final cleanup: remove internal DB IDs before sending to frontend
-  delete studentData._id;
+  const payload = {
+    rollNumber: studentData.rollNumber,
+    department: studentData.department,
+    semester: studentData.semester,
+    section: studentData.section,
+    batch: studentData.batch,
+    contactNumber: studentData.contactNumber,
+    user: studentData.user,
+    courses: studentData.enrolledCourses.map(ec => ec.course),
+    attendance: attendanceFormatted,
+    summaries: summaries
+  };
 
-  return res.status(200).json(studentData);
+  return res.status(200).json(payload);
 });
 
 app.get("/api/teacher/dashboard/:teacherId", async (req, res) => {
   const { teacherId } = req.params;
-  let teacher = await Teacher.findOne(
-    { employeeId: teacherId },
-    { createdAt: 0, updatedAt: 0, __v: 0 },
-  ).populate({
-    path: "user",
-    select: "-_id name email",
+  const teacher = await prisma.teacher.findUnique({
+    where: { employeeId: teacherId },
+    include: {
+      user: { select: { name: true, email: true } },
+    }
   });
 
   if (!teacher) {
@@ -146,79 +149,94 @@ app.get("/api/teacher/dashboard/:teacherId", async (req, res) => {
 
   console.log(teacher);
   // 1. Find all courses this specific teacher is assigned to teach
-  const teacherAllocations = await CourseAllocation.find({
-    teacher: teacher._id,
-  }).populate({ path: "course", select: "-_id name code" });
-  const allocationIds = teacherAllocations.map((alloc) => alloc._id);
+  const teacherAllocations = await prisma.courseAllocation.findMany({
+    where: { teacherId: teacher.id },
+    include: { course: true }
+  });
+  const allocationIds = teacherAllocations.map(alloc => alloc.id);
   console.log(allocationIds);
 
-  // 2. Find all attendance sheets that belong to any of those courses, dropping internal DB fields
-  const attendances = await Attendance.find(
-    { courseAllocation: { $in: allocationIds } },
-    { createdAt: 0, updatedAt: 0, __v: 0 },
-  ).populate({
-    path: "courseAllocation",
-    select: "-_id course department semester section",
-    populate: { path: "course", select: "-_id name code" },
+  // 2. Find all attendance sheets that belong to any of those courses
+  const attendances = await prisma.attendanceSession.findMany({
+    where: { courseAllocationId: { in: allocationIds } },
+    include: {
+      courseAllocation: {
+        include: { course: true }
+      },
+      records: {
+        include: { student: true }
+      }
+    }
   });
 
   // Attach the attendance history to the teacher's data payload, flattened for the frontend
-  teacher = teacher.toObject();
-
-  teacher.recentAttendance = attendances.map((att) => {
+  const recentAttendance = attendances.map((session) => {
     return {
-      id: att._id,
-      name: att.courseAllocation?.course?.name,
-      code: att.courseAllocation?.course?.code,
-      department: att.courseAllocation?.department,
-      semester: att.courseAllocation?.semester,
-      section: att.courseAllocation?.section,
-      date: att.date,
-      records: att.records,
+      id: session.id,
+      name: session.courseAllocation.course.name,
+      code: session.courseAllocation.course.code,
+      department: session.courseAllocation.department,
+      semester: session.courseAllocation.semester,
+      section: session.courseAllocation.section,
+      date: session.date,
+      records: session.records.map(r => ({
+        student: r.studentId, // keeping student id to match mongo format expectations
+        status: r.status === "PRESENT" ? "Present" : r.status === "ABSENT" ? "Absent" : r.status === "LATE" ? "Late" : "Leave"
+      })),
     };
   });
 
-  // Attach all assigned subjects directly to the teacher payload for the new Modal logic
-  teacher.allocations = teacherAllocations;
+  const payload = {
+    employeeId: teacher.employeeId,
+    designation: teacher.designation,
+    department: teacher.department,
+    user: teacher.user,
+    allocations: teacherAllocations,
+    recentAttendance: recentAttendance
+  };
 
-  // Final cleanup: remove the teacher's internal DB ID before sending
-  delete teacher._id;
-
-  return res.status(200).json(teacher);
+  return res.status(200).json(payload);
 });
 
 app.get("/api/teacher/attendance/:sessionId", async (req, res) => {
   try {
     const { sessionId } = req.params;
-    const attendance = await Attendance.findById(sessionId)
-      .populate({
-        path: "courseAllocation",
-        populate: { path: "course", select: "-_id name code" },
-      })
-      .populate({
-        path: "records.student",
-        select: "rollNumber user",
-        populate: { path: "user", select: "name avatar" },
-      });
+    const session = await prisma.attendanceSession.findUnique({
+      where: { id: parseInt(sessionId) }, // MySQL Prisma IDs are ints
+      include: {
+        courseAllocation: {
+          include: { course: true }
+        },
+        records: {
+          include: {
+            student: {
+              include: {
+                user: { select: { name: true } }
+              }
+            }
+          }
+        }
+      }
+    });
 
-    if (!attendance) {
+    if (!session) {
       return res.status(404).json({ message: "Session not found" });
     }
 
     // Format for frontend
     const payload = {
-      id: attendance._id,
-      date: attendance.date,
-      courseName: attendance.courseAllocation?.course?.name || "Unknown Course",
-      courseCode: attendance.courseAllocation?.course?.code || "Unknown Code",
-      department: attendance.courseAllocation?.department,
-      semester: attendance.courseAllocation?.semester,
-      section: attendance.courseAllocation?.section,
-      students: attendance.records.map((record) => ({
-        id: record.student._id,
+      id: session.id,
+      date: session.date,
+      courseName: session.courseAllocation.course.name || "Unknown Course",
+      courseCode: session.courseAllocation.course.code || "Unknown Code",
+      department: session.courseAllocation.department,
+      semester: session.courseAllocation.semester,
+      section: session.courseAllocation.section,
+      students: session.records.map((record) => ({
+        id: record.student.id,
         name: record.student.user?.name || "Unknown Student",
         rollNumber: record.student.rollNumber,
-        status: record.status,
+        status: record.status === "PRESENT" ? "Present" : record.status === "ABSENT" ? "Absent" : record.status === "LATE" ? "Late" : "Leave",
       })),
     };
 
@@ -233,59 +251,56 @@ app.get("/api/teacher/:teacherId/course/:courseCode", async (req, res) => {
   try {
     const { teacherId, courseCode } = req.params;
 
-    const teacher = await Teacher.findOne({ employeeId: teacherId });
+    const teacher = await prisma.teacher.findUnique({ where: { employeeId: teacherId } });
     if (!teacher) return res.status(404).json({ message: "Teacher not found" });
 
     // Find Allocations for this Teacher, then filter by courseCode
-    const allocations = await CourseAllocation.find({
-      teacher: teacher._id,
-    }).populate("course");
-
-    // Find the allocation matching the courseCode
-    const courseAllocations = allocations.filter(
-      (a) => a.course && a.course.code === courseCode,
-    );
+    const courseAllocations = await prisma.courseAllocation.findMany({
+      where: {
+        teacherId: teacher.id,
+        course: { code: courseCode }
+      },
+      include: { course: true }
+    });
 
     if (courseAllocations.length === 0) {
-      return res
-        .status(404)
-        .json({ message: "Course not found for this teacher" });
+      return res.status(404).json({ message: "Course not found for this teacher" });
     }
 
-    const allocationIds = courseAllocations.map((a) => a._id);
+    const allocationIds = courseAllocations.map((a) => a.id);
     const courseDetail = courseAllocations[0].course; // Metadata from populated field
 
     // Find Attendances for these allocations
-    const attendances = await Attendance.find({
-      courseAllocation: { $in: allocationIds },
-    })
-      .populate({
-        path: "courseAllocation",
-        select: "department semester section",
-      })
-      .sort({ date: -1 });
+    const attendances = await prisma.attendanceSession.findMany({
+      where: { courseAllocationId: { in: allocationIds } },
+      include: {
+        courseAllocation: true,
+        records: true
+      },
+      orderBy: { date: 'desc' }
+    });
 
     // Calculate Stats
     const totalSessions = attendances.length;
     let totalPresent = 0;
     let totalStudentsAgg = 0;
 
-    const formattedSessions = attendances.map((att) => {
-      const presentCount = att.records.filter(
-        (r) => r.status === "Present" || r.status === "Late",
+    const formattedSessions = attendances.map((session) => {
+      const presentCount = session.records.filter(
+        (r) => r.status === "PRESENT" || r.status === "LATE",
       ).length;
-      const totalCount = att.records.length;
+      const totalCount = session.records.length;
 
       totalPresent += presentCount;
       totalStudentsAgg += totalCount;
 
       return {
-        id: att._id,
-        date: att.date,
+        id: session.id,
+        date: session.date,
         name: courseDetail.name,
-        department: att.courseAllocation?.department,
-        semester: att.courseAllocation?.semester,
-        section: att.courseAllocation?.section,
+        department: session.courseAllocation.department,
+        semester: session.courseAllocation.semester,
+        section: session.courseAllocation.section,
         presentCount,
         totalCount,
       };
@@ -310,23 +325,29 @@ app.get("/api/teacher/:teacherId/course/:courseCode", async (req, res) => {
 app.get("/api/teacher/attendance/live/:allocationId", async (req, res) => {
   try {
     const { allocationId } = req.params;
-    const alloc = await CourseAllocation.findById(allocationId).populate("course");
+    const alloc = await prisma.courseAllocation.findUnique({
+      where: { id: parseInt(allocationId) },
+      include: { course: true }
+    });
+    
     if (!alloc) return res.status(404).json({ message: "Course Allocation not found" });
 
     // Find all students exactly matching this allocation's demographics
-    const students = await Student.find({
-      department: alloc.department,
-      semester: alloc.semester,
-      section: alloc.section,
-    }).populate("user", "name avatar");
+    const students = await prisma.student.findMany({
+      where: {
+        department: alloc.department,
+        semester: alloc.semester,
+        section: alloc.section,
+      },
+      include: { user: { select: { name: true } } }
+    });
 
     return res.status(200).json({
       allocation: alloc,
       students: students.map(s => ({
-        id: s._id,
+        id: s.id,
         name: s.user?.name || "Unknown",
         rollNumber: s.rollNumber,
-        avatar: s.user?.avatar
       }))
     });
   } catch (error) {
@@ -339,14 +360,21 @@ app.post("/api/teacher/attendance/submit", async (req, res) => {
   try {
     const { courseAllocationId, date, records } = req.body;
     
-    const attendance = new Attendance({
-      courseAllocation: courseAllocationId,
-      date: date || new Date(),
-      records: records,
+    // We expect records to be array of objects with `student` (student id) and `status` ("Present", etc)
+    const session = await prisma.attendanceSession.create({
+      data: {
+        courseAllocationId: parseInt(courseAllocationId),
+        date: date ? new Date(date) : new Date(),
+        records: {
+          create: records.map(r => ({
+            studentId: parseInt(r.student), // MongoDB objectIds might have been passed, but now they are ints
+            status: r.status.toUpperCase() // Enum: PRESENT, ABSENT, LATE, LEAVE
+          }))
+        }
+      }
     });
     
-    await attendance.save();
-    return res.status(201).json({ message: "Attendance properly saved", id: attendance._id });
+    return res.status(201).json({ message: "Attendance properly saved", id: session.id });
   } catch (error) {
     console.error("Error saving attendance:", error);
     return res.status(500).json({ message: "Server error" });

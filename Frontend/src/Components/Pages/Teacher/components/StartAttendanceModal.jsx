@@ -20,7 +20,7 @@ const StartAttendanceModal = ({ isOpen, onClose, allocations = [] }) => {
     const sems = new Set(
       allocations
         .filter((a) => a.department === selectedDept && a.semester != null)
-        .map((a) => a.semester)
+        .map((a) => a.semester),
     );
     return Array.from(sems).sort((a, b) => a - b);
   }, [allocations, selectedDept]);
@@ -34,9 +34,9 @@ const StartAttendanceModal = ({ isOpen, onClose, allocations = [] }) => {
           (a) =>
             a.department === selectedDept &&
             a.semester?.toString() === selectedSem &&
-            a.section != null
+            a.section != null,
         )
-        .map((a) => a.section)
+        .map((a) => a.section),
     );
     return Array.from(secs).sort();
   }, [allocations, selectedDept, selectedSem]);
@@ -49,7 +49,7 @@ const StartAttendanceModal = ({ isOpen, onClose, allocations = [] }) => {
         a.department === selectedDept &&
         a.semester?.toString() === selectedSem &&
         a.section === selectedSec &&
-        a.course
+        a.course,
     );
   }, [allocations, selectedDept, selectedSem, selectedSec]);
 
@@ -87,7 +87,12 @@ const StartAttendanceModal = ({ isOpen, onClose, allocations = [] }) => {
             stroke="currentColor"
             viewBox="0 0 24 24"
           >
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
+              d="M6 18L18 6M6 6l12 12"
+            />
           </svg>
         </button>
 
@@ -120,8 +125,18 @@ const StartAttendanceModal = ({ isOpen, onClose, allocations = [] }) => {
                 ))}
               </select>
               <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-gray-400">
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                <svg
+                  className="w-4 h-4"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M19 9l-7 7-7-7"
+                  />
                 </svg>
               </div>
             </div>
@@ -149,8 +164,18 @@ const StartAttendanceModal = ({ isOpen, onClose, allocations = [] }) => {
                   ))}
                 </select>
                 <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-gray-400">
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                  <svg
+                    className="w-4 h-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M19 9l-7 7-7-7"
+                    />
                   </svg>
                 </div>
               </div>
@@ -179,8 +204,18 @@ const StartAttendanceModal = ({ isOpen, onClose, allocations = [] }) => {
                   ))}
                 </select>
                 <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-gray-400">
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                  <svg
+                    className="w-4 h-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M19 9l-7 7-7-7"
+                    />
                   </svg>
                 </div>
               </div>
@@ -203,14 +238,25 @@ const StartAttendanceModal = ({ isOpen, onClose, allocations = [] }) => {
                     Select subject
                   </option>
                   {availableCourses.map((alloc) => (
-                    <option key={alloc._id} value={alloc._id}>
-                      {alloc.course?.name || "Unknown"} ({alloc.course?.code || "N/A"})
+                    <option key={alloc.id} value={alloc.id}>
+                      {alloc.course?.name || "Unknown"} (
+                      {alloc.course?.code || "N/A"})
                     </option>
                   ))}
                 </select>
                 <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-gray-400">
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                  <svg
+                    className="w-4 h-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M19 9l-7 7-7-7"
+                    />
                   </svg>
                 </div>
               </div>
@@ -229,23 +275,28 @@ const StartAttendanceModal = ({ isOpen, onClose, allocations = [] }) => {
             disabled={!selectedCourseId}
             onClick={() => {
               if (!selectedCourseId) return;
-              const alloc = availableCourses.find((a) => a._id === selectedCourseId);
+              const alloc = availableCourses.find(
+                (a) => a.id.toString() === selectedCourseId.toString(),
+              );
               // Persist the session so the dashboard can show it as active
-              localStorage.setItem("activeSession", JSON.stringify({
-                allocationId: alloc._id,
-                courseName: alloc.course?.name || "Unknown Subject",
-                courseCode: alloc.course?.code || "N/A",
-                department: alloc.department,
-                semester: alloc.semester,
-                section: alloc.section,
-                startedAt: new Date().toISOString()
-              }));
-              navigate(`/teacher/attendance/live/${alloc._id}`);
+              localStorage.setItem(
+                "activeSession",
+                JSON.stringify({
+                  allocationId: alloc.id,
+                  courseName: alloc.course?.name || "Unknown Subject",
+                  courseCode: alloc.course?.code || "N/A",
+                  department: alloc.department,
+                  semester: alloc.semester,
+                  section: alloc.section,
+                  startedAt: new Date().toISOString(),
+                }),
+              );
+              navigate(`/teacher/attendance/live/${alloc.id}`);
               onClose();
             }}
             className={`px-5 py-2.5 rounded-lg text-sm font-bold flex items-center gap-2 transition ${
-              selectedCourseId 
-                ? "bg-[#818cf8] text-white hover:bg-indigo-500 shadow-sm cursor-pointer" 
+              selectedCourseId
+                ? "bg-[#818cf8] text-white hover:bg-indigo-500 shadow-sm cursor-pointer"
                 : "bg-gray-100 text-gray-400 cursor-not-allowed"
             }`}
           >
@@ -255,8 +306,18 @@ const StartAttendanceModal = ({ isOpen, onClose, allocations = [] }) => {
               stroke="currentColor"
               viewBox="0 0 24 24"
             >
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"
+              />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
             </svg>
             Start Session
           </button>

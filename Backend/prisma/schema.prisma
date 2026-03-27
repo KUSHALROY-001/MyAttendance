@@ -1,0 +1,183 @@
+// MyAttendance - Prisma Schema (MySQL)
+// Replaces all Mongoose models: User, Student, Teacher, Course, CourseAllocation, Attendance
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+// ─────────────────────────────────────────────
+// USER — Core auth entity (students & teachers login via this)
+// ─────────────────────────────────────────────
+model User {
+  id        Int      @id @default(autoincrement())
+  name      String
+  email     String   @unique
+  password  String
+  role      Role     @default(STUDENT)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  student Student?
+  teacher Teacher?
+}
+
+enum Role {
+  STUDENT
+  TEACHER
+  ADMIN
+}
+
+// ─────────────────────────────────────────────
+// STUDENT — Profile linked to a User
+// ─────────────────────────────────────────────
+model Student {
+  id            Int      @id @default(autoincrement())
+  userId        Int      @unique
+  rollNumber    String   @unique
+  department    String
+  semester      Int
+  section       String   @default("A")
+  batch         String
+  contactNumber String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  // Relations
+  user              User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  enrolledCourses   StudentCourse[]     // Many-to-many with Course
+  attendanceRecords AttendanceRecord[]  // All attendance records for this student
+}
+
+// ─────────────────────────────────────────────
+// TEACHER — Profile linked to a User
+// ─────────────────────────────────────────────
+model Teacher {
+  id          Int      @id @default(autoincrement())
+  userId      Int      @unique
+  employeeId  String   @unique
+  designation String
+  department  String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  user              User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  courseAllocations CourseAllocation[]
+  schedules         TeacherSchedule[]
+}
+
+// ─────────────────────────────────────────────
+// TEACHER SCHEDULE — Replaces teacher.schedule[] embedded array
+// ─────────────────────────────────────────────
+model TeacherSchedule {
+  id         Int    @id @default(autoincrement())
+  teacherId  Int
+  day        String // e.g. "Monday"
+  slots      String // e.g. "1,2" (comma-separated slot numbers)
+  subject    String
+  department String
+  semester   String
+  section    String
+  room       String?
+  classType  String @default("class") // "class" or "lab"
+
+  teacher Teacher @relation(fields: [teacherId], references: [id], onDelete: Cascade)
+}
+
+// ─────────────────────────────────────────────
+// COURSE (was Subject) — A subject/paper
+// ─────────────────────────────────────────────
+model Course {
+  id         Int      @id @default(autoincrement())
+  name       String
+  code       String   @unique // e.g. "BCA-101"
+  department String
+  semester   Int
+  credits    Int      @default(3)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  // Relations
+  enrolledStudents StudentCourse[]
+  allocations      CourseAllocation[]
+}
+
+// ─────────────────────────────────────────────
+// STUDENT-COURSE — Join table (replaces student.courses[] array)
+// ─────────────────────────────────────────────
+model StudentCourse {
+  studentId Int
+  courseId  Int
+
+  student Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  course  Course  @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  @@id([studentId, courseId]) // Composite primary key — a student can't enroll in same course twice
+}
+
+// ─────────────────────────────────────────────
+// COURSE ALLOCATION — "Who teaches what, to whom, and where?"
+// ─────────────────────────────────────────────
+model CourseAllocation {
+  id           Int      @id @default(autoincrement())
+  teacherId    Int
+  courseId     Int
+  department   String
+  semester     Int
+  section      String
+  academicYear String   @default("2025-2026")
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  // Relations
+  teacher            Teacher            @relation(fields: [teacherId], references: [id], onDelete: Cascade)
+  course             Course             @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  attendanceSessions AttendanceSession[]
+
+  @@unique([teacherId, courseId, department, semester, section]) // A teacher can't be assigned same course+section twice
+}
+
+// ─────────────────────────────────────────────
+// ATTENDANCE SESSION — One class session (was: Attendance document header)
+// ─────────────────────────────────────────────
+model AttendanceSession {
+  id                 Int      @id @default(autoincrement())
+  courseAllocationId Int
+  date               DateTime @default(now())
+  createdAt          DateTime @default(now())
+
+  // Relations
+  courseAllocation CourseAllocation   @relation(fields: [courseAllocationId], references: [id], onDelete: Cascade)
+  records          AttendanceRecord[]
+
+  @@unique([courseAllocationId, date]) // Can't take attendance for same class twice on same day
+}
+
+// ─────────────────────────────────────────────
+// ATTENDANCE RECORD — One student's status in a session (was: records[] array)
+// ─────────────────────────────────────────────
+model AttendanceRecord {
+  id        Int              @id @default(autoincrement())
+  sessionId Int
+  studentId Int
+  status    AttendanceStatus @default(PRESENT)
+
+  session AttendanceSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  student Student           @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  @@unique([sessionId, studentId]) // A student can only have one status per session
+  @@index([studentId])             // Fast lookup: "find all sessions for a given student"
+}
+
+enum AttendanceStatus {
+  PRESENT
+  ABSENT
+  LATE
+  LEAVE
+}
