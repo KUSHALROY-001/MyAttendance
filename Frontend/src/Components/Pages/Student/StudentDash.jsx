@@ -5,15 +5,20 @@ import AttendanceCalendar from "./Component/AttendanceCalendar";
 import CourseCard from "./Component/CourseCard";
 import RecentAttendanceList from "./Component/RecentAttendanceList";
 import QuickStats from "./Component/QuickStats";
-import StatCard from "./Component/StatCard";
+import StatCard from "../../UI/StatCard";
+import {
+  ExclamationCircleSVG,
+  CrossSVG,
+  CalendarSVG,
+  StackSVG,
+  ChartSVG,
+} from "../../UI/SVG";
+import LoadingAnimation from "../../UI/LoadingAnimation";
+import { useCalendar } from "../../../hooks/useCalendar";
 
 const StudentDashboard = () => {
   const location = useLocation();
   const [stuData, setStuData] = useState(location.state?.user || null);
-
-  const [calendarMonth, setCalendarMonth] = useState(
-    () => new Date(new Date().getFullYear(), new Date().getMonth(), 1),
-  );
 
   useEffect(() => {
     if (stuData) return;
@@ -38,46 +43,7 @@ const StudentDashboard = () => {
     return map;
   }, [stuData]);
 
-  const calendarDays = useMemo(() => {
-    const year = calendarMonth.getFullYear();
-    const month = calendarMonth.getMonth();
-    const firstOfMonth = new Date(year, month, 1);
-    const lastOfMonth = new Date(year, month + 1, 0);
-
-    // Monday-anchored week start/end
-    const startOffset = (firstOfMonth.getDay() + 6) % 7;
-    const endOffset = 5 - ((lastOfMonth.getDay() + 6) % 7);
-    const startDate = new Date(year, month, 1 - startOffset);
-    const endDate = new Date(year, month, lastOfMonth.getDate() + endOffset);
-
-    const days = [];
-    for (
-      let dt = new Date(startDate);
-      dt <= endDate;
-      dt.setDate(dt.getDate() + 1)
-    ) {
-      if (dt.getDay() === 0) continue; // skip Sundays
-      const d = new Date(dt);
-      const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
-      const dayRecords = attendanceByDate[key] ?? [];
-      const periods = dayRecords.slice(0, 4).map((r) => r.status.toUpperCase());
-      while (periods.length < 4) periods.push(null);
-      days.push({ date: d, periods, isCurrentMonth: d.getMonth() === month });
-    }
-    return days;
-  }, [attendanceByDate, calendarMonth]);
-
-  // useCallback prevents child re-renders on every parent render
-  const goToPreviousMonth = useCallback(
-    () =>
-      setCalendarMonth((p) => new Date(p.getFullYear(), p.getMonth() - 1, 1)),
-    [],
-  );
-  const goToNextMonth = useCallback(
-    () =>
-      setCalendarMonth((p) => new Date(p.getFullYear(), p.getMonth() + 1, 1)),
-    [],
-  );
+  const { calendarMonth, calendarDays, goToPreviousMonth, goToNextMonth } = useCalendar(attendanceByDate);
 
   // ─────────────────────── Aggregate stats (safe against empty summaries) ───────────────────────
 
@@ -101,11 +67,7 @@ const StudentDashboard = () => {
   // ─────────────────────── Loading state (guard BEFORE any render that uses stuData) ───────────────────────
 
   if (!stuData) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600" />
-      </div>
-    );
+    return <LoadingAnimation />;
   }
 
   const safeUserName = stuData.user?.name?.split(" ")[0] ?? "Student";
@@ -130,19 +92,7 @@ const StudentDashboard = () => {
         {lowAttendanceSubjects.length > 0 && (
           <div className="bg-red-50 border border-red-100 rounded-2xl p-6 text-red-900">
             <div className="flex items-center space-x-2 mb-4">
-              <svg
-                className="w-5 h-5 text-red-600"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
-                />
-              </svg>
+              <ExclamationCircleSVG className="w-5 h-5 text-red-600" />
               <span className="font-bold text-sm uppercase tracking-tight">
                 Low Attendance Warning
               </span>
@@ -158,14 +108,7 @@ const StudentDashboard = () => {
                   className="flex justify-between items-center text-sm"
                 >
                   <div className="flex items-center space-x-2">
-                    <svg
-                      className="w-4 h-4 text-red-400 rotate-45"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path d="M7 7l10 10M7 17l10-10" strokeWidth="2" />
-                    </svg>
+                    <CrossSVG className="w-4 h-4 text-red-400 rotate-45" />
                     <span className="font-bold text-red-700">
                       {sub.courseName}
                     </span>
@@ -188,22 +131,22 @@ const StudentDashboard = () => {
           <StatCard
             title="OVERALL ATTENDANCE"
             value={`${overallPercentage.toFixed(1)}%`}
-            icon="📈"
+            icon={<ChartSVG />}
           />
           <StatCard
             title="ENROLLED COURSES"
             value={stuData.courses?.length}
-            icon="📚"
+            icon={<StackSVG />}
           />
           <StatCard
             title="CLASSES ATTENDED"
             value={`${overallAttended} of ${overallTotal}`}
-            icon="📅"
+            icon={<CalendarSVG />}
           />
           <StatCard
             title="LOW ATTENDANCE"
             value={lowAttendanceSubjects.length.toString()}
-            icon="⚠️"
+            icon={<ExclamationCircleSVG />}
           />
         </div>
 

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import SessionCard from "./SessionCard";
+import { ChevronRightSVG, PlayCircleSVG } from "../../../UI/SVG";
 
 const AttendanceSessions = ({ sessions = [] }) => {
   const [activeTab, setActiveTab] = useState("completed");
@@ -23,7 +24,7 @@ const AttendanceSessions = ({ sessions = [] }) => {
   }, [liveSession]);
 
   const sortedSessions = [...sessions].sort(
-    (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+    (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
   );
 
   return (
@@ -71,18 +72,23 @@ const AttendanceSessions = ({ sessions = [] }) => {
                         LIVE
                       </span>
                     </div>
-                    <p className="font-bold text-sm text-gray-900 truncate">{liveSession.courseName}</p>
+                    <p className="font-bold text-sm text-gray-900 truncate">
+                      {liveSession.courseName}
+                    </p>
                     <p className="text-[11px] font-semibold text-gray-500 mt-0.5">
-                      {liveSession.courseCode} • Sem {liveSession.semester} • Sec {liveSession.section}
+                      {liveSession.courseCode} • Sem {liveSession.semester} •
+                      Sec {liveSession.section}
                     </p>
                     <p className="text-[11px] text-gray-400 mt-1">
-                      Started {new Date(liveSession.startedAt).toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" })}
+                      Started{" "}
+                      {new Date(liveSession.startedAt).toLocaleTimeString(
+                        "en-US",
+                        { hour: "2-digit", minute: "2-digit" },
+                      )}
                     </p>
                   </div>
                   <div className="shrink-0 w-8 h-8 rounded-lg bg-emerald-100 flex items-center justify-center text-emerald-600 group-hover:bg-emerald-200 transition-colors">
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
-                    </svg>
+                    <ChevronRightSVG className="w-4 h-4" />
                   </div>
                 </div>
               </div>
@@ -90,13 +96,14 @@ const AttendanceSessions = ({ sessions = [] }) => {
           ) : (
             <div className="h-full flex flex-col justify-center items-center text-center py-6">
               <div className="w-12 h-12 bg-gray-50 rounded-full flex items-center justify-center mb-4 border border-gray-100">
-                <svg className="w-6 h-6 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
+                <PlayCircleSVG className="w-6 h-6 text-indigo-400" />
               </div>
-              <h3 className="text-sm font-bold text-gray-400">No active sessions</h3>
-              <p className="text-xs text-gray-400 mt-1">Start a new attendance session above</p>
+              <h3 className="text-sm font-bold text-gray-400">
+                No active sessions
+              </h3>
+              <p className="text-xs text-gray-400 mt-1">
+                Start a new attendance session above
+              </p>
             </div>
           )
         ) : sortedSessions.length > 0 ? (
@@ -108,13 +115,14 @@ const AttendanceSessions = ({ sessions = [] }) => {
         ) : (
           <div className="h-full flex flex-col justify-center items-center text-center py-6">
             <div className="w-12 h-12 bg-gray-50 rounded-full flex items-center justify-center mb-4 border border-gray-100">
-              <svg className="w-6 h-6 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
+              <PlayCircleSVG className="w-6 h-6 text-indigo-400" />
             </div>
-            <h3 className="text-sm font-bold text-gray-400">No completed sessions</h3>
-            <p className="text-xs text-gray-400 mt-1">Start a new attendance session above</p>
+            <h3 className="text-sm font-bold text-gray-400">
+              No completed sessions
+            </h3>
+            <p className="text-xs text-gray-400 mt-1">
+              Start a new attendance session above
+            </p>
           </div>
         )}
       </div>

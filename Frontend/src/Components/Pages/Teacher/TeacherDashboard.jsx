@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import TeacherHeader from "./components/TeacherHeader";
 import TeacherStats from "./components/TeacherStats";
 import TodaysClasses from "./components/TodaysClasses";
@@ -8,13 +8,12 @@ import TeacherCourses from "./components/TeacherCourses";
 import StartAttendanceModal from "./components/StartAttendanceModal";
 import axios from "axios";
 
-
 const TeacherDashboard = () => {
-  const [isModalOpen, setIsModalOpen] = React.useState(false);
-  const [teacherData, setTeacherData] = React.useState(null);
-  const [loading, setLoading] = React.useState(true);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [teacherData, setTeacherData] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-  React.useEffect(() => {
+  useEffect(() => {
     const fetchTeacher = async () => {
       try {
         const res = await axios.get("/api/teacher/dashboard/EMP-001");
@@ -28,51 +27,35 @@ const TeacherDashboard = () => {
     fetchTeacher();
   }, []);
 
-  const teacherName = React.useMemo(() => {
+  const teacherName = useMemo(() => {
     return teacherData?.user?.name
       ? teacherData.user.name.replace("Dr. ", "")
       : "Teacher";
   }, [teacherData]);
 
   // Derived state from real API
-  const { coursesList, totalSessions, thisMonthSessions } =
-    React.useMemo(() => {
-      if (!teacherData?.recentAttendance)
-        return { coursesList: [], totalSessions: 0, thisMonthSessions: 0 };
+  const { coursesList, totalSessions, thisMonthSessions } = useMemo(() => {
+    if (!teacherData?.allocations)
+      return { coursesList: [], totalSessions: 0, thisMonthSessions: 0 };
 
-      const unique = {};
-      let currentMonthCount = 0;
-      const currentMonth = new Date().getMonth();
+    // Base courses list securely off of the teacher's formal allocations
+    // rather than what happens to show up in the recent attendance logs
+    const coursesList = teacherData.allocations.map((alloc) => ({
+      id: alloc.course?.code || alloc.id,
+      name: alloc.course?.name || "Unknown Course",
+      code: alloc.course?.code,
+      department: alloc.department,
+      semester: `Sem ${alloc.semester}`,
+      section: alloc.section,
+    }));
 
-      teacherData.recentAttendance.forEach((att) => {
-        const code = att.code || "UNKNOWN";
-
-        // Count unique courses
-        if (!unique[code]) {
-          unique[code] = {
-            id: code,
-            name: att.name || "Unknown Course",
-            code: code,
-            department: att.department,
-            semester: `Sem ${att.semester}`,
-            section: att.section,
-            classesConducted: 0,
-          };
-        }
-        unique[code].classesConducted += 1;
-
-        // Count this month's sessions
-        if (new Date(att.date).getMonth() === currentMonth) {
-          currentMonthCount += 1;
-        }
-      });
-
-      return {
-        coursesList: Object.values(unique),
-        totalSessions: teacherData.recentAttendance.length,
-        thisMonthSessions: currentMonthCount,
-      };
-    }, [teacherData]);
+    // Directly apply backend optimized SQL counts instead of artificially counting limited array size
+    return {
+      coursesList,
+      totalSessions: teacherData.totalSessions || 0,
+      thisMonthSessions: teacherData.thisMonthSessions || 0,
+    };
+  }, [teacherData]);
 
   if (loading) {
     return (

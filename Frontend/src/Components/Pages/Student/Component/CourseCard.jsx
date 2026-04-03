@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { BookSVG, ExclamationCircleSVG } from "../../../UI/SVG";
 
 const CourseCard = ({ course, to, state }) => {
   const isLow = course.percentage < 75;
@@ -20,17 +21,7 @@ const CourseCard = ({ course, to, state }) => {
               isLow ? "bg-red-50 text-red-500" : "bg-indigo-50 text-indigo-500"
             }`}
           >
-            <svg
-              className="w-5 h-5"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
-                strokeWidth="2"
-              />
-            </svg>
+            <BookSVG className="w-5 h-5" />
           </div>
           <div>
             <h3 className="text-sm font-bold text-gray-900">
@@ -43,17 +34,7 @@ const CourseCard = ({ course, to, state }) => {
         </div>
         {isLow && (
           <span className="text-[10px] font-black text-red-600 bg-red-50 px-2 py-1 rounded border border-red-100 uppercase tracking-tight flex items-center">
-            <svg
-              className="w-3 h-3 mr-1"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
-                strokeWidth="2"
-              />
-            </svg>
+            <ExclamationCircleSVG className="w-3 h-3 mr-1" />
             Low
           </span>
         )}

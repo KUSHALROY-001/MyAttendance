@@ -3,7 +3,8 @@ import { Link, useParams, useLocation } from "react-router-dom";
 import axios from "axios";
 import AttendanceCalendar from "./Component/AttendanceCalendar";
 import RecentAttendanceList from "./Component/RecentAttendanceList";
-import StatCard from "./Component/StatCard";
+import StatCard from "../../UI/StatCard";
+import { useCalendar } from "../../../hooks/useCalendar";
 
 const CourseDetail = () => {
   const { courseId } = useParams();
@@ -43,7 +44,8 @@ const CourseDetail = () => {
     const byDate = {};
     courseRecords.forEach((rec) => {
       const dateObj = new Date(rec.date);
-      const dateStr = dateObj.toISOString().split("T")[0];
+      // Use local date parts to avoid UTC-midnight timezone shifts
+      const dateStr = `${dateObj.getFullYear()}-${String(dateObj.getMonth() + 1).padStart(2, "0")}-${String(dateObj.getDate()).padStart(2, "0")}`;
       if (!byDate[dateStr]) byDate[dateStr] = [];
       byDate[dateStr].push(rec);
     });
@@ -81,53 +83,8 @@ const CourseDetail = () => {
     };
   }, [attendanceByDate]);
 
-  const [calendarMonth, setCalendarMonth] = useState(() => {
-    const today = new Date();
-    return new Date(today.getFullYear(), today.getMonth(), 1);
-  });
-
-  const calendarDays = useMemo(() => {
-    const year = calendarMonth.getFullYear();
-    const month = calendarMonth.getMonth();
-    const firstOfMonth = new Date(year, month, 1);
-
-    const startDay = (firstOfMonth.getDay() + 6) % 7;
-    const startDate = new Date(year, month, 1 - startDay);
-
-    const lastOfMonth = new Date(year, month + 1, 0);
-    const endDay = (lastOfMonth.getDay() + 6) % 7;
-    const endDate = new Date(year, month, lastOfMonth.getDate() + (5 - endDay));
-
-    const days = [];
-    for (
-      let dt = new Date(startDate);
-      dt <= endDate;
-      dt.setDate(dt.getDate() + 1)
-    ) {
-      const d = new Date(dt);
-      if (d.getDay() === 0) continue;
-      const dStr = d.toISOString().split("T")[0];
-      const dayRecords = attendanceByDate[dStr] || [];
-      const periods = [null, null, null, null];
-
-      // Assign periods sequentially up to 4 like in dash
-      dayRecords.slice(0, 4).forEach((rec, index) => {
-        periods[index] = rec.status.toUpperCase();
-      });
-
-      days.push({ date: d, periods, isCurrentMonth: d.getMonth() === month });
-    }
-    return days;
-  }, [attendanceByDate, calendarMonth]);
-
-  const goToPreviousMonth = () =>
-    setCalendarMonth(
-      (prev) => new Date(prev.getFullYear(), prev.getMonth() - 1, 1),
-    );
-  const goToNextMonth = () =>
-    setCalendarMonth(
-      (prev) => new Date(prev.getFullYear(), prev.getMonth() + 1, 1),
-    );
+  const { calendarMonth, calendarDays, goToPreviousMonth, goToNextMonth } =
+    useCalendar(attendanceByDate);
 
   if (!stuData) {
     return (

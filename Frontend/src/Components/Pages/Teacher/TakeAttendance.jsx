@@ -1,6 +1,15 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
+import {
+  BackArrowSVG,
+  UsersSVG,
+  CheckCircleSVG,
+  XCircleSVG,
+  MissingSVG,
+} from "../../UI/SVG";
+import LoadingAnimation from "../../UI/LoadingAnimation";
+import ItemNotFound from "../../UI/ItemNotFound";
 
 const TakeAttendance = () => {
   const { allocationId } = useParams();
@@ -86,22 +95,13 @@ const TakeAttendance = () => {
     }
   };
 
+  // remove the redundant code
   if (loading) {
-    return (
-      <div className="flex h-screen items-center justify-center bg-gray-50 pb-20">
-        <div className="w-8 h-8 rounded-full border-4 border-indigo-100 border-t-indigo-600 animate-spin"></div>
-      </div>
-    );
+    return <LoadingAnimation />;
   }
 
   if (!data) {
-    return (
-      <div className="flex h-screen items-center justify-center bg-gray-50 pb-20">
-        <p className="text-xl font-bold text-gray-500">
-          Class Roster Not Found
-        </p>
-      </div>
-    );
+    return <ItemNotFound item={"Class Roster"} />;
   }
 
   const { allocation, students } = data;
@@ -123,19 +123,7 @@ const TakeAttendance = () => {
               onClick={() => navigate(-1)}
               className="p-2 bg-white rounded-full shadow-sm hover:bg-gray-50 border border-gray-200 transition shrink-0"
             >
-              <svg
-                className="w-5 h-5 text-gray-600"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M10 19l-7-7m0 0l7-7m-7 7h18"
-                />
-              </svg>
+              <BackArrowSVG className="w-5 h-5 text-gray-600" />
             </button>
             <div>
               <div className="flex items-center gap-3">
@@ -182,19 +170,7 @@ const TakeAttendance = () => {
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
           <div className="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm flex items-center gap-4">
             <div className="w-10 h-10 rounded-xl bg-gray-50 flex items-center justify-center text-gray-400">
-              <svg
-                className="w-5 h-5"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
-                />
-              </svg>
+              <UsersSVG className="w-5 h-5" />
             </div>
             <div>
               <h3 className="text-xl font-black text-gray-900">
@@ -208,19 +184,7 @@ const TakeAttendance = () => {
 
           <div className="bg-white p-4 rounded-2xl border border-emerald-100 shadow-sm flex items-center gap-4">
             <div className="w-10 h-10 rounded-xl bg-emerald-50 flex items-center justify-center text-emerald-500">
-              <svg
-                className="w-5 h-5"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-                />
-              </svg>
+              <CheckCircleSVG className="w-5 h-5" />
             </div>
             <div>
               <h3 className="text-xl font-black text-emerald-600">
@@ -234,19 +198,7 @@ const TakeAttendance = () => {
 
           <div className="bg-white p-4 rounded-2xl border border-red-100 shadow-sm flex items-center gap-4">
             <div className="w-10 h-10 rounded-xl bg-red-50 flex items-center justify-center text-red-500">
-              <svg
-                className="w-5 h-5"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
-                />
-              </svg>
+              <XCircleSVG className="w-5 h-5" />
             </div>
             <div>
               <h3 className="text-xl font-black text-red-600">
@@ -260,19 +212,7 @@ const TakeAttendance = () => {
 
           <div className="bg-white p-4 rounded-2xl border border-amber-100 shadow-sm flex items-center gap-4">
             <div className="w-10 h-10 rounded-xl bg-amber-50 flex items-center justify-center text-amber-500">
-              <svg
-                className="w-5 h-5"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-                />
-              </svg>
+              <MissingSVG className="w-5 h-5" />
             </div>
             <div>
               <h3 className="text-xl font-black text-amber-600">

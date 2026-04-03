@@ -1,4 +1,5 @@
 import AttendanceCircle from "./AttendanceCircle";
+import { ChevronLeftSVG, ChevronRightSVG } from "../../../UI/SVG";
 
 const WEEKDAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
@@ -19,14 +20,7 @@ const AttendanceCalendar = ({
             className="p-1 hover:bg-gray-100 rounded-full transition-colors"
             aria-label="Previous month"
           >
-            <svg
-              className="w-5 h-5"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path d="M15 19l-7-7 7-7" strokeWidth="2" />
-            </svg>
+            <ChevronLeftSVG className="w-5 h-5" />
           </button>
           <span className="text-sm font-bold text-gray-900">
             {month.toLocaleString("default", { month: "long" })}{" "}
@@ -37,14 +31,7 @@ const AttendanceCalendar = ({
             className="p-1 hover:bg-gray-100 rounded-full transition-colors"
             aria-label="Next month"
           >
-            <svg
-              className="w-5 h-5"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path d="M9 5l7 7-7 7" strokeWidth="2" />
-            </svg>
+            <ChevronRightSVG className="w-5 h-5" />
           </button>
         </div>
       </div>

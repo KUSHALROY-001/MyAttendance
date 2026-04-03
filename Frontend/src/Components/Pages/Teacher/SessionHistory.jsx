@@ -1,26 +1,17 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
-
-const StatCard = ({ title, value, icon, iconBg }) => {
-  return (
-    <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 w-full">
-      <div className="flex justify-between items-start">
-        <div>
-          <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">
-            {title}
-          </p>
-          <h3 className="text-xl font-black text-gray-900">{value}</h3>
-        </div>
-        <div
-          className={`w-8 h-8 rounded-lg flex items-center justify-center ${iconBg}`}
-        >
-          {icon}
-        </div>
-      </div>
-    </div>
-  );
-};
+import StatCard from "../../UI/StatCard";
+import LoadingAnimation from "../../UI/LoadingAnimation";
+import ItemNotFound from "../../UI/ItemNotFound";
+import {
+  BackArrowSVG,
+  BookSVG,
+  UsersSVG,
+  PlayCircleSVG,
+  XCircleSVG,
+  ChartSVG,
+} from "../../UI/SVG";
 
 const SessionHistory = () => {
   const { sessionId } = useParams();
@@ -44,28 +35,14 @@ const SessionHistory = () => {
     fetchSessionDetails();
   }, [sessionId]);
 
+  // remove the redundant code
   if (loading) {
-    return (
-      <div className="flex h-screen items-center justify-center bg-gray-50 pb-20">
-        <div className="w-8 h-8 rounded-full border-4 border-indigo-100 border-t-indigo-600 animate-spin"></div>
-      </div>
-    );
+    return <LoadingAnimation />;
   }
 
+  // remove the redundant code
   if (!session) {
-    return (
-      <div className="flex flex-col h-screen items-center justify-center bg-gray-50 pb-20">
-        <h2 className="text-xl font-bold text-gray-800 mb-2">
-          Session Not Found
-        </h2>
-        <button
-          onClick={() => navigate(-1)}
-          className="px-4 py-2 bg-indigo-600 text-white font-bold rounded-lg hover:bg-indigo-700 transition"
-        >
-          Go Back
-        </button>
-      </div>
-    );
+    return <ItemNotFound item={"Session"} />;
   }
 
   const totalStudents = session.students.length;
@@ -91,19 +68,7 @@ const SessionHistory = () => {
             onClick={() => navigate(-1)}
             className="p-2 bg-white rounded-full shadow-sm hover:bg-gray-50 border border-gray-200 transition"
           >
-            <svg
-              className="w-5 h-5 text-gray-600"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M10 19l-7-7m0 0l7-7m-7 7h18"
-              />
-            </svg>
+            <BackArrowSVG />
           </button>
           <div>
             <h1 className="text-2xl font-black text-gray-900 tracking-tight">
@@ -126,19 +91,7 @@ const SessionHistory = () => {
             <div>
               <div className="flex items-center space-x-3 mb-2">
                 <div className="w-10 h-10 bg-indigo-50 rounded-lg flex items-center justify-center text-indigo-600">
-                  <svg
-                    className="w-5 h-5"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
-                    />
-                  </svg>
+                  <BookSVG className="w-5 h-5" />
                 </div>
                 <div>
                   <h2 className="text-lg font-bold text-gray-900 leading-tight">
@@ -160,87 +113,25 @@ const SessionHistory = () => {
                 title="Total"
                 value={totalStudents}
                 iconBg="bg-gray-100"
-                icon={
-                  <svg
-                    className="w-4 h-4 text-gray-600"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
-                    />
-                  </svg>
-                }
+                icon={<UsersSVG className="w-4 h-4 text-gray-600" />}
               />
               <StatCard
                 title="Present"
                 value={presentCount}
                 iconBg="bg-emerald-100"
-                icon={
-                  <svg
-                    className="w-4 h-4 text-emerald-600"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"
-                    />
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                    />
-                  </svg>
-                }
+                icon={<PlayCircleSVG className="w-4 h-4 text-emerald-600" />}
               />
               <StatCard
                 title="Absent"
                 value={absentCount}
                 iconBg="bg-red-100"
-                icon={
-                  <svg
-                    className="w-4 h-4 text-red-600"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
-                    />
-                  </svg>
-                }
+                icon={<XCircleSVG className="w-4 h-4 text-red-600" />}
               />
               <StatCard
                 title="Ratio"
                 value={`${attendancePercentage}%`}
                 iconBg="bg-indigo-100"
-                icon={
-                  <svg
-                    className="w-4 h-4 text-indigo-600"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
-                    />
-                  </svg>
-                }
+                icon={<ChartSVG className="w-4 h-4 text-indigo-600" />}
               />
             </div>
           </div>

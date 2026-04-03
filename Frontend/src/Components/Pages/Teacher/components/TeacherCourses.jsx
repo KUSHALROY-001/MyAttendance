@@ -15,24 +15,21 @@ const TeacherCourses = ({ courses }) => {
             key={course.id}
             className="flex-1 block bg-white border border-gray-100 shadow-sm rounded-xl p-5 hover:border-indigo-200 transition-colors group cursor-pointer"
           >
-            <div className="flex justify-between items-start mb-4">
-              <div>
-                <h3 className="text-sm font-bold text-gray-900 group-hover:text-indigo-600 transition-colors">
+            <div className="mb-4">
+              <div className="flex justify-between mb-1">
+                <h3 className="text-base font-bold text-gray-900 group-hover:text-indigo-600 transition-colors">
                   {course.name}
                 </h3>
-                <p className="text-[12px] font-bold text-gray-600 uppercase tracking-widest mt-1">
+                <p className="text-base font-bold text-gray-600 uppercase tracking-widest mt-1">
                   {course.code}
                 </p>
-                <p className="text-[12px] font-semibold text-gray-500">
+              </div>
+              <div className="flex justify-between">
+                <p className="text-[14px] font-semibold text-gray-500">
                   {course.department} • {course.semester} • {course.section}
                 </p>
-              </div>
-              <div className="text-right">
-                <span className="text-2xl font-black text-indigo-600">
-                  {course.classesConducted}
-                </span>
-                <p className="text-[12px] font-bold text-gray-400 -mt-1 uppercase tracking-widest">
-                  Classes
+                <p className="text-[14px] font-semibold text-gray-900 bg-gray-300 hover:bg-green-300 rounded-xl px-2 py-0.5">
+                  Full history {">"}
                 </p>
               </div>
             </div>

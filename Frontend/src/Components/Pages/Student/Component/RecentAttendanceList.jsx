@@ -8,7 +8,10 @@ const RecentAttendanceList = ({ records }) => {
   });
 
   // Sort them descending by date
-  allRecords.sort((a, b) => new Date(b.displayDate).getTime() - new Date(a.displayDate).getTime());
+  allRecords.sort(
+    (a, b) =>
+      new Date(b.displayDate).getTime() - new Date(a.displayDate).getTime(),
+  );
 
   return (
     <div className="lg:col-span-1 bg-white rounded-2xl shadow-sm border border-gray-100 p-6 h-full flex flex-col">
@@ -22,8 +25,8 @@ const RecentAttendanceList = ({ records }) => {
           const course = rec.course || null;
 
           return (
-            <div 
-              key={`${rec.displayDate}-${index}`} 
+            <div
+              key={`${rec.displayDate}-${index}`}
               className={`flex items-center justify-between px-3 py-2 rounded-xl border transition-colors ${
                 status === "PRESENT"
                   ? "bg-green-50/50 border-green-100"
@@ -87,7 +90,9 @@ const RecentAttendanceList = ({ records }) => {
           );
         })}
         {allRecords.length === 0 && (
-          <p className="text-sm text-gray-400 text-center py-4">No recent records.</p>
+          <p className="text-sm text-gray-400 text-center py-4">
+            No recent records.
+          </p>
         )}
       </div>
     </div>

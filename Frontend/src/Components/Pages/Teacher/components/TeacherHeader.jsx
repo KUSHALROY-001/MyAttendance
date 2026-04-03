@@ -1,4 +1,5 @@
 import React from "react";
+import { PlusSVG } from "../../../UI/SVG";
 
 const TeacherHeader = ({ teacherName, onStartAttendance }) => {
   return (
@@ -15,19 +16,7 @@ const TeacherHeader = ({ teacherName, onStartAttendance }) => {
         onClick={onStartAttendance}
         className="inline-flex items-center justify-center rounded-lg bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-indigo-700 transition shadow-sm"
       >
-        <svg
-          className="w-4 h-4 mr-2"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth="2"
-            d="M12 4v16m8-8H4"
-          />
-        </svg>
+        <PlusSVG className="w-4 h-4 mr-2" />
         Start Attendance
       </button>
     </div>

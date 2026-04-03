@@ -81,6 +81,30 @@ const getTeacherDashboard = async (req, res) => {
     // Sort flattened attendance by date descending
     recentAttendance.sort((a, b) => new Date(b.date) - new Date(a.date));
 
+    // Calculate true historical counts on database
+    const allocationIds = teacher.courseAllocations.map((a) => a.id);
+
+    let totalSessions = 0;
+    let thisMonthSessions = 0;
+
+    if (allocationIds.length > 0) {
+      const startOfMonth = new Date();
+      startOfMonth.setDate(1);
+      startOfMonth.setHours(0, 0, 0, 0);
+
+      [totalSessions, thisMonthSessions] = await Promise.all([
+        prisma.attendanceSession.count({
+          where: { courseAllocationId: { in: allocationIds } },
+        }),
+        prisma.attendanceSession.count({
+          where: {
+            courseAllocationId: { in: allocationIds },
+            date: { gte: startOfMonth },
+          },
+        }),
+      ]);
+    }
+
     return res.status(200).json({
       employeeId: teacher.employeeId,
       designation: teacher.designation,
@@ -88,6 +112,8 @@ const getTeacherDashboard = async (req, res) => {
       user: teacher.user,
       allocations: formattedAllocations,
       recentAttendance,
+      totalSessions,
+      thisMonthSessions,
     });
   } catch (error) {
     console.error("Error fetching dashboard:", error);
