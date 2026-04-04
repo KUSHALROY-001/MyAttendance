@@ -1,6 +1,6 @@
 import React, { useMemo, useState, useEffect } from "react";
 import { Link, useParams, useLocation } from "react-router-dom";
-import axios from "axios";
+import axios from "../../../api/axios";
 import AttendanceCalendar from "./Component/AttendanceCalendar";
 import RecentAttendanceList from "./Component/RecentAttendanceList";
 import StatCard from "../../UI/StatCard";

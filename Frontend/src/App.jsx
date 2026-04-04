@@ -1,4 +1,7 @@
 import "./App.css";
+import { Toaster } from "react-hot-toast";
+import ErrorBoundary from "./Components/UI/ErrorBoundary";
+import PremiumErrorState from "./Components/UI/PremiumErrorState";
 
 import Navbar from "./Components/Layout/Navbar.jsx";
 import Footer from "./Components/Layout/Footer.jsx";
@@ -15,7 +18,8 @@ import TakeAttendance from "./Components/Pages/Teacher/TakeAttendance.jsx";
 
 function App() {
   return (
-    <>
+    <ErrorBoundary>
+      <Toaster position="top-right" />
       <Navbar />
       <Routes>
         <Route path="/" element={<Home />} />
@@ -27,9 +31,18 @@ function App() {
         <Route path="/teacher/session/:sessionId" element={<SessionHistory />} />
         <Route path="/teacher/course/:courseId" element={<TeacherCourseDetail />} />
         <Route path="/teacher/attendance/live/:allocationId" element={<TakeAttendance />} />
+        
+        {/* Fallback for unmatched routes */}
+        <Route path="*" element={
+          <PremiumErrorState 
+            title="Page Not Found" 
+            message="The URL you are trying to access does not exist or has been moved." 
+            errorCode="404" 
+          />
+        } />
       </Routes>
       <Footer />
-    </>
+    </ErrorBoundary>
   );
 }
 

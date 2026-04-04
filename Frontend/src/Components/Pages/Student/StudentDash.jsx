@@ -1,6 +1,7 @@
 import React, { useState, useMemo, useEffect, useCallback } from "react";
-import axios from "axios";
+import axios from "../../../api/axios";
 import { useLocation } from "react-router-dom";
+import PremiumErrorState from "../../UI/PremiumErrorState";
 import AttendanceCalendar from "./Component/AttendanceCalendar";
 import CourseCard from "./Component/CourseCard";
 import RecentAttendanceList from "./Component/RecentAttendanceList";
@@ -19,13 +20,19 @@ import { useCalendar } from "../../../hooks/useCalendar";
 const StudentDashboard = () => {
   const location = useLocation();
   const [stuData, setStuData] = useState(location.state?.user || null);
+  const [fetchError, setFetchError] = useState(null);
 
   useEffect(() => {
     if (stuData) return;
     axios
-      .get("/api/student/dashboard/BCA-002")
+      .get("/api/student/dashboard/BCA-002", { hideGlobalToast: true })
       .then((res) => setStuData(res.data))
-      .catch((err) => console.error("Error fetching student data", err));
+      .catch((err) => {
+        setFetchError({
+          status: err.response?.status || 500,
+          message: err.response?.data?.message || "Failed to load dashboard data",
+        });
+      });
   }, []); // only run once on mount
 
   // ──────────────────────── Memoised derivations ────────────────────────
@@ -65,6 +72,16 @@ const StudentDashboard = () => {
   }, [summaries]);
 
   // ─────────────────────── Loading state (guard BEFORE any render that uses stuData) ───────────────────────
+
+  if (fetchError) {
+    return (
+      <PremiumErrorState 
+        title={fetchError.status === 404 ? "Student Not Found" : "System Error"}
+        message={fetchError.message} 
+        errorCode={fetchError.status === 404 ? "404" : fetchError.status.toString()} 
+      />
+    );
+  }
 
   if (!stuData) {
     return <LoadingAnimation />;

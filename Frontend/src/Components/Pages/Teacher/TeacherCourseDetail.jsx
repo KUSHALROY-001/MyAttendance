@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
-import axios from "axios";
+import axios from "../../../api/axios";
 import SessionCard from "./components/SessionCard";
 import LoadingAnimation from "../../UI/LoadingAnimation";
-import ItemNotFound from "../../UI/ItemNotFound";
+import PremiumErrorState from "../../UI/PremiumErrorState";
 import StatCard from "../../UI/StatCard";
 import { BookSVG, ChartSVG, BackArrowSVG, MissingSVG } from "../../UI/SVG.jsx";
 
@@ -38,7 +38,7 @@ const TeacherCourseDetail = () => {
   }
 
   if (!courseData) {
-    return <ItemNotFound item={"Course"} />;
+    return <PremiumErrorState title="Course Not Found" message="No details found for this course assignment." errorCode="404" />;
   }
 
   return (
