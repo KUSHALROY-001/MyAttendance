@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import axios from "axios";
+import axios from "../../../api/axios";
 import {
   BackArrowSVG,
   UsersSVG,
@@ -9,7 +9,7 @@ import {
   MissingSVG,
 } from "../../UI/SVG";
 import LoadingAnimation from "../../UI/LoadingAnimation";
-import ItemNotFound from "../../UI/ItemNotFound";
+import PremiumErrorState from "../../UI/PremiumErrorState";
 
 const TakeAttendance = () => {
   const { allocationId } = useParams();
@@ -101,7 +101,7 @@ const TakeAttendance = () => {
   }
 
   if (!data) {
-    return <ItemNotFound item={"Class Roster"} />;
+    return <PremiumErrorState title="Class Roster Not Found" message="We couldn't locate the class roster for this session." errorCode="404" />;
   }
 
   const { allocation, students } = data;

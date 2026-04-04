@@ -6,7 +6,7 @@ import WeeklySchedule from "./components/WeeklySchedule";
 import AttendanceSessions from "./components/AttendanceSessions";
 import TeacherCourses from "./components/TeacherCourses";
 import StartAttendanceModal from "./components/StartAttendanceModal";
-import axios from "axios";
+import axios from "../../../api/axios";
 
 const TeacherDashboard = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -18,8 +18,6 @@ const TeacherDashboard = () => {
       try {
         const res = await axios.get("/api/teacher/dashboard/EMP-001");
         setTeacherData(res.data);
-      } catch (err) {
-        console.error("Failed to fetch teacher", err);
       } finally {
         setLoading(false);
       }

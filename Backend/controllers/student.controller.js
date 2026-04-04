@@ -1,5 +1,7 @@
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
+const ApiError = require("../utils/ApiError");
+const asyncHandler = require("../utils/asyncHandler");
 
 const STATUS_MAP = {
   PRESENT: "Present",
@@ -8,7 +10,7 @@ const STATUS_MAP = {
   LEAVE: "Leave",
 };
 
-const getStudentDashboard = async (req, res) => {
+const getStudentDashboard = asyncHandler(async (req, res) => {
   const { roll } = req.params;
 
   // OPTIMIZATION 1 & 2: A single, highly-filtered query
@@ -52,7 +54,7 @@ const getStudentDashboard = async (req, res) => {
   });
 
   if (!studentData) {
-    return res.status(404).json({ message: "Student not found" });
+    throw new ApiError(404, "Student not found");
   }
 
   // Initialize stats map
@@ -119,7 +121,7 @@ const getStudentDashboard = async (req, res) => {
   };
 
   return res.status(200).json(payload);
-};
+});
 
 module.exports = {
   getStudentDashboard,

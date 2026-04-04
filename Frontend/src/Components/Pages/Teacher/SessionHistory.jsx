@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import axios from "axios";
+import axios from "../../../api/axios";
 import StatCard from "../../UI/StatCard";
 import LoadingAnimation from "../../UI/LoadingAnimation";
-import ItemNotFound from "../../UI/ItemNotFound";
+import PremiumErrorState from "../../UI/PremiumErrorState";
 import {
   BackArrowSVG,
   BookSVG,
@@ -42,7 +42,7 @@ const SessionHistory = () => {
 
   // remove the redundant code
   if (!session) {
-    return <ItemNotFound item={"Session"} />;
+    return <PremiumErrorState title="Session Not Found" message="This attendance session doesn't exist or was removed." errorCode="404" />;
   }
 
   const totalStudents = session.students.length;
