@@ -43,6 +43,11 @@ const AdminToolbar = ({ searchProps, filters = [] }) => {
           <React.Fragment key={filter.label}>
             <div className="h-5 w-px bg-slate-200 dark:bg-slate-700 mx-2 md:mx-3 shrink-0" />
             <div className="relative flex items-center">
+              {filter.field && (
+                <span className="text-base font-semibold text-slate-400 dark:text-slate-500 mr-1 select-none">
+                  {filter.field}:
+                </span>
+              )}
               <select
                 value={filter.value}
                 onChange={(e) => filter.onChange(e.target.value)}
@@ -51,15 +56,19 @@ const AdminToolbar = ({ searchProps, filters = [] }) => {
                 <option value="" className="text-slate-500">
                   {filter.label}
                 </option>
-                {filter.options.map((opt) => (
-                  <option
-                    className="text-slate-900 dark:text-slate-900"
-                    key={typeof opt === "string" ? opt : opt.value}
-                    value={typeof opt === "string" ? opt : opt.value}
-                  >
-                    {typeof opt === "string" ? opt : opt.label}
-                  </option>
-                ))}
+                {filter.options.map((opt) => {
+                  const isPrimitive =
+                    typeof opt === "string" || typeof opt === "number";
+                  return (
+                    <option
+                      className="text-slate-900 dark:text-slate-900"
+                      key={isPrimitive ? opt : opt.value}
+                      value={isPrimitive ? opt : opt.value}
+                    >
+                      {isPrimitive ? opt : opt.label}
+                    </option>
+                  );
+                })}
               </select>
               <div className="absolute right-1 pointer-events-none text-slate-500">
                 <svg

@@ -29,6 +29,9 @@ function Navbar() {
           <Link to="/student" className="hover:text-indigo-600">
             Get Started
           </Link>
+          <Link to="/library" className="hover:text-indigo-600">
+            Library
+          </Link>
         </div>
 
         <Link

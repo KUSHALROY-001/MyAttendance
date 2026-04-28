@@ -1,119 +1,190 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import AdminTable from "./Component/AdminTable";
 import AdminModal from "./Component/AdminModal";
 import ConfirmDialog from "./Component/ConfirmDialog";
 import AdminToolbar from "./Component/AdminToolbar";
-import { mockStudents } from "../../../data/adminMockData";
+import AdminForm from "./Component/AdminForm";
 import { Plus, Pencil, Trash2 } from "lucide-react";
+import api from "../../../api/axios";
+
+const initial_form = {
+  name: "",
+  rollNumber: "",
+  email: "",
+  department: "BCA",
+  semester: "1",
+  section: "A",
+  batch: "",
+  contactNumber: "",
+};
+
+const columns = [
+  {
+    header: "Roll Number",
+    accessor: "rollNumber",
+    render: (r) => (
+      <span className="font-mono font-medium text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-500/10 px-2 py-1 rounded">
+        {r.rollNumber}
+      </span>
+    ),
+  },
+  {
+    header: "Name",
+    accessor: "name",
+    render: (r) => (
+      <div>
+        <p className="font-semibold text-slate-900 dark:text-white">
+          {r.user?.name}
+        </p>
+        <p className="text-xs text-slate-500">{r.user?.email}</p>
+      </div>
+    ),
+  },
+  {
+    header: "Dep/Sem",
+    accessor: "department",
+    render: (r) => `${r.department} Sem-${r.semester}`,
+  },
+  { header: "Section", accessor: "section" },
+  { header: "Batch", accessor: "batch" },
+];
 
 const AdminStudents = () => {
-  const [data, setData] = useState(mockStudents);
+  const [data, setData] = useState([]);
   const [search, setSearch] = useState("");
-  const [filterDept, setFilterDept] = useState("");
-  const [filterSem, setFilterSem] = useState("");
-  const [filterSec, setFilterSec] = useState("");
+  const [dept, setDept] = useState("BCA");
+  const [sem, setSem] = useState("1");
+  const [sec, setSec] = useState("");
+  const [departments, setDepartments] = useState([]);
 
-  // Modal states
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [currentRecord, setCurrentRecord] = useState(null); // null means ADD mode
-
-  // Delete dialog states
+  const [currentRecord, setCurrentRecord] = useState(null);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [recordToDelete, setRecordToDelete] = useState(null);
+  const [formData, setFormData] = useState(initial_form);
 
-  // Form state
-  const [formData, setFormData] = useState({
-    name: "",
-    rollNumber: "",
-    email: "",
-    department: "BCA",
-    semester: "1",
-    section: "A",
-    batch: "",
-    contactNumber: "",
-  });
+  useEffect(() => {
+    api.get("/api/admin/departments").then((res) => setDepartments(res.data));
+  }, []);
 
-  // Filtering
-  const filteredData = data.filter((s) => {
-    const matchesSearch =
-      s.name.toLowerCase().includes(search.toLowerCase()) ||
-      s.rollNumber.toLowerCase().includes(search.toLowerCase());
-    const matchesDept = filterDept ? s.department === filterDept : true;
-    const matchesSem = filterSem
-      ? s.semester.toString() === filterSem.toString()
-      : true;
-    const matchesSec = filterSec ? s.section === filterSec : true;
+  const fetchStudents = async () => {
+    const res = await api.get(
+      `/api/admin/students?department=${dept}&semester=${sem}&section=${sec}`,
+    );
+    setData(res.data);
+  };
 
-    return matchesSearch && matchesDept && matchesSem && matchesSec;
-  });
+  useEffect(() => {
+    fetchStudents();
+  }, [dept, sem, sec]);
 
-  const columns = [
-    {
-      header: "Roll Number",
-      accessor: "rollNumber",
-      render: (r) => (
-        <span className="font-mono font-medium text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-500/10 px-2 py-1 rounded">
-          {r.rollNumber}
-        </span>
-      ),
-    },
-    {
-      header: "Name",
-      accessor: "name",
-      render: (r) => (
-        <div>
-          <p className="font-semibold">{r.name}</p>
-          <p className="text-xs text-slate-500">{r.email}</p>
-        </div>
-      ),
-    },
-    {
-      header: "Dep/Sem",
-      accessor: "department",
-      render: (r) => `${r.department} Sem-${r.semester}`,
-    },
-    { header: "Section", accessor: "section" },
-    { header: "Batch", accessor: "batch" },
-  ];
+  const filteredData = data.filter(
+    (s) =>
+      s.user.name.toLowerCase().includes(search.toLowerCase()) ||
+      s.rollNumber.toLowerCase().includes(search.toLowerCase()),
+  );
 
   const handleOpenModal = (record = null) => {
     setCurrentRecord(record);
-    if (record) {
-      setFormData(record);
-    } else {
-      setFormData({
-        name: "",
-        rollNumber: "",
-        email: "",
-        department: "BCA",
-        semester: "1",
-        section: "A",
-        batch: "",
-        contactNumber: "",
-      });
-    }
+    setFormData(
+      record
+        ? {
+            name: record.user?.name || "",
+            rollNumber: record.rollNumber || "",
+            email: record.user?.email || "",
+            department: record.department || "BCA",
+            semester: record.semester?.toString() || "1",
+            section: record.section || "A",
+            batch: record.batch || "",
+            contactNumber: record.contactNumber || "",
+          }
+        : initial_form,
+    );
     setIsModalOpen(true);
   };
 
-  const handleSave = (e) => {
+  const handleSave = async (e) => {
     e.preventDefault();
-    if (currentRecord) {
-      // Edit
-      setData(
-        data.map((d) =>
-          d.id === currentRecord.id ? { ...d, ...formData } : d,
-        ),
-      );
-    } else {
-      // Add
-      setData([...data, { id: Date.now(), ...formData }]);
+    try {
+      if (currentRecord) {
+        await api.put(`/api/admin/students/${currentRecord.id}`, formData);
+      } else {
+        await api.post("/api/admin/students", formData);
+      }
+      setIsModalOpen(false);
+      await fetchStudents();
+    } catch (err) {
+      alert(err.response?.data?.message || "Something went wrong!");
     }
-    setIsModalOpen(false);
   };
 
-  const handleDelete = () => {
-    setData(data.filter((d) => d.id !== recordToDelete.id));
+  const handleDelete = async () => {
+    try {
+      await api.delete(`/api/admin/students/${recordToDelete.id}`);
+      setIsDeleteDialogOpen(false);
+      setRecordToDelete(null);
+      await fetchStudents();
+    } catch (err) {
+      alert(err.response?.data?.message || "Failed to delete student!");
+    }
   };
+
+  const currentDept = departments.find((d) => d.code === dept);
+  const semOptions = currentDept?.semesterDetails.map((s) => s.semester) || [];
+  const secOptions =
+    currentDept?.semesterDetails.find(
+      (s) => s.semester.toString() === sem.toString(),
+    )?.sections || [];
+
+  const formCurrentDept = departments.find(
+    (d) => d.code === formData.department,
+  );
+  const formSemOptions =
+    formCurrentDept?.semesterDetails.map((s) => s.semester) || [];
+  const formSecOptions =
+    formCurrentDept?.semesterDetails.find(
+      (s) => s.semester.toString() === formData.semester?.toString(),
+    )?.sections || [];
+
+  const student_fields = [
+    { name: "name", label: "Full Name", colSpan: 6 },
+    {
+      name: "rollNumber",
+      label: "Roll Number",
+      className: "font-mono",
+      colSpan: 6,
+    },
+    { name: "email", label: "Email Address", type: "email", colSpan: 12 },
+    {
+      name: "department",
+      label: "Dept",
+      type: "select",
+      options: departments.map((d) => d.code),
+      colSpan: 6,
+    },
+    {
+      name: "semester",
+      label: "Semester",
+      type: "select",
+      options: formSemOptions,
+      colSpan: 3,
+    },
+    {
+      name: "section",
+      label: "Section",
+      type: "select",
+      options: formSecOptions,
+      colSpan: 3,
+    },
+    {
+      name: "batch",
+      label: "Batch Year",
+      required: false,
+      placeholder: "e.g. 2023-26",
+      colSpan: 6,
+    },
+    { name: "contactNumber", label: "Contact", required: false, colSpan: 6 },
+  ];
 
   return (
     <div className="space-y-6 animate-in fade-in duration-300">
@@ -135,7 +206,6 @@ const AdminStudents = () => {
         </button>
       </div>
 
-      {/* Toolbar */}
       <AdminToolbar
         searchProps={{
           value: search,
@@ -145,21 +215,23 @@ const AdminStudents = () => {
         filters={[
           {
             label: "Dept",
-            value: filterDept,
-            onChange: setFilterDept,
-            options: [...new Set(data.map((d) => d.department))],
+            value: dept,
+            onChange: setDept,
+            options: departments.map((d) => d.code),
           },
           {
             label: "Sem",
-            value: filterSem,
-            onChange: setFilterSem,
-            options: [...new Set(data.map((d) => d.semester))].sort(),
+            value: sem,
+            onChange: setSem,
+            field: "Sem",
+            options: semOptions,
           },
           {
             label: "Sec",
-            value: filterSec,
-            onChange: setFilterSec,
-            options: [...new Set(data.map((d) => d.section))].sort(),
+            value: sec,
+            onChange: setSec,
+            field: "Sec",
+            options: secOptions,
           },
         ]}
       />
@@ -193,140 +265,14 @@ const AdminStudents = () => {
         onClose={() => setIsModalOpen(false)}
         title={currentRecord ? "Edit Student" : "Add New Student"}
       >
-        <form onSubmit={handleSave} className="space-y-4">
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-1">
-              <label className="text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase">
-                Full Name
-              </label>
-              <input
-                required
-                type="text"
-                className="w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm focus:ring-2 focus:ring-indigo-500 outline-none text-slate-900 dark:text-white"
-                value={formData.name}
-                onChange={(e) =>
-                  setFormData({ ...formData, name: e.target.value })
-                }
-              />
-            </div>
-            <div className="space-y-1">
-              <label className="text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase">
-                Roll Number
-              </label>
-              <input
-                required
-                type="text"
-                className="w-full px-3 py-2 font-mono rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm focus:ring-2 focus:ring-indigo-500 outline-none text-slate-900 dark:text-white"
-                value={formData.rollNumber}
-                onChange={(e) =>
-                  setFormData({ ...formData, rollNumber: e.target.value })
-                }
-              />
-            </div>
-          </div>
-          <div className="space-y-1">
-            <label className="text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase">
-              Email Address
-            </label>
-            <input
-              required
-              type="email"
-              className="w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm focus:ring-2 focus:ring-indigo-500 outline-none text-slate-900 dark:text-white"
-              value={formData.email}
-              onChange={(e) =>
-                setFormData({ ...formData, email: e.target.value })
-              }
-            />
-          </div>
-          <div className="grid grid-cols-3 gap-4">
-            <div className="space-y-1">
-              <label className="text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase">
-                Dept
-              </label>
-              <input
-                required
-                type="text"
-                className="w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm focus:ring-2 focus:ring-indigo-500 outline-none text-slate-900 dark:text-white"
-                value={formData.department}
-                onChange={(e) =>
-                  setFormData({ ...formData, department: e.target.value })
-                }
-              />
-            </div>
-            <div className="space-y-1">
-              <label className="text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase">
-                Semester
-              </label>
-              <input
-                required
-                type="number"
-                className="w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm focus:ring-2 focus:ring-indigo-500 outline-none text-slate-900 dark:text-white"
-                value={formData.semester}
-                onChange={(e) =>
-                  setFormData({ ...formData, semester: e.target.value })
-                }
-              />
-            </div>
-            <div className="space-y-1">
-              <label className="text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase">
-                Section
-              </label>
-              <input
-                required
-                type="text"
-                className="w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm focus:ring-2 focus:ring-indigo-500 outline-none text-slate-900 dark:text-white"
-                value={formData.section}
-                onChange={(e) =>
-                  setFormData({ ...formData, section: e.target.value })
-                }
-              />
-            </div>
-          </div>
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-1">
-              <label className="text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase">
-                Batch Year
-              </label>
-              <input
-                type="text"
-                className="w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm focus:ring-2 focus:ring-indigo-500 outline-none text-slate-900 dark:text-white"
-                value={formData.batch}
-                onChange={(e) =>
-                  setFormData({ ...formData, batch: e.target.value })
-                }
-                placeholder="e.g. 2023-26"
-              />
-            </div>
-            <div className="space-y-1">
-              <label className="text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase">
-                Contact
-              </label>
-              <input
-                type="text"
-                className="w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm focus:ring-2 focus:ring-indigo-500 outline-none text-slate-900 dark:text-white"
-                value={formData.contactNumber}
-                onChange={(e) =>
-                  setFormData({ ...formData, contactNumber: e.target.value })
-                }
-              />
-            </div>
-          </div>
-          <div className="pt-4 flex justify-end gap-3">
-            <button
-              type="button"
-              onClick={() => setIsModalOpen(false)}
-              className="px-4 py-2 font-medium bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700 transition"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              className="px-4 py-2 font-medium bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition shadow-sm"
-            >
-              Save Student
-            </button>
-          </div>
-        </form>
+        <AdminForm
+          formData={formData}
+          setFormData={setFormData}
+          onSubmit={handleSave}
+          onCancel={() => setIsModalOpen(false)}
+          submitLabel={currentRecord ? "Update Student" : "Save Student"}
+          fields={student_fields}
+        />
       </AdminModal>
 
       <ConfirmDialog
@@ -334,7 +280,7 @@ const AdminStudents = () => {
         onClose={() => setIsDeleteDialogOpen(false)}
         onConfirm={handleDelete}
         title="Delete Student"
-        message={`Are you sure you want to delete ${recordToDelete?.name}? This action cannot be undone and will remove all their attendance records.`}
+        message={`Are you sure you want to delete ${recordToDelete?.user?.name || recordToDelete?.rollNumber}? This action cannot be undone and will remove all their attendance records.`}
       />
     </div>
   );

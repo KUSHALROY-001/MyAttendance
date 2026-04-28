@@ -293,7 +293,7 @@ const getLiveAttendance = asyncHandler(async (req, res) => {
 const submitAttendance = asyncHandler(async (req, res) => {
   const { courseAllocationId, date, records } = req.body;
 
-  // ALREADY OPTIMIZED: Nested Writes (create) is the fastest way to insert relational data
+  // Step 1: Create the attendance session with all student records in one nested write
   const session = await prisma.attendanceSession.create({
     data: {
       courseAllocationId: parseInt(courseAllocationId),
@@ -306,6 +306,33 @@ const submitAttendance = asyncHandler(async (req, res) => {
       },
     },
   });
+
+  // Step 2: Update the StudentAttendanceStat cache using two fast batch queries
+  // Get ALL student IDs in this class (everyone's totalSessions goes up by 1)
+  const allStudentIds = records.map((r) => parseInt(r.student));
+
+  // Get ONLY the IDs of students who were present or late (their totalAttended goes up by 1)
+  const presentStudentIds = records
+    .filter(
+      (r) =>
+        r.status.toUpperCase() === "PRESENT" ||
+        r.status.toUpperCase() === "LATE"
+    )
+    .map((r) => parseInt(r.student));
+
+  // Run both updates simultaneously inside a transaction for safety
+  await prisma.$transaction([
+    // Increment totalSessions for every student in the class
+    prisma.studentAttendanceStat.updateMany({
+      where: { studentId: { in: allStudentIds } },
+      data: { totalSessions: { increment: 1 } },
+    }),
+    // Increment totalAttended only for students who were present/late
+    prisma.studentAttendanceStat.updateMany({
+      where: { studentId: { in: presentStudentIds } },
+      data: { totalAttended: { increment: 1 } },
+    }),
+  ]);
 
   return res
     .status(201)

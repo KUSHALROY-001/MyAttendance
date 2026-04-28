@@ -1,23 +1,38 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import AdminStatCard from "./Component/AdminStatCard";
-import {
-  mockSessions,
-  mockDefaulters,
-  mockStudents,
-  mockTeachers,
-  mockCourses,
-} from "../../../data/adminMockData";
-
-import {
-  Users,
-  GraduationCap,
-  BookOpen,
-  CheckCircle,
-  TrendingUp,
-  AlertTriangle,
-} from "lucide-react";
+import LoadingAnimation from "../../UI/LoadingAnimation";
+import StatCard from "../../UI/StatCard";
+import { Users, GraduationCap, BookOpen } from "lucide-react";
+import api from "../../../api/axios";
 
 const AdminDashboard = () => {
+  const [dashboardData, setDashboardData] = useState({
+    student: 0,
+    teacher: 0,
+    department: 0,
+    recentSessions: [],
+  });
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchDashboardData = async () => {
+      try {
+        const response = await api.get("/api/admin/dashboard");
+        setDashboardData(response.data);
+      } catch (error) {
+        console.error("Error fetching admin dashboard data:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchDashboardData();
+  }, []);
+
+  if (loading) {
+    return <LoadingAnimation />;
+  }
+
   return (
     <div className="space-y-6">
       <div>
@@ -31,60 +46,33 @@ const AdminDashboard = () => {
 
       {/* Top Stats Grid */}
       <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-6">
-        <AdminStatCard
+        <StatCard
           title="Total Students"
-          value={mockStudents.length.toString()}
-          icon={<Users className="w-6 h-6" />}
-          iconColor="text-blue-500"
-          bgColor="bg-blue-500/10"
+          value={dashboardData.student?.toString()}
+          icon={<Users className="w-6 h-6 text-blue-500" />}
+          iconBg="bg-blue-500/10"
         />
-        <AdminStatCard
+        <StatCard
           title="Total Teachers"
-          value={mockTeachers.length.toString()}
-          icon={<GraduationCap className="w-6 h-6" />}
-          iconColor="text-indigo-500"
-          bgColor="bg-indigo-500/10"
+          value={dashboardData.teacher?.toString()}
+          icon={<GraduationCap className="w-6 h-6  text-indigo-500" />}
+          iconBg="bg-indigo-500/10"
         />
-        <AdminStatCard
-          title="Total Courses"
-          value={mockCourses.length.toString()}
-          icon={<BookOpen className="w-6 h-6" />}
-          iconColor="text-violet-500"
-          bgColor="bg-violet-500/10"
-        />
-        <AdminStatCard
-          title="Sessions Today"
-          value="4"
-          icon={<CheckCircle className="w-6 h-6" />}
-          subtitle="3 pending"
-          iconColor="text-emerald-500"
-          bgColor="bg-emerald-500/10"
-        />
-        <AdminStatCard
-          title="Avg Attendance"
-          value="84%"
-          icon={<TrendingUp className="w-6 h-6" />}
-          subtitle="+2% from last week"
-          iconColor="text-amber-500"
-          bgColor="bg-amber-500/10"
-        />
-        <AdminStatCard
-          title="Defaulters Alert"
-          value={mockDefaulters.length.toString()}
-          icon={<AlertTriangle className="w-6 h-6" />}
-          subtitle="Students < 75%"
-          iconColor="text-red-500"
-          bgColor="bg-red-500/10"
+        <StatCard
+          title="Total Departments"
+          value={dashboardData.department?.toString()}
+          icon={<BookOpen className="w-6 h-6 text-violet-500" />}
+          iconBg="bg-violet-500/10"
         />
       </div>
 
-      {/* Two Column Layout for Dash Data */}
-      <div className="grid lg:grid-cols-3 gap-6">
+      {/* Dash Data */}
+      <div>
         {/* Recent Sessions Table */}
-        <div className="lg:col-span-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-sm overflow-hidden flex flex-col">
+        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-sm overflow-hidden flex flex-col">
           <div className="p-5 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center bg-slate-50/50 dark:bg-slate-800/30">
             <h2 className="text-lg font-semibold text-slate-900 dark:text-white">
-              Recent Sessions
+              10 Recent Sessions
             </h2>
             <button className="text-sm font-medium text-indigo-600 dark:text-indigo-400 hover:underline">
               View All
@@ -101,97 +89,76 @@ const AdminDashboard = () => {
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 dark:divide-slate-800 block sm:table-row-group">
-                {mockSessions.slice(0, 4).map((session) => (
-                  <tr
-                    key={session.id}
-                    className="hover:bg-slate-50/50 dark:hover:bg-slate-800/30 block sm:table-row"
-                  >
-                    <td className="px-4 py-3 sm:px-5 block sm:table-cell border-b sm:border-0 border-slate-100 dark:border-slate-800">
-                      <span className="sm:hidden font-semibold text-xs uppercase text-slate-400 block mb-1">
-                        Course
-                      </span>
-                      <p className="font-medium text-slate-900 dark:text-slate-200">
-                        {session.course}
-                      </p>
-                      <p className="text-xs text-slate-500">
-                        {new Date(session.date).toLocaleTimeString([], {
-                          hour: "2-digit",
-                          minute: "2-digit",
-                        })}
-                      </p>
-                    </td>
-                    <td className="px-4 py-3 sm:px-5 block sm:table-cell border-b sm:border-0 border-slate-100 dark:border-slate-800">
-                      <span className="sm:hidden font-semibold text-xs uppercase text-slate-400 block mb-1">
-                        Teacher
-                      </span>
-                      {session.teacher}
-                    </td>
-                    <td className="px-4 py-3 sm:px-5 block sm:table-cell border-b sm:border-0 border-slate-100 dark:border-slate-800">
-                      <span className="sm:hidden font-semibold text-xs uppercase text-slate-400 block mb-1">
-                        Class Info
-                      </span>
-                      <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-300">
-                        {session.department} •{" "}
-                        {session.semester
-                          ? `Sem ${session.semester}`
-                          : `Sec ${session.section}`}
-                      </span>
-                    </td>
-                    <td className="px-4 py-3 sm:px-5 block sm:table-cell text-left sm:text-right">
-                      <span className="sm:hidden font-semibold text-xs uppercase text-slate-400 block mb-1">
-                        Attendance
-                      </span>
-                      <div className="flex items-center sm:justify-end gap-2">
-                        <span className="font-semibold text-slate-900 dark:text-white">
-                          {session.present}/{session.total}
+                {dashboardData.recentSessions?.length > 0 ? (
+                  dashboardData.recentSessions?.map((session) => (
+                    <tr
+                      key={session.id}
+                      className="hover:bg-slate-50/50 dark:hover:bg-slate-800/30 block sm:table-row"
+                    >
+                      <td className="px-4 py-3 sm:px-5 block sm:table-cell border-b sm:border-0 border-slate-100 dark:border-slate-800">
+                        <span className="sm:hidden font-semibold text-xs uppercase text-slate-400 block mb-1">
+                          Course
                         </span>
-                        <span className="text-xs text-slate-500">
-                          ({Math.round((session.present / session.total) * 100)}
-                          %)
+                        <p className="font-medium text-slate-900 dark:text-slate-200">
+                          {session.course}
+                        </p>
+                        <p className="text-xs text-slate-500">
+                          {new Date(session.date).toLocaleTimeString([], {
+                            hour: "2-digit",
+                            minute: "2-digit",
+                          })}
+                        </p>
+                      </td>
+                      <td className="px-4 py-3 sm:px-5 block sm:table-cell border-b sm:border-0 border-slate-100 dark:border-slate-800">
+                        <span className="sm:hidden font-semibold text-xs uppercase text-slate-400 block mb-1">
+                          Teacher
                         </span>
-                      </div>
+                        {session.teacher}
+                      </td>
+                      <td className="px-4 py-3 sm:px-5 block sm:table-cell border-b sm:border-0 border-slate-100 dark:border-slate-800">
+                        <span className="sm:hidden font-semibold text-xs uppercase text-slate-400 block mb-1">
+                          Class Info
+                        </span>
+                        <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-300">
+                          {session.department} •{" "}
+                          {session.semester
+                            ? `Sem ${session.semester}`
+                            : `Sec ${session.section}`}
+                        </span>
+                      </td>
+                      <td className="px-4 py-3 sm:px-5 block sm:table-cell text-left sm:text-right">
+                        <span className="sm:hidden font-semibold text-xs uppercase text-slate-400 block mb-1">
+                          Attendance
+                        </span>
+                        <div className="flex items-center sm:justify-end gap-2">
+                          <span className="font-semibold text-slate-900 dark:text-white">
+                            {session.present}/{session.total}
+                          </span>
+                          <span className="text-xs text-slate-500">
+                            (
+                            {session.total > 0
+                              ? Math.round(
+                                  (session.present / session.total) * 100,
+                                )
+                              : 0}
+                            %)
+                          </span>
+                        </div>
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td
+                      colSpan="4"
+                      className="px-5 py-8 text-center text-slate-500 block sm:table-cell"
+                    >
+                      No recent sessions found.
                     </td>
                   </tr>
-                ))}
+                )}
               </tbody>
             </table>
-          </div>
-        </div>
-
-        {/* Defaulters Panel */}
-        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-sm overflow-hidden flex flex-col">
-          <div className="p-5 border-b border-red-100 dark:border-red-900/30 flex justify-between items-center bg-red-50/50 dark:bg-red-900/10">
-            <div className="flex items-center gap-2 text-red-600 dark:text-red-400 font-semibold">
-              <AlertTriangle className="w-5 h-5" />
-              Critical Defaulters
-            </div>
-          </div>
-          <div className="p-0 divide-y divide-slate-100 dark:divide-slate-800">
-            {mockDefaulters.slice(0, 5).map((def) => (
-              <div
-                key={def.id}
-                className="p-4 flex items-center justify-between hover:bg-slate-50 dark:hover:bg-slate-800/30 transition"
-              >
-                <div>
-                  <p className="font-semibold text-sm text-slate-900 dark:text-white">
-                    {def.name}
-                  </p>
-                  <p className="text-xs text-slate-500 font-mono mt-0.5">
-                    {def.rollNumber} • {def.course}
-                  </p>
-                </div>
-                <div className="text-right">
-                  <div className="inline-flex items-center px-2 py-1 rounded-md bg-red-100 dark:bg-red-500/10 text-red-700 dark:text-red-400 font-bold text-xs ring-1 ring-inset ring-red-600/10 dark:ring-red-500/20">
-                    {def.percentage}%
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-          <div className="p-3 border-t border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/30 mt-auto">
-            <button className="w-full text-center text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white py-1">
-              View Full Report →
-            </button>
           </div>
         </div>
       </div>

@@ -25,11 +25,6 @@ const AdminStatCard = ({
           <h3 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white">
             {value}
           </h3>
-          {subtitle && (
-            <p className="text-xs text-slate-500 dark:text-slate-500 mt-2">
-              {subtitle}
-            </p>
-          )}
         </div>
         <div className={`p-3 rounded-lg ${bgColor} ${iconColor}`}>{icon}</div>
       </div>
