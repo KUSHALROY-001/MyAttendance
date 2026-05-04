@@ -1,7 +1,7 @@
 import React, { useState, useRef } from "react";
 import { Search } from "lucide-react";
 
-const AdminToolbar = ({ searchProps, filters = [] }) => {
+const AdminToolbar = ({ searchProps, filters = [], actions }) => {
   const [isSearchExpanded, setIsSearchExpanded] = useState(false);
   const inputRef = useRef(null);
 
@@ -13,7 +13,7 @@ const AdminToolbar = ({ searchProps, filters = [] }) => {
   };
 
   const handleBlur = () => {
-    if (!searchProps.value) {
+    if (!searchProps?.value) {
       setIsSearchExpanded(false);
     }
   };
@@ -22,27 +22,34 @@ const AdminToolbar = ({ searchProps, filters = [] }) => {
     <div className="flex bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-1.5 rounded-full shadow-sm w-full overflow-x-auto hide-scrollbar">
       <div className="flex items-center min-w-max px-2">
         {/* Search Section */}
-        <div
-          className={`flex items-center transition-all duration-300 ease-in-out ${isSearchExpanded || searchProps.value ? "bg-slate-50 dark:bg-slate-800 rounded-full px-3 py-1.5" : "p-1.5 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-full cursor-pointer"}`}
-          onClick={!isSearchExpanded ? expandSearch : undefined}
-        >
-          <Search className="w-5 h-5 text-slate-500 shrink-0" />
-          <input
-            ref={inputRef}
-            type="text"
-            placeholder={searchProps.placeholder || "Search..."}
-            value={searchProps.value}
-            onChange={(e) => searchProps.onChange(e.target.value)}
-            onBlur={handleBlur}
-            className={`bg-transparent outline-none text-sm text-slate-900 dark:text-white transition-all duration-300 ease-in-out placeholder-slate-400 ${isSearchExpanded || searchProps.value ? "w-32 lg:w-48 ml-2 opacity-100" : "w-0 opacity-0 pointer-events-none m-0"}`}
-          />
-        </div>
+        {searchProps && (
+          <div
+            className={`flex items-center transition-all duration-300 ease-in-out ${isSearchExpanded || searchProps.value ? "bg-slate-50 dark:bg-slate-800 rounded-full px-3 py-1.5" : "p-1.5 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-full cursor-pointer"}`}
+            onClick={!isSearchExpanded ? expandSearch : undefined}
+          >
+            <Search className="w-5 h-5 text-slate-500 shrink-0" />
+            <input
+              ref={inputRef}
+              type="text"
+              placeholder={searchProps.placeholder || "Search..."}
+              value={searchProps.value}
+              onChange={(e) => searchProps.onChange(e.target.value)}
+              onBlur={handleBlur}
+              className={`bg-transparent outline-none text-sm text-slate-900 dark:text-white transition-all duration-300 ease-in-out placeholder-slate-400 ${isSearchExpanded || searchProps.value ? "w-32 lg:w-48 ml-2 opacity-100" : "w-0 opacity-0 pointer-events-none m-0"}`}
+            />
+          </div>
+        )}
 
         {/* Dividers & Filters */}
         {filters.map((filter) => (
           <React.Fragment key={filter.label}>
             <div className="h-5 w-px bg-slate-200 dark:bg-slate-700 mx-2 md:mx-3 shrink-0" />
             <div className="relative flex items-center">
+              {filter.field && (
+                <span className="text-base font-semibold text-slate-400 dark:text-slate-500 mr-1 select-none">
+                  {filter.field}:
+                </span>
+              )}
               <select
                 value={filter.value}
                 onChange={(e) => filter.onChange(e.target.value)}
@@ -51,15 +58,19 @@ const AdminToolbar = ({ searchProps, filters = [] }) => {
                 <option value="" className="text-slate-500">
                   {filter.label}
                 </option>
-                {filter.options.map((opt) => (
-                  <option
-                    className="text-slate-900 dark:text-slate-900"
-                    key={typeof opt === "string" ? opt : opt.value}
-                    value={typeof opt === "string" ? opt : opt.value}
-                  >
-                    {typeof opt === "string" ? opt : opt.label}
-                  </option>
-                ))}
+                {filter.options.map((opt) => {
+                  const isPrimitive =
+                    typeof opt === "string" || typeof opt === "number";
+                  return (
+                    <option
+                      className="text-slate-900 dark:text-slate-900"
+                      key={isPrimitive ? opt : opt.value}
+                      value={isPrimitive ? opt : opt.value}
+                    >
+                      {isPrimitive ? opt : opt.label}
+                    </option>
+                  );
+                })}
               </select>
               <div className="absolute right-1 pointer-events-none text-slate-500">
                 <svg
@@ -80,6 +91,11 @@ const AdminToolbar = ({ searchProps, filters = [] }) => {
           </React.Fragment>
         ))}
       </div>
+
+      {/* Actions (right side) */}
+      {actions && (
+        <div className="ml-auto flex items-center px-2 shrink-0">{actions}</div>
+      )}
     </div>
   );
 };

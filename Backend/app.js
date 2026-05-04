@@ -4,6 +4,8 @@ const path = require("path");
 // Route imports
 const studentRoutes = require("./routes/student.route");
 const teacherRoutes = require("./routes/teacher.route");
+const adminRoutes = require("./routes/admin.route");
+const libraryRoutes = require("./routes/library.route");
 const errorHandler = require("./middlewares/error.middleware");
 
 // Load environment variables (looks for .env in project root)
@@ -18,6 +20,8 @@ app.use(express.urlencoded({ extended: true }));
 // Routes
 app.use("/api/student", studentRoutes);
 app.use("/api/teacher", teacherRoutes);
+app.use("/api/admin", adminRoutes);
+app.use("/api/library", libraryRoutes);
 
 // Global Error Handler Middleware
 app.use(errorHandler);

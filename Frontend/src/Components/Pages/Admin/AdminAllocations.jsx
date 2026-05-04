@@ -1,130 +1,245 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import AdminTable from "./Component/AdminTable";
 import AdminModal from "./Component/AdminModal";
 import ConfirmDialog from "./Component/ConfirmDialog";
 import AdminToolbar from "./Component/AdminToolbar";
-import {
-  mockAllocations,
-  mockTeachers,
-  mockCourses,
-} from "../../../data/adminMockData";
-import { Plus, Trash2 } from "lucide-react";
+import AdminForm from "./Component/AdminForm";
+import { Plus, Trash2, Pencil } from "lucide-react";
+import api from "../../../api/axios";
+
+const initial_form = {
+  teacherId: "",
+  courseId: "",
+  department: "BCA",
+  semester: "1",
+  section: "A",
+  academicYear: "2023-2024",
+};
+
+const columns = [
+  {
+    header: "Faculty",
+    accessor: "teacherName",
+    render: (r) => (
+      <span className="font-semibold text-slate-800 dark:text-slate-200">
+        {r.teacherName}
+      </span>
+    ),
+  },
+  {
+    header: "Course details",
+    accessor: "courseName",
+    render: (r) => (
+      <div>
+        <p className="font-semibold text-indigo-600 dark:text-indigo-400">
+          {r.courseName}
+        </p>
+        <p className="text-xs text-slate-500">{r.courseCode}</p>
+      </div>
+    ),
+  },
+  {
+    header: "Dept / Sem",
+    accessor: "department",
+    render: (r) => `${r.department} (Sem ${r.semester})`,
+  },
+  {
+    header: "Section",
+    accessor: "section",
+    render: (r) => (
+      <span className="px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 font-medium text-xs">
+        {r.section}
+      </span>
+    ),
+  },
+  { header: "Academic Yr", accessor: "academicYear" },
+];
 
 const AdminAllocations = () => {
-  const [data, setData] = useState(mockAllocations);
+  const [data, setData] = useState([]);
   const [search, setSearch] = useState("");
-  const [filterDept, setFilterDept] = useState("");
-  const [filterSem, setFilterSem] = useState("");
-  const [filterSec, setFilterSec] = useState("");
+  const [dept, setDept] = useState("BCA");
+  const [sem, setSem] = useState("1");
+  const [sec, setSec] = useState("");
+  const [departments, setDepartments] = useState([]);
+  const [teachers, setTeachers] = useState([]);
+  const [courses, setCourses] = useState([]);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [currentRecord, setCurrentRecord] = useState(null);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [recordToDelete, setRecordToDelete] = useState(null);
+  const [formData, setFormData] = useState(initial_form);
 
-  const [formData, setFormData] = useState({
-    teacherId: "",
-    courseCode: "",
-    department: "BCA",
-    semester: "1",
-    section: "A",
-    academicYear: "2023-2024",
-  });
+  useEffect(() => {
+    api.get("/api/admin/departments").then((res) => setDepartments(res.data));
+    api.get("/api/admin/courses").then((res) => setCourses(res.data));
+    api.get("/api/admin/teachers").then((res) => setTeachers(res.data));
+  }, []);
+
+  const fetchAllocations = async () => {
+    const res = await api.get("/api/admin/allocations");
+    setData(res.data);
+  };
+
+  useEffect(() => {
+    fetchAllocations();
+  }, []);
 
   const filteredData = data.filter((a) => {
     const matchesSearch =
-      a.teacherName.toLowerCase().includes(search.toLowerCase()) ||
-      a.courseName.toLowerCase().includes(search.toLowerCase());
-    const matchesDept = filterDept ? a.department === filterDept : true;
-    const matchesSem = filterSem
-      ? a.semester.toString() === filterSem.toString()
-      : true;
-    const matchesSec = filterSec ? a.section === filterSec : true;
+      a.teacherName?.toLowerCase().includes(search.toLowerCase()) ||
+      a.courseName?.toLowerCase().includes(search.toLowerCase());
+    const matchesDept = dept ? a.department === dept : true;
+    const matchesSem = sem ? a.semester.toString() === sem.toString() : true;
+    const matchesSec = sec ? a.section === sec : true;
 
     return matchesSearch && matchesDept && matchesSem && matchesSec;
   });
 
-  const columns = [
-    {
-      header: "Faculty",
-      accessor: "teacherName",
-      render: (r) => (
-        <span className="font-semibold text-slate-800 dark:text-slate-200">
-          {r.teacherName}
-        </span>
-      ),
-    },
-    {
-      header: "Course details",
-      accessor: "courseName",
-      render: (r) => (
-        <div>
-          <p className="font-semibold text-indigo-600 dark:text-indigo-400">
-            {r.courseName}
-          </p>
-          <p className="text-xs text-slate-500">{r.courseCode}</p>
-        </div>
-      ),
-    },
-    {
-      header: "Dept / Sem",
-      accessor: "department",
-      render: (r) => `${r.department} (Sem ${r.semester})`,
-    },
-    {
-      header: "Section",
-      accessor: "section",
-      render: (r) => (
-        <span className="px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 font-medium text-xs">
-          {r.section}
-        </span>
-      ),
-    },
-    { header: "Academic Yr", accessor: "academicYear" },
-  ];
-
-  const handleOpenModal = () => {
-    setFormData({
-      teacherId: "",
-      courseCode: "",
-      department: "BCA",
-      semester: "1",
-      section: "A",
-      academicYear: "2023-2024",
-    });
+  const handleOpenModal = (record = null) => {
+    // Check if record is actually a data object and not a click event
+    const isEdit = record && record.id && typeof record.id === "number";
+    
+    if (isEdit) {
+      setCurrentRecord(record);
+      setFormData({
+        teacherId: record.teacherId?.toString() || "",
+        courseId: record.courseId?.toString() || "",
+        department: record.department || "BCA",
+        semester: record.semester?.toString() || "1",
+        section: record.section || "A",
+        academicYear: record.academicYear || "2023-2024",
+      });
+    } else {
+      setCurrentRecord(null);
+      setFormData(initial_form);
+    }
     setIsModalOpen(true);
   };
 
-  const handleSave = (e) => {
+  // Reset dependent fields when department changes
+  useEffect(() => {
+    if (isModalOpen && !currentRecord) {
+      setFormData((prev) => ({
+        ...prev,
+        teacherId: "",
+        courseId: "",
+        semester: "1",
+        section: "A",
+      }));
+    }
+  }, [formData.department, isModalOpen, currentRecord]);
+
+  // Reset course when semester changes
+  useEffect(() => {
+    if (isModalOpen && !currentRecord) {
+      setFormData((prev) => ({
+        ...prev,
+        courseId: "",
+      }));
+    }
+  }, [formData.semester, isModalOpen, currentRecord]);
+
+  const handleSave = async (e) => {
     e.preventDefault();
-    // Lookup teacher name and course name from the selected IDs for mock rendering
-    const teacher = mockTeachers.find(
-      (t) => t.id.toString() === formData.teacherId.toString(),
-    );
-    const course = mockCourses.find((c) => c.code === formData.courseCode);
+    try {
+      if (currentRecord) {
+        await api.put(`/api/admin/allocations/${currentRecord.id}`, formData);
+      } else {
+        await api.post("/api/admin/allocations", formData);
+      }
+      setIsModalOpen(false);
+      await fetchAllocations();
+    } catch (err) {
+      alert(err.response?.data?.message || "Failed to save allocation!");
+    }
+  };
 
-    if (!teacher || !course)
-      return alert("Please select valid teacher and course.");
+  const handleDelete = async () => {
+    try {
+      await api.delete(`/api/admin/allocations/${recordToDelete.id}`);
+      setIsDeleteDialogOpen(false);
+      setRecordToDelete(null);
+      await fetchAllocations();
+    } catch (err) {
+      alert(err.response?.data?.message || "Failed to delete allocation!");
+    }
+  };
 
-    setData([
-      ...data,
+  const currentDept = departments.find((d) => d.code === dept);
+  const semOptions = currentDept?.semesterDetails.map((s) => s.semester) || [];
+  const secOptions = currentDept?.semesterDetails.find(
+      (s) => s.semester.toString() === sem.toString(),
+  )?.sections || [];
+
+  const formCurrentDept = departments.find(
+    (d) => d.code === formData.department,
+  );
+  const formSemOptions =
+    formCurrentDept?.semesterDetails.map((s) => s.semester) || [];
+  const formSecOptions = formCurrentDept?.semesterDetails.find(
+      (s) => s.semester.toString() === formData.semester?.toString(),
+  )?.sections || [];
+
+  // Filter teachers and courses for dropdown based on selected form department
+  const formTeachers = useMemo(() => {
+    return teachers
+      .filter((t) => t.department === formData.department)
+      .map((t) => ({ label: t.name, value: t.id }));
+  }, [teachers, formData.department]);
+
+  const formCourses = useMemo(() => {
+    return courses
+      .filter((c) => c.department === formData.department && c.semester.toString() === formData.semester?.toString())
+      .map((c) => ({ label: `${c.name} (${c.code})`, value: c.id }));
+  }, [courses, formData.department, formData.semester]);
+
+  const allocation_fields = useMemo(
+    () => [
       {
-        id: Date.now(),
-        teacherId: teacher.id,
-        teacherName: teacher.name,
-        courseCode: course.code,
-        courseName: course.name,
-        department: formData.department,
-        semester: parseInt(formData.semester),
-        section: formData.section,
-        academicYear: formData.academicYear,
+        name: "department",
+        label: "Department",
+        type: "select",
+        options: departments.map((d) => d.code),
+        colSpan: 6,
       },
-    ]);
-    setIsModalOpen(false);
-  };
-
-  const handleDelete = () => {
-    setData(data.filter((d) => d.id !== recordToDelete.id));
-  };
+      {
+        name: "semester",
+        label: "Semester",
+        type: "select",
+        options: formSemOptions,
+        colSpan: 3,
+      },
+      {
+        name: "section",
+        label: "Section",
+        type: "select",
+        options: formSecOptions,
+        colSpan: 3,
+      },
+      {
+        name: "teacherId",
+        label: "Select Teacher",
+        type: "select",
+        options: formTeachers,
+        colSpan: 6,
+      },
+      {
+        name: "courseId",
+        label: "Select Course",
+        type: "select",
+        options: formCourses,
+        colSpan: 6,
+      },
+      {
+        name: "academicYear",
+        label: "Academic Year",
+        colSpan: 12,
+      },
+    ],
+    [departments, formSemOptions, formSecOptions, formTeachers, formCourses],
+  );
 
   return (
     <div className="space-y-6 animate-in fade-in duration-300">
@@ -138,7 +253,7 @@ const AdminAllocations = () => {
           </p>
         </div>
         <button
-          onClick={handleOpenModal}
+          onClick={() => handleOpenModal()}
           className="inline-flex items-center justify-center rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-700 transition"
         >
           <Plus className="w-5 h-5 mr-1" />
@@ -155,21 +270,23 @@ const AdminAllocations = () => {
         filters={[
           {
             label: "Dept",
-            value: filterDept,
-            onChange: setFilterDept,
-            options: [...new Set(data.map((d) => d.department))],
+            value: dept,
+            onChange: setDept,
+            options: departments.map((d) => d.code),
           },
           {
             label: "Sem",
-            value: filterSem,
-            onChange: setFilterSem,
-            options: [...new Set(data.map((d) => d.semester))].sort(),
+            value: sem,
+            onChange: setSem,
+            field: "Sem",
+            options: semOptions,
           },
           {
             label: "Sec",
-            value: filterSec,
-            onChange: setFilterSec,
-            options: [...new Set(data.map((d) => d.section))].sort(),
+            value: sec,
+            onChange: setSec,
+            field: "Sec",
+            options: secOptions,
           },
         ]}
       />
@@ -178,142 +295,39 @@ const AdminAllocations = () => {
         columns={columns}
         data={filteredData}
         actions={(row) => (
-          <button
-            onClick={() => {
-              setRecordToDelete(row);
-              setIsDeleteDialogOpen(true);
-            }}
-            className="p-1.5 text-slate-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30 rounded transition"
-          >
-            <Trash2 className="w-5 h-5" />
-          </button>
+          <>
+            <button
+              onClick={() => handleOpenModal(row)}
+              className="p-1.5 text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 rounded transition"
+            >
+              <Pencil className="w-4 h-4" />
+            </button>
+            <button
+              onClick={() => {
+                setRecordToDelete(row);
+                setIsDeleteDialogOpen(true);
+              }}
+              className="p-1.5 text-slate-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30 rounded transition"
+            >
+              <Trash2 className="w-4 h-4" />
+            </button>
+          </>
         )}
       />
 
       <AdminModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        title="Assign New Course"
+        title={currentRecord ? "Edit Allocation" : "Assign New Course"}
       >
-        <form onSubmit={handleSave} className="space-y-4">
-          <div className="space-y-1">
-            <label className="text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase">
-              Select Teacher
-            </label>
-            <select
-              required
-              className="w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm focus:ring-2 focus:ring-indigo-500 outline-none text-slate-900 dark:text-white"
-              value={formData.teacherId}
-              onChange={(e) =>
-                setFormData({ ...formData, teacherId: e.target.value })
-              }
-            >
-              <option value="">-- Choose Faculty --</option>
-              {mockTeachers.map((t) => (
-                <option key={t.id} value={t.id}>
-                  {t.name} ({t.department})
-                </option>
-              ))}
-            </select>
-          </div>
-          <div className="space-y-1">
-            <label className="text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase">
-              Select Course
-            </label>
-            <select
-              required
-              className="w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm focus:ring-2 focus:ring-indigo-500 outline-none text-slate-900 dark:text-white"
-              value={formData.courseCode}
-              onChange={(e) =>
-                setFormData({ ...formData, courseCode: e.target.value })
-              }
-            >
-              <option value="">-- Choose Subject --</option>
-              {mockCourses.map((c) => (
-                <option key={c.id} value={c.code}>
-                  {c.name} ({c.code})
-                </option>
-              ))}
-            </select>
-          </div>
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-1">
-              <label className="text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase">
-                Department
-              </label>
-              <input
-                required
-                type="text"
-                className="w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm focus:ring-2 focus:ring-indigo-500 outline-none text-slate-900 dark:text-white"
-                value={formData.department}
-                onChange={(e) =>
-                  setFormData({ ...formData, department: e.target.value })
-                }
-              />
-            </div>
-            <div className="space-y-1">
-              <label className="text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase">
-                Semester
-              </label>
-              <input
-                required
-                type="number"
-                min="1"
-                max="10"
-                className="w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm focus:ring-2 focus:ring-indigo-500 outline-none text-slate-900 dark:text-white"
-                value={formData.semester}
-                onChange={(e) =>
-                  setFormData({ ...formData, semester: e.target.value })
-                }
-              />
-            </div>
-          </div>
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-1">
-              <label className="text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase">
-                Section
-              </label>
-              <input
-                required
-                type="text"
-                className="w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm focus:ring-2 focus:ring-indigo-500 outline-none text-slate-900 dark:text-white"
-                value={formData.section}
-                onChange={(e) =>
-                  setFormData({ ...formData, section: e.target.value })
-                }
-              />
-            </div>
-            <div className="space-y-1">
-              <label className="text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase">
-                Academic Year
-              </label>
-              <input
-                required
-                type="text"
-                className="w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm focus:ring-2 focus:ring-indigo-500 outline-none text-slate-900 dark:text-white"
-                value={formData.academicYear}
-                onChange={(e) =>
-                  setFormData({ ...formData, academicYear: e.target.value })
-                }
-              />
-            </div>
-          </div>
-          <div className="pt-4 flex justify-end gap-3">
-            <button
-              type="button"
-              onClick={() => setIsModalOpen(false)}
-              className="px-4 py-2 font-medium bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700 transition"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              className="px-4 py-2 font-medium bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition shadow-sm"
-            >
-              Assign Course
-            </button>
-          </div>
-        </form>
+        <AdminForm
+          formData={formData}
+          setFormData={setFormData}
+          onSubmit={handleSave}
+          onCancel={() => setIsModalOpen(false)}
+          submitLabel={currentRecord ? "Update Allocation" : "Assign Course"}
+          fields={allocation_fields}
+        />
       </AdminModal>
 
       <ConfirmDialog

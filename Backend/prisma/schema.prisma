@@ -6,8 +6,9 @@ generator client {
 }
 
 datasource db {
-  provider = "mysql"
-  url      = env("DATABASE_URL")
+  provider     = "mysql"
+  url          = env("DATABASE_URL")
+  relationMode = "prisma"
 }
 
 // ─────────────────────────────────────────────
@@ -23,14 +24,27 @@ model User {
   updatedAt DateTime @updatedAt
 
   // Relations
-  student Student?
-  teacher Teacher?
+  student          Student?
+  teacher          Teacher?
+  libraryResources LibraryResource[]
 }
 
 enum Role {
   STUDENT
   TEACHER
   ADMIN
+}
+
+// ─────────────────────────────────────────────
+// DEPARTMENT 
+// ─────────────────────────────────────────────
+model DepartmentInfo {
+  id              Int      @id @default(autoincrement())
+  name            String
+  code            String
+  semesterDetails Json // Stores the array of objects mentioned above
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 }
 
 // ─────────────────────────────────────────────
@@ -49,9 +63,10 @@ model Student {
   updatedAt     DateTime @updatedAt
 
   // Relations
-  user              User                @relation(fields: [userId], references: [id], onDelete: Cascade)
-  enrolledCourses   StudentCourse[]     // Many-to-many with Course
-  attendanceRecords AttendanceRecord[]  // All attendance records for this student
+  user              User                    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  enrolledCourses   StudentCourse[] // Many-to-many with Course
+  attendanceRecords AttendanceRecord[] // All attendance records for this student
+  attendanceStats   StudentAttendanceStat[] // Cached attendance per course
 }
 
 // ─────────────────────────────────────────────
@@ -63,11 +78,12 @@ model Teacher {
   employeeId  String   @unique
   designation String
   department  String
+  contactNumber String?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
   // Relations
-  user              User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user              User               @relation(fields: [userId], references: [id], onDelete: Cascade)
   courseAllocations CourseAllocation[]
   schedules         TeacherSchedule[]
 }
@@ -76,18 +92,55 @@ model Teacher {
 // TEACHER SCHEDULE — Replaces teacher.schedule[] embedded array
 // ─────────────────────────────────────────────
 model TeacherSchedule {
-  id         Int    @id @default(autoincrement())
-  teacherId  Int
-  day        String // e.g. "Monday"
-  slots      String // e.g. "1,2" (comma-separated slot numbers)
-  subject    String
-  department String
-  semester   String
-  section    String
-  room       String?
-  classType  String @default("class") // "class" or "lab"
+  id                 Int     @id @default(autoincrement())
+  teacherId          Int
+  courseAllocationId Int
+  day                String // e.g. "Monday"
+  slots              String // e.g. "1,2" (comma-separated slot numbers)
+  room               String?
+  classType          String  @default("class") // "class" or "lab"
 
-  teacher Teacher @relation(fields: [teacherId], references: [id], onDelete: Cascade)
+  teacher          Teacher          @relation(fields: [teacherId], references: [id], onDelete: Cascade)
+  courseAllocation CourseAllocation @relation(fields: [courseAllocationId], references: [id], onDelete: Cascade)
+
+  @@index([teacherId])
+  @@index([courseAllocationId])
+}
+
+// ─────────────────────────────────────────────
+// CLASS TIMETABLE — Stores period structure per class (dept+sem+sec)
+// ─────────────────────────────────────────────
+model ClassTimetable {
+  id         Int      @id @default(autoincrement())
+  department String
+  semester   Int
+  section    String
+  periods    Json     @default("[]") // [{period:1, startTime:"09:00", endTime:"10:00", type:"class"}]
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  entries ClassScheduleEntry[]
+
+  @@unique([department, semester, section])
+}
+
+// ─────────────────────────────────────────────
+// CLASS SCHEDULE ENTRY — One cell in the class timetable grid
+// ─────────────────────────────────────────────
+model ClassScheduleEntry {
+  id                Int    @id @default(autoincrement())
+  classTimetableId  Int
+  periodNumber      Int
+  day               String
+  courseAllocationId Int
+  room              String?
+  classType         String @default("class")
+
+  classTimetable   ClassTimetable   @relation(fields: [classTimetableId], references: [id], onDelete: Cascade)
+  courseAllocation  CourseAllocation @relation(fields: [courseAllocationId], references: [id], onDelete: Cascade)
+
+  @@unique([classTimetableId, periodNumber, day])
+  @@index([courseAllocationId])
 }
 
 // ─────────────────────────────────────────────
@@ -106,6 +159,7 @@ model Course {
   // Relations
   enrolledStudents StudentCourse[]
   allocations      CourseAllocation[]
+  attendanceStats  StudentAttendanceStat[]
 }
 
 // ─────────────────────────────────────────────
@@ -119,6 +173,7 @@ model StudentCourse {
   course  Course  @relation(fields: [courseId], references: [id], onDelete: Cascade)
 
   @@id([studentId, courseId]) // Composite primary key — a student can't enroll in same course twice
+  @@index([courseId])
 }
 
 // ─────────────────────────────────────────────
@@ -136,11 +191,14 @@ model CourseAllocation {
   updatedAt    DateTime @updatedAt
 
   // Relations
-  teacher            Teacher            @relation(fields: [teacherId], references: [id], onDelete: Cascade)
-  course             Course             @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  teacher            Teacher             @relation(fields: [teacherId], references: [id], onDelete: Cascade)
+  course             Course              @relation(fields: [courseId], references: [id], onDelete: Cascade)
   attendanceSessions AttendanceSession[]
+  schedules          TeacherSchedule[]
+  classScheduleEntries ClassScheduleEntry[]
 
   @@unique([teacherId, courseId, department, semester, section]) // A teacher can't be assigned same course+section twice
+  @@index([courseId])
 }
 
 // ─────────────────────────────────────────────
@@ -172,7 +230,7 @@ model AttendanceRecord {
   student Student           @relation(fields: [studentId], references: [id], onDelete: Cascade)
 
   @@unique([sessionId, studentId]) // A student can only have one status per session
-  @@index([studentId])             // Fast lookup: "find all sessions for a given student"
+  @@index([studentId]) // Fast lookup: "find all sessions for a given student"
 }
 
 enum AttendanceStatus {
@@ -180,4 +238,42 @@ enum AttendanceStatus {
   ABSENT
   LATE
   LEAVE
+}
+
+// ─────────────────────────────────────────────
+// STUDENT ATTENDANCE STAT — Live cached percentage data
+// ─────────────────────────────────────────────
+model StudentAttendanceStat {
+  id            Int @id @default(autoincrement())
+  studentId     Int
+  courseId      Int
+  totalSessions Int @default(0)
+  totalAttended Int @default(0)
+
+  student Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  course  Course  @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  @@unique([studentId, courseId])
+  @@index([courseId])
+}
+
+// ─────────────────────────────────────────────
+// LIBRARY RESOURCE — User-contributed Google Drive links
+// ─────────────────────────────────────────────
+model LibraryResource {
+  id            Int      @id @default(autoincrement())
+  title         String
+  subjectName   String
+  department    String
+  semester      Int
+  driveLink     String   @db.Text
+  description   String?  @db.Text
+  contributorId Int
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  contributor User @relation(fields: [contributorId], references: [id], onDelete: Cascade)
+
+  @@index([contributorId])
+  @@index([department, semester])
 }

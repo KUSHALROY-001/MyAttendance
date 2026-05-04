@@ -33,6 +33,15 @@ const getStudentDashboard = asyncHandler(async (req, res) => {
         },
       },
 
+      // Fetch attendance stats for summary
+      attendanceStats: {
+        select: {
+          totalSessions: true,
+          totalAttended: true,
+          course: { select: { code: true, name: true } },
+        },
+      },
+
       // Fetch attendance embedded directly in the student query
       attendanceRecords: {
         select: {
@@ -57,37 +66,10 @@ const getStudentDashboard = asyncHandler(async (req, res) => {
     throw new ApiError(404, "Student not found");
   }
 
-  // Initialize stats map
-  const courseStatsMap = {};
-  studentData.enrolledCourses.forEach(({ course }) => {
-    courseStatsMap[course.code] = {
-      courseCode: course.code,
-      courseName: course.name,
-      totalClasses: 0,
-      attendedClasses: 0,
-    };
-  });
-
-  // Map attendance and calculate totals in one pass
+  // Map attendance records for history
   const attendanceFormatted = studentData.attendanceRecords.map((record) => {
     const { status } = record;
     const { course, teacher } = record.session.courseAllocation;
-
-    if (course.code) {
-      if (!courseStatsMap[course.code]) {
-        courseStatsMap[course.code] = {
-          courseCode: course.code,
-          courseName: course.name || "Unknown",
-          totalClasses: 0,
-          attendedClasses: 0,
-        };
-      }
-
-      courseStatsMap[course.code].totalClasses += 1;
-      if (status === "PRESENT" || status === "LATE") {
-        courseStatsMap[course.code].attendedClasses += 1;
-      }
-    }
 
     return {
       date: record.session.date,
@@ -97,12 +79,15 @@ const getStudentDashboard = asyncHandler(async (req, res) => {
     };
   });
 
-  // Calculate percentages
-  const summaries = Object.values(courseStatsMap).map((stat) => ({
-    ...stat,
+  // Calculate percentages using dedicated stats table
+  const summaries = studentData.attendanceStats.map((stat) => ({
+    courseCode: stat.course.code,
+    courseName: stat.course.name,
+    totalClasses: stat.totalSessions,
+    attendedClasses: stat.totalAttended,
     percentage:
-      stat.totalClasses > 0
-        ? (stat.attendedClasses / stat.totalClasses) * 100
+      stat.totalSessions > 0
+        ? (stat.totalAttended / stat.totalSessions) * 100
         : 0,
   }));
 

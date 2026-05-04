@@ -15,6 +15,7 @@ import TeacherDashboard from "./Components/Pages/Teacher/TeacherDashboard.jsx";
 import SessionHistory from "./Components/Pages/Teacher/SessionHistory.jsx";
 import TeacherCourseDetail from "./Components/Pages/Teacher/TeacherCourseDetail.jsx";
 import TakeAttendance from "./Components/Pages/Teacher/TakeAttendance.jsx";
+import Library from "./Components/Pages/Library/Library.jsx";
 
 // Admin Imports
 import { ThemeProvider } from "./contexts/ThemeContext.jsx";
@@ -48,6 +49,8 @@ function App() {
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<SignUp />} />
             <Route path="/student" element={<StudentDashboard />} />
+            <Route path="/library" element={<Library />} />
+
             <Route
               path="/student/course/:courseId"
               element={<CourseDetail />}
