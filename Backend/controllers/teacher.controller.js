@@ -13,7 +13,6 @@ const STATUS_MAP = {
 const getTeacherDashboard = asyncHandler(async (req, res) => {
   const { teacherId } = req.params;
 
-  // OPTIMIZATION: Fetch Teacher, Allocations, and Recent Sessions in ONE single trip
   const teacher = await prisma.teacher.findUnique({
     where: { employeeId: teacherId },
     select: {
@@ -22,6 +21,23 @@ const getTeacherDashboard = asyncHandler(async (req, res) => {
       designation: true,
       department: true,
       user: { select: { name: true, email: true } },
+      schedules: {
+        select: {
+          id: true,
+          day: true,
+          slots: true,
+          room: true,
+          classType: true,
+          courseAllocation: {
+            select: {
+              department: true,
+              semester: true,
+              section: true,
+              course: { select: { name: true, code: true } },
+            },
+          },
+        },
+      },
       courseAllocations: {
         select: {
           id: true,
@@ -57,6 +73,18 @@ const getTeacherDashboard = asyncHandler(async (req, res) => {
     semester: alloc.semester,
     section: alloc.section,
     course: alloc.course,
+  }));
+
+  const formattedSchedules = teacher.schedules.map((sch) => ({
+    id: sch.id,
+    day: sch.day,
+    slots: sch.slots,
+    room: sch.room,
+    classType: sch.classType,
+    department: sch.courseAllocation.department,
+    semester: sch.courseAllocation.semester,
+    section: sch.courseAllocation.section,
+    course: sch.courseAllocation.course,
   }));
 
   // Flatten and format recent attendance history from all allocations
@@ -111,6 +139,7 @@ const getTeacherDashboard = asyncHandler(async (req, res) => {
     designation: teacher.designation,
     department: teacher.department,
     user: teacher.user,
+    schedules: formattedSchedules,
     allocations: formattedAllocations,
     recentAttendance,
     totalSessions,
@@ -118,10 +147,10 @@ const getTeacherDashboard = asyncHandler(async (req, res) => {
   });
 });
 
+/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+*/
 const getAttendanceSession = asyncHandler(async (req, res) => {
   const { sessionId } = req.params;
 
-  // OPTIMIZATION: Precise selection to minimize memory footprint
   const session = await prisma.attendanceSession.findUnique({
     where: { id: parseInt(sessionId) },
     select: {
@@ -173,10 +202,10 @@ const getAttendanceSession = asyncHandler(async (req, res) => {
   });
 });
 
+/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+*/
 const getCourseAttendance = asyncHandler(async (req, res) => {
   const { teacherId, courseCode } = req.params;
 
-  // OPTIMIZATION: 2 Queries merged into 1. Fetch Allocations AND their Sessions.
   const courseAllocations = await prisma.courseAllocation.findMany({
     where: {
       teacher: { employeeId: teacherId },
@@ -249,10 +278,10 @@ const getCourseAttendance = asyncHandler(async (req, res) => {
   });
 });
 
+/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+*/
 const getLiveAttendance = asyncHandler(async (req, res) => {
   const { allocationId } = req.params;
 
-  // OPTIMIZATION: Select specific fields
   const alloc = await prisma.courseAllocation.findUnique({
     where: { id: parseInt(allocationId) },
     select: {
@@ -290,6 +319,7 @@ const getLiveAttendance = asyncHandler(async (req, res) => {
   });
 });
 
+/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+*/
 const submitAttendance = asyncHandler(async (req, res) => {
   const { courseAllocationId, date, records } = req.body;
 
@@ -316,7 +346,7 @@ const submitAttendance = asyncHandler(async (req, res) => {
     .filter(
       (r) =>
         r.status.toUpperCase() === "PRESENT" ||
-        r.status.toUpperCase() === "LATE"
+        r.status.toUpperCase() === "LATE",
     )
     .map((r) => parseInt(r.student));
 

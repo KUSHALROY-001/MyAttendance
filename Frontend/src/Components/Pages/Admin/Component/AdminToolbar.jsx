@@ -1,7 +1,7 @@
 import React, { useState, useRef } from "react";
 import { Search } from "lucide-react";
 
-const AdminToolbar = ({ searchProps, filters = [] }) => {
+const AdminToolbar = ({ searchProps, filters = [], actions }) => {
   const [isSearchExpanded, setIsSearchExpanded] = useState(false);
   const inputRef = useRef(null);
 
@@ -13,7 +13,7 @@ const AdminToolbar = ({ searchProps, filters = [] }) => {
   };
 
   const handleBlur = () => {
-    if (!searchProps.value) {
+    if (!searchProps?.value) {
       setIsSearchExpanded(false);
     }
   };
@@ -22,21 +22,23 @@ const AdminToolbar = ({ searchProps, filters = [] }) => {
     <div className="flex bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-1.5 rounded-full shadow-sm w-full overflow-x-auto hide-scrollbar">
       <div className="flex items-center min-w-max px-2">
         {/* Search Section */}
-        <div
-          className={`flex items-center transition-all duration-300 ease-in-out ${isSearchExpanded || searchProps.value ? "bg-slate-50 dark:bg-slate-800 rounded-full px-3 py-1.5" : "p-1.5 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-full cursor-pointer"}`}
-          onClick={!isSearchExpanded ? expandSearch : undefined}
-        >
-          <Search className="w-5 h-5 text-slate-500 shrink-0" />
-          <input
-            ref={inputRef}
-            type="text"
-            placeholder={searchProps.placeholder || "Search..."}
-            value={searchProps.value}
-            onChange={(e) => searchProps.onChange(e.target.value)}
-            onBlur={handleBlur}
-            className={`bg-transparent outline-none text-sm text-slate-900 dark:text-white transition-all duration-300 ease-in-out placeholder-slate-400 ${isSearchExpanded || searchProps.value ? "w-32 lg:w-48 ml-2 opacity-100" : "w-0 opacity-0 pointer-events-none m-0"}`}
-          />
-        </div>
+        {searchProps && (
+          <div
+            className={`flex items-center transition-all duration-300 ease-in-out ${isSearchExpanded || searchProps.value ? "bg-slate-50 dark:bg-slate-800 rounded-full px-3 py-1.5" : "p-1.5 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-full cursor-pointer"}`}
+            onClick={!isSearchExpanded ? expandSearch : undefined}
+          >
+            <Search className="w-5 h-5 text-slate-500 shrink-0" />
+            <input
+              ref={inputRef}
+              type="text"
+              placeholder={searchProps.placeholder || "Search..."}
+              value={searchProps.value}
+              onChange={(e) => searchProps.onChange(e.target.value)}
+              onBlur={handleBlur}
+              className={`bg-transparent outline-none text-sm text-slate-900 dark:text-white transition-all duration-300 ease-in-out placeholder-slate-400 ${isSearchExpanded || searchProps.value ? "w-32 lg:w-48 ml-2 opacity-100" : "w-0 opacity-0 pointer-events-none m-0"}`}
+            />
+          </div>
+        )}
 
         {/* Dividers & Filters */}
         {filters.map((filter) => (
@@ -89,6 +91,11 @@ const AdminToolbar = ({ searchProps, filters = [] }) => {
           </React.Fragment>
         ))}
       </div>
+
+      {/* Actions (right side) */}
+      {actions && (
+        <div className="ml-auto flex items-center px-2 shrink-0">{actions}</div>
+      )}
     </div>
   );
 };

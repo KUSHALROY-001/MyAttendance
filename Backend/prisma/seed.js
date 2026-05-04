@@ -20,7 +20,7 @@ async function main() {
   await prisma.student.deleteMany();
   await prisma.teacher.deleteMany();
   await prisma.user.deleteMany();
-  await prisma.department.deleteMany();
+  await prisma.departmentInfo.deleteMany();
   console.log("Database cleared!");
 
   const salt = await bcrypt.genSalt(10);
@@ -31,12 +31,43 @@ async function main() {
   // ──────────────────────────────────────────────────────────
   const departments = [];
   const departmentData = [
-    { name: "Bachelor of Computer Applications", code: "BCA" },
-    { name: "Bachelor of Business Administration", code: "BBA" },
-    { name: "Bachelor of Commerce", code: "BCOM" },
+    {
+      name: "Bachelor of Computer Applications",
+      code: "BCA",
+      semesterDetails: [
+        { semester: 1, sections: ["A", "B", "C"] },
+        { semester: 2, sections: ["A", "B"] },
+        { semester: 3, sections: ["A", "B"] },
+        { semester: 4, sections: ["A"] },
+        { semester: 5, sections: ["A"] },
+        { semester: 6, sections: ["A"] },
+      ],
+    },
+    {
+      name: "Bachelor of Business Administration",
+      code: "BBA",
+      semesterDetails: [
+        { semester: 1, sections: ["A", "B"] },
+        { semester: 2, sections: ["A", "B"] },
+        { semester: 3, sections: ["A"] },
+        { semester: 4, sections: ["A"] },
+        { semester: 5, sections: ["A"] },
+        { semester: 6, sections: ["A"] },
+      ],
+    },
+    {
+      name: "Bachelor of Commerce",
+      code: "BCOM",
+      semesterDetails: [
+        { semester: 1, sections: ["A"] },
+        { semester: 2, sections: ["A"] },
+        { semester: 3, sections: ["A"] },
+        { semester: 4, sections: ["A"] },
+      ],
+    },
   ];
   for (const d of departmentData) {
-    departments.push(await prisma.department.create({ data: d }));
+    departments.push(await prisma.departmentInfo.create({ data: d }));
   }
   console.log(`✅ ${departments.length} departments created`);
 
@@ -62,6 +93,7 @@ async function main() {
       empId: "EMP-001",
       desig: "Principal",
       dept: "BCA",
+      contact: "9876543220",
     },
     {
       name: "Minerva McGonagall",
@@ -69,6 +101,7 @@ async function main() {
       empId: "EMP-002",
       desig: "Vice Principal",
       dept: "BCA",
+      contact: "9876543221",
     },
     {
       name: "Severus Snape",
@@ -76,6 +109,7 @@ async function main() {
       empId: "EMP-003",
       desig: "HOD",
       dept: "BCA",
+      contact: "9876543222",
     },
     {
       name: "Filius Flitwick",
@@ -83,6 +117,7 @@ async function main() {
       empId: "EMP-004",
       desig: "Professor",
       dept: "BCA",
+      contact: "9876543223",
     },
     {
       name: "Pomona Sprout",
@@ -90,6 +125,7 @@ async function main() {
       empId: "EMP-005",
       desig: "Professor",
       dept: "BBA",
+      contact: "9876543224",
     },
     {
       name: "Horace Slughorn",
@@ -97,6 +133,7 @@ async function main() {
       empId: "EMP-006",
       desig: "HOD",
       dept: "BBA",
+      contact: "9876543225",
     },
     {
       name: "Remus Lupin",
@@ -104,6 +141,7 @@ async function main() {
       empId: "EMP-007",
       desig: "Professor",
       dept: "BCOM",
+      contact: "9876543226",
     },
   ];
 
@@ -120,6 +158,7 @@ async function main() {
             employeeId: t.empId,
             designation: t.desig,
             department: t.dept,
+            contactNumber : t.contact
           },
         },
       },
@@ -437,10 +476,7 @@ async function main() {
         teacherId: teachers[0].id,
         day: "Monday",
         slots: "1,2",
-        subject: "Programming in C",
-        department: "BCA",
-        semester: "1",
-        section: "A",
+        courseAllocationId: allocations[0].id,
         room: "Lab 1",
         classType: "lab",
       },
@@ -448,10 +484,7 @@ async function main() {
         teacherId: teachers[0].id,
         day: "Wednesday",
         slots: "3",
-        subject: "Programming in C",
-        department: "BCA",
-        semester: "1",
-        section: "A",
+        courseAllocationId: allocations[0].id,
         room: "Room 101",
         classType: "class",
       },
@@ -459,10 +492,7 @@ async function main() {
         teacherId: teachers[1].id,
         day: "Tuesday",
         slots: "3",
-        subject: "Web Development",
-        department: "BCA",
-        semester: "1",
-        section: "A",
+        courseAllocationId: allocations[1].id,
         room: "Room 102",
         classType: "class",
       },
@@ -470,10 +500,7 @@ async function main() {
         teacherId: teachers[1].id,
         day: "Thursday",
         slots: "4,5",
-        subject: "Web Development",
-        department: "BCA",
-        semester: "1",
-        section: "A",
+        courseAllocationId: allocations[1].id,
         room: "Lab 2",
         classType: "lab",
       },
@@ -481,10 +508,7 @@ async function main() {
         teacherId: teachers[2].id,
         day: "Wednesday",
         slots: "4,5",
-        subject: "Data Structures",
-        department: "BCA",
-        semester: "1",
-        section: "A",
+        courseAllocationId: allocations[2].id,
         room: "Room 103",
         classType: "class",
       },
@@ -492,10 +516,7 @@ async function main() {
         teacherId: teachers[2].id,
         day: "Thursday",
         slots: "1",
-        subject: "Database Management",
-        department: "BCA",
-        semester: "1",
-        section: "A",
+        courseAllocationId: allocations[3].id,
         room: "Room 104",
         classType: "class",
       },
@@ -503,10 +524,7 @@ async function main() {
         teacherId: teachers[2].id,
         day: "Friday",
         slots: "2,3",
-        subject: "Database Management",
-        department: "BCA",
-        semester: "1",
-        section: "A",
+        courseAllocationId: allocations[3].id,
         room: "Lab 1",
         classType: "lab",
       },
@@ -514,10 +532,7 @@ async function main() {
         teacherId: teachers[3].id,
         day: "Monday",
         slots: "4",
-        subject: "Digital Electronics",
-        department: "BCA",
-        semester: "1",
-        section: "A",
+        courseAllocationId: allocations[4].id,
         room: "Room 105",
         classType: "class",
       },
@@ -525,10 +540,7 @@ async function main() {
         teacherId: teachers[3].id,
         day: "Friday",
         slots: "1",
-        subject: "Digital Electronics",
-        department: "BCA",
-        semester: "1",
-        section: "A",
+        courseAllocationId: allocations[4].id,
         room: "Room 105",
         classType: "class",
       },

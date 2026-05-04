@@ -1,97 +1,148 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import AdminTable from "./Component/AdminTable";
 import AdminModal from "./Component/AdminModal";
 import ConfirmDialog from "./Component/ConfirmDialog";
 import AdminToolbar from "./Component/AdminToolbar";
-import { mockTeachers } from "../../../data/adminMockData";
+import AdminForm from "./Component/AdminForm";
 import { Pencil, Plus, Trash2 } from "lucide-react";
+import api from "../../../api/axios";
+
+const initial_form = {
+  name: "",
+  employeeId: "",
+  email: "",
+  department: "BCA",
+  designation: "",
+  contactNumber: "",
+};
+
+const columns = [
+  {
+    header: "EMPLOYEE ID",
+    accessor: "employeeId",
+    render: (r) => (
+      <span className="font-mono font-medium text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-500/10 px-2 py-1 rounded">
+        {r.employeeId}
+      </span>
+    ),
+  },
+  {
+    header: "Teacher Details",
+    accessor: "name",
+    render: (r) => (
+      <div>
+        <p className="font-semibold text-slate-900 dark:text-white">
+          {r.name}
+        </p>
+        <p className="text-xs text-slate-500">{r.email}</p>
+      </div>
+    ),
+  },
+  { header: "Contact Number", accessor: "contactNumber" },
+  { header: "Department", accessor: "department" },
+  { header: "Designation", accessor: "designation" },
+];
 
 const AdminTeachers = () => {
-  const [data, setData] = useState(mockTeachers);
+  const [data, setData] = useState([]);
   const [search, setSearch] = useState("");
-  const [filterDept, setFilterDept] = useState("");
+  const [dept, setDept] = useState("BCA");
+  const [departments, setDepartments] = useState([]);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentRecord, setCurrentRecord] = useState(null);
-
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [recordToDelete, setRecordToDelete] = useState(null);
+  const [formData, setFormData] = useState(initial_form);
 
-  const [formData, setFormData] = useState({
-    name: "",
-    employeeId: "",
-    email: "",
-    department: "",
-    designation: "",
-  });
+  useEffect(() => {
+    api
+      .get("/api/admin/departments?deptOnly=true")
+      .then((res) => setDepartments(res.data));
+  }, []);
 
-  const filteredData = data.filter((t) => {
-    const matchesSearch =
-      t.name.toLowerCase().includes(search.toLowerCase()) ||
-      t.employeeId.toLowerCase().includes(search.toLowerCase()) ||
-      t.department.toLowerCase().includes(search.toLowerCase());
-    const matchesDept = filterDept ? t.department === filterDept : true;
+  const fetchTeachers = async () => {
+    const res = await api.get(`/api/admin/teachers?department=${dept}`);
+    setData(res.data);
+  };
 
-    return matchesSearch && matchesDept;
-  });
+  useEffect(() => {
+    fetchTeachers();
+  }, [dept]);
 
-  const columns = [
-    {
-      header: "EMP ID",
-      accessor: "employeeId",
-      render: (r) => (
-        <span className="font-mono font-medium text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-500/10 px-2 py-1 rounded">
-          {r.employeeId}
-        </span>
-      ),
-    },
-    {
-      header: "Teacher Details",
-      accessor: "name",
-      render: (r) => (
-        <div>
-          <p className="font-semibold">{r.name}</p>
-          <p className="text-xs text-slate-500">{r.email}</p>
-        </div>
-      ),
-    },
-    { header: "Department", accessor: "department" },
-    { header: "Designation", accessor: "designation" },
-  ];
+  const filteredData = data.filter(
+    (t) =>
+      t.name?.toLowerCase().includes(search.toLowerCase()) ||
+      t.employeeId?.toLowerCase().includes(search.toLowerCase()),
+  );
 
   const handleOpenModal = (record = null) => {
     setCurrentRecord(record);
-    if (record) {
-      setFormData(record);
-    } else {
-      setFormData({
-        name: "",
-        employeeId: "",
-        email: "",
-        department: "",
-        designation: "",
-      });
-    }
+    setFormData(
+      record
+        ? {
+            name: record.name || "",
+            employeeId: record.employeeId || "",
+            email: record.email || "",
+            department: record.department || "BCA",
+            designation: record.designation || "",
+            contactNumber: record.contactNumber || "",
+          }
+        : initial_form,
+    );
     setIsModalOpen(true);
   };
 
-  const handleSave = (e) => {
+  const handleSave = async (e) => {
     e.preventDefault();
-    if (currentRecord) {
-      setData(
-        data.map((d) =>
-          d.id === currentRecord.id ? { ...d, ...formData } : d,
-        ),
-      );
-    } else {
-      setData([...data, { id: Date.now(), ...formData }]);
+    try {
+      if (currentRecord) {
+        await api.put(`/api/admin/teachers/${currentRecord.id}`, formData);
+      } else {
+        await api.post("/api/admin/teachers", formData);
+      }
+      setIsModalOpen(false);
+      await fetchTeachers();
+    } catch (err) {
+      alert(err.response?.data?.message || "Something went wrong!");
     }
-    setIsModalOpen(false);
   };
 
-  const handleDelete = () => {
-    setData(data.filter((d) => d.id !== recordToDelete.id));
+  const handleDelete = async () => {
+    try {
+      await api.delete(`/api/admin/teachers/${recordToDelete.id}`);
+      setIsDeleteDialogOpen(false);
+      setRecordToDelete(null);
+      await fetchTeachers();
+    } catch (err) {
+      alert(err.response?.data?.message || "Failed to delete teacher!");
+    }
   };
+
+  const teacher_fields = [
+    { name: "name", label: "Full Name", colSpan: 6 },
+    {
+      name: "employeeId",
+      label: "Employee ID",
+      className: "font-mono",
+      colSpan: 6,
+    },
+    { name: "email", label: "Email Address", type: "email", colSpan: 12 },
+    {
+      name: "department",
+      label: "Department",
+      type: "select",
+      options: departments.map((d) => d.code),
+      colSpan: 4,
+    },
+    { name: "designation", label: "Designation", colSpan: 4 },
+    {
+      name: "contactNumber",
+      label: "Contact",
+      required: false,
+      colSpan: 4,
+    },
+  ];
 
   return (
     <div className="space-y-6 animate-in fade-in duration-300">
@@ -117,14 +168,14 @@ const AdminTeachers = () => {
         searchProps={{
           value: search,
           onChange: setSearch,
-          placeholder: "Search by name, ID or dept...",
+          placeholder: "Search by name or employee ID...",
         }}
         filters={[
           {
             label: "Dept",
-            value: filterDept,
-            onChange: setFilterDept,
-            options: [...new Set(data.map((d) => d.department))],
+            value: dept,
+            onChange: setDept,
+            options: departments.map((d) => d.code),
           },
         ]}
       />
@@ -158,97 +209,14 @@ const AdminTeachers = () => {
         onClose={() => setIsModalOpen(false)}
         title={currentRecord ? "Edit Teacher" : "Add New Teacher"}
       >
-        <form onSubmit={handleSave} className="space-y-4">
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-1">
-              <label className="text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase">
-                Full Name
-              </label>
-              <input
-                required
-                type="text"
-                className="w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm focus:ring-2 focus:ring-indigo-500 outline-none text-slate-900 dark:text-white"
-                value={formData.name}
-                onChange={(e) =>
-                  setFormData({ ...formData, name: e.target.value })
-                }
-              />
-            </div>
-            <div className="space-y-1">
-              <label className="text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase">
-                Employee ID
-              </label>
-              <input
-                required
-                type="text"
-                className="w-full px-3 py-2 font-mono rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm focus:ring-2 focus:ring-indigo-500 outline-none text-slate-900 dark:text-white"
-                value={formData.employeeId}
-                onChange={(e) =>
-                  setFormData({ ...formData, employeeId: e.target.value })
-                }
-              />
-            </div>
-          </div>
-          <div className="space-y-1">
-            <label className="text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase">
-              Email Address
-            </label>
-            <input
-              required
-              type="email"
-              className="w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm focus:ring-2 focus:ring-indigo-500 outline-none text-slate-900 dark:text-white"
-              value={formData.email}
-              onChange={(e) =>
-                setFormData({ ...formData, email: e.target.value })
-              }
-            />
-          </div>
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-1">
-              <label className="text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase">
-                Department
-              </label>
-              <input
-                required
-                type="text"
-                className="w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm focus:ring-2 focus:ring-indigo-500 outline-none text-slate-900 dark:text-white"
-                value={formData.department}
-                onChange={(e) =>
-                  setFormData({ ...formData, department: e.target.value })
-                }
-              />
-            </div>
-            <div className="space-y-1">
-              <label className="text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase">
-                Designation
-              </label>
-              <input
-                required
-                type="text"
-                className="w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm focus:ring-2 focus:ring-indigo-500 outline-none text-slate-900 dark:text-white"
-                value={formData.designation}
-                onChange={(e) =>
-                  setFormData({ ...formData, designation: e.target.value })
-                }
-              />
-            </div>
-          </div>
-          <div className="pt-4 flex justify-end gap-3">
-            <button
-              type="button"
-              onClick={() => setIsModalOpen(false)}
-              className="px-4 py-2 font-medium bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700 transition"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              className="px-4 py-2 font-medium bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition shadow-sm"
-            >
-              Save Teacher
-            </button>
-          </div>
-        </form>
+        <AdminForm
+          formData={formData}
+          setFormData={setFormData}
+          onSubmit={handleSave}
+          onCancel={() => setIsModalOpen(false)}
+          submitLabel={currentRecord ? "Update Teacher" : "Save Teacher"}
+          fields={teacher_fields}
+        />
       </AdminModal>
 
       <ConfirmDialog
@@ -256,7 +224,7 @@ const AdminTeachers = () => {
         onClose={() => setIsDeleteDialogOpen(false)}
         onConfirm={handleDelete}
         title="Delete Teacher"
-        message={`Are you sure you want to remove ${recordToDelete?.name}? Their course allocations and schedules will be orphaned.`}
+        message={`Are you sure you want to remove ${recordToDelete?.name || recordToDelete?.employeeId}? Their course allocations and schedules will be orphaned.`}
       />
     </div>
   );

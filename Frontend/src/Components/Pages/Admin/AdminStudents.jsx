@@ -34,9 +34,9 @@ const columns = [
     render: (r) => (
       <div>
         <p className="font-semibold text-slate-900 dark:text-white">
-          {r.user?.name}
+          {r.name}
         </p>
-        <p className="text-xs text-slate-500">{r.user?.email}</p>
+        <p className="text-xs text-slate-500">{r.email}</p>
       </div>
     ),
   },
@@ -80,7 +80,7 @@ const AdminStudents = () => {
 
   const filteredData = data.filter(
     (s) =>
-      s.user.name.toLowerCase().includes(search.toLowerCase()) ||
+      s.name.toLowerCase().includes(search.toLowerCase()) ||
       s.rollNumber.toLowerCase().includes(search.toLowerCase()),
   );
 
@@ -89,9 +89,9 @@ const AdminStudents = () => {
     setFormData(
       record
         ? {
-            name: record.user?.name || "",
+            name: record.name || "",
             rollNumber: record.rollNumber || "",
-            email: record.user?.email || "",
+            email: record.email || "",
             department: record.department || "BCA",
             semester: record.semester?.toString() || "1",
             section: record.section || "A",
@@ -280,7 +280,7 @@ const AdminStudents = () => {
         onClose={() => setIsDeleteDialogOpen(false)}
         onConfirm={handleDelete}
         title="Delete Student"
-        message={`Are you sure you want to delete ${recordToDelete?.user?.name || recordToDelete?.rollNumber}? This action cannot be undone and will remove all their attendance records.`}
+        message={`Are you sure you want to delete ${recordToDelete?.name || recordToDelete?.rollNumber}? This action cannot be undone and will remove all their attendance records.`}
       />
     </div>
   );

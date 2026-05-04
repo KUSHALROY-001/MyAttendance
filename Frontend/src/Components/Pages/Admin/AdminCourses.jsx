@@ -1,127 +1,178 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import AdminTable from "./Component/AdminTable";
 import AdminModal from "./Component/AdminModal";
 import ConfirmDialog from "./Component/ConfirmDialog";
 import AdminToolbar from "./Component/AdminToolbar";
-import { mockCourses } from "../../../data/adminMockData";
+import AdminForm from "./Component/AdminForm";
 import { Plus, Pencil, Trash2 } from "lucide-react";
+import api from "../../../api/axios";
+
+const initial_form = {
+  code: "",
+  name: "",
+  department: "BCA",
+  semester: "1",
+  credits: "3",
+};
+
+const columns = [
+  {
+    header: "Code",
+    accessor: "code",
+    render: (r) => (
+      <span className="font-mono font-bold text-slate-800 dark:text-slate-200">
+        {r.code}
+      </span>
+    ),
+  },
+  {
+    header: "Course Name",
+    accessor: "name",
+    render: (r) => (
+      <span className="font-semibold text-indigo-600 dark:text-indigo-400">
+        {r.name}
+      </span>
+    ),
+  },
+  { header: "Department", accessor: "department" },
+  {
+    header: "Semester",
+    accessor: "semester",
+    render: (r) => `Sem ${r.semester}`,
+  },
+  {
+    header: "Credits",
+    accessor: "credits",
+    render: (r) => (
+      <span className="px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-xs font-semibold">
+        {r.credits} CR
+      </span>
+    ),
+  },
+];
 
 const AdminCourses = () => {
-  const [data, setData] = useState(mockCourses);
+  const [data, setData] = useState([]);
   const [search, setSearch] = useState("");
-  const [filterDept, setFilterDept] = useState("");
-  const [filterSem, setFilterSem] = useState("");
+  const [dept, setDept] = useState("BCA");
+  const [sem, setSem] = useState("1");
+  const [departments, setDepartments] = useState([]);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentRecord, setCurrentRecord] = useState(null);
-
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [recordToDelete, setRecordToDelete] = useState(null);
+  const [formData, setFormData] = useState(initial_form);
 
-  const [formData, setFormData] = useState({
-    code: "",
-    name: "",
-    department: "",
-    semester: "1",
-    credits: "3",
-  });
+  useEffect(() => {
+    api.get("/api/admin/departments").then((res) => setDepartments(res.data));
+  }, []);
+
+  const fetchCourses = async () => {
+    const res = await api.get("/api/admin/courses");
+    setData(res.data);
+  };
+
+  useEffect(() => {
+    fetchCourses();
+  }, []);
 
   const filteredData = data.filter((c) => {
     const matchesSearch =
       c.name.toLowerCase().includes(search.toLowerCase()) ||
       c.code.toLowerCase().includes(search.toLowerCase());
-    const matchesDept = filterDept ? c.department === filterDept : true;
-    const matchesSem = filterSem
-      ? c.semester.toString() === filterSem.toString()
-      : true;
+    const matchesDept = dept ? c.department === dept : true;
+    const matchesSem = sem ? c.semester.toString() === sem.toString() : true;
 
     return matchesSearch && matchesDept && matchesSem;
   });
 
-  const columns = [
-    {
-      header: "Code",
-      accessor: "code",
-      render: (r) => (
-        <span className="font-mono font-bold text-slate-800 dark:text-slate-200">
-          {r.code}
-        </span>
-      ),
-    },
-    {
-      header: "Course Name",
-      accessor: "name",
-      render: (r) => (
-        <span className="font-semibold text-indigo-600 dark:text-indigo-400">
-          {r.name}
-        </span>
-      ),
-    },
-    { header: "Department", accessor: "department" },
-    {
-      header: "Semester",
-      accessor: "semester",
-      render: (r) => `Sem ${r.semester}`,
-    },
-    {
-      header: "Credits",
-      accessor: "credits",
-      render: (r) => (
-        <span className="px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-xs font-semibold">
-          {r.credits} CR
-        </span>
-      ),
-    },
-  ];
-
   const handleOpenModal = (record = null) => {
     setCurrentRecord(record);
-    if (record) {
-      setFormData(record);
-    } else {
-      setFormData({
-        code: "",
-        name: "",
-        department: "",
-        semester: "1",
-        credits: "3",
-      });
-    }
+    setFormData(
+      record
+        ? {
+            code: record.code || "",
+            name: record.name || "",
+            department: record.department || "BCA",
+            semester: record.semester?.toString() || "1",
+            credits: record.credits?.toString() || "3",
+          }
+        : initial_form,
+    );
     setIsModalOpen(true);
   };
 
-  const handleSave = (e) => {
+  const handleSave = async (e) => {
     e.preventDefault();
-    if (currentRecord) {
-      setData(
-        data.map((d) =>
-          d.id === currentRecord.id
-            ? {
-                ...d,
-                ...formData,
-                semester: parseInt(formData.semester),
-                credits: parseInt(formData.credits),
-              }
-            : d,
-        ),
-      );
-    } else {
-      setData([
-        ...data,
-        {
-          id: Date.now(),
-          ...formData,
-          semester: parseInt(formData.semester),
-          credits: parseInt(formData.credits),
-        },
-      ]);
+    try {
+      if (currentRecord) {
+        await api.put(`/api/admin/courses/${currentRecord.id}`, formData);
+      } else {
+        await api.post("/api/admin/courses", formData);
+      }
+      setIsModalOpen(false);
+      await fetchCourses();
+    } catch (err) {
+      alert(err.response?.data?.message || "Something went wrong!");
     }
-    setIsModalOpen(false);
   };
 
-  const handleDelete = () => {
-    setData(data.filter((d) => d.id !== recordToDelete.id));
+  const handleDelete = async () => {
+    try {
+      await api.delete(`/api/admin/courses/${recordToDelete.id}`);
+      setIsDeleteDialogOpen(false);
+      setRecordToDelete(null);
+      await fetchCourses();
+    } catch (err) {
+      alert(err.response?.data?.message || "Failed to delete course!");
+    }
   };
+
+  const currentDept = departments.find((d) => d.code === dept);
+  const semOptions = currentDept?.semesterDetails.map((s) => s.semester) || [];
+
+  const formCurrentDept = departments.find(
+    (d) => d.code === formData.department,
+  );
+  const formSemOptions =
+    formCurrentDept?.semesterDetails.map((s) => s.semester) || [];
+
+  const course_fields = useMemo(
+    () => [
+      {
+        name: "code",
+        label: "Course Code",
+        className: "font-mono uppercase",
+        placeholder: "e.g. CS101",
+        colSpan: 6,
+      },
+      {
+        name: "credits",
+        label: "Credits",
+        type: "number",
+        min: 1,
+        max: 6,
+        colSpan: 6,
+      },
+      { name: "name", label: "Full Course Name", colSpan: 12 },
+      {
+        name: "department",
+        label: "Department",
+        type: "select",
+        options: departments.map((d) => d.code),
+        colSpan: 6,
+      },
+      {
+        name: "semester",
+        label: "Target Semester",
+        type: "select",
+        options: formSemOptions,
+        colSpan: 6,
+      },
+    ],
+    [departments, formSemOptions],
+  );
 
   return (
     <div className="space-y-6 animate-in fade-in duration-300">
@@ -152,15 +203,16 @@ const AdminCourses = () => {
         filters={[
           {
             label: "Dept",
-            value: filterDept,
-            onChange: setFilterDept,
-            options: [...new Set(data.map((d) => d.department))],
+            value: dept,
+            onChange: setDept,
+            options: departments.map((d) => d.code),
           },
           {
             label: "Sem",
-            value: filterSem,
-            onChange: setFilterSem,
-            options: [...new Set(data.map((d) => d.semester))].sort(),
+            value: sem,
+            onChange: setSem,
+            field: "Sem",
+            options: semOptions,
           },
         ]}
       />
@@ -194,102 +246,14 @@ const AdminCourses = () => {
         onClose={() => setIsModalOpen(false)}
         title={currentRecord ? "Edit Course" : "Add New Course"}
       >
-        <form onSubmit={handleSave} className="space-y-4">
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-1">
-              <label className="text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase">
-                Course Code
-              </label>
-              <input
-                required
-                type="text"
-                className="w-full px-3 py-2 font-mono uppercase rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm focus:ring-2 focus:ring-indigo-500 outline-none text-slate-900 dark:text-white"
-                value={formData.code}
-                onChange={(e) =>
-                  setFormData({ ...formData, code: e.target.value })
-                }
-                placeholder="e.g. CS101"
-              />
-            </div>
-            <div className="space-y-1">
-              <label className="text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase">
-                Credits
-              </label>
-              <input
-                required
-                type="number"
-                min="1"
-                max="6"
-                className="w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm focus:ring-2 focus:ring-indigo-500 outline-none text-slate-900 dark:text-white"
-                value={formData.credits}
-                onChange={(e) =>
-                  setFormData({ ...formData, credits: e.target.value })
-                }
-              />
-            </div>
-          </div>
-          <div className="space-y-1">
-            <label className="text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase">
-              Full Course Name
-            </label>
-            <input
-              required
-              type="text"
-              className="w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm focus:ring-2 focus:ring-indigo-500 outline-none text-slate-900 dark:text-white"
-              value={formData.name}
-              onChange={(e) =>
-                setFormData({ ...formData, name: e.target.value })
-              }
-            />
-          </div>
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-1">
-              <label className="text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase">
-                Department
-              </label>
-              <input
-                required
-                type="text"
-                className="w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm focus:ring-2 focus:ring-indigo-500 outline-none text-slate-900 dark:text-white"
-                value={formData.department}
-                onChange={(e) =>
-                  setFormData({ ...formData, department: e.target.value })
-                }
-              />
-            </div>
-            <div className="space-y-1">
-              <label className="text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase">
-                Target Semester
-              </label>
-              <input
-                required
-                type="number"
-                min="1"
-                max="10"
-                className="w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm focus:ring-2 focus:ring-indigo-500 outline-none text-slate-900 dark:text-white"
-                value={formData.semester}
-                onChange={(e) =>
-                  setFormData({ ...formData, semester: e.target.value })
-                }
-              />
-            </div>
-          </div>
-          <div className="pt-4 flex justify-end gap-3">
-            <button
-              type="button"
-              onClick={() => setIsModalOpen(false)}
-              className="px-4 py-2 font-medium bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700 transition"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              className="px-4 py-2 font-medium bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition shadow-sm"
-            >
-              Save Course
-            </button>
-          </div>
-        </form>
+        <AdminForm
+          formData={formData}
+          setFormData={setFormData}
+          onSubmit={handleSave}
+          onCancel={() => setIsModalOpen(false)}
+          submitLabel={currentRecord ? "Update Course" : "Save Course"}
+          fields={course_fields}
+        />
       </AdminModal>
 
       <ConfirmDialog

@@ -120,10 +120,8 @@ const AdminDashboard = () => {
                           Class Info
                         </span>
                         <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-300">
-                          {session.department} •{" "}
-                          {session.semester
-                            ? `Sem ${session.semester}`
-                            : `Sec ${session.section}`}
+                          {session.department} • {`Sem ${session.semester}`} •{" "}
+                          {session.section ? `Sec ${session.section}` : ""}
                         </span>
                       </td>
                       <td className="px-4 py-3 sm:px-5 block sm:table-cell text-left sm:text-right">
