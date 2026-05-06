@@ -2,6 +2,9 @@ import React, { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { CloseSVG, ChevronDownSVG, PlayCircleSVG } from "../../../UI/SVG";
 
+const selectClass =
+  "w-full appearance-none rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 transition hover:border-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:hover:border-slate-600";
+
 const StartAttendanceModal = ({ isOpen, onClose, allocations = [] }) => {
   const navigate = useNavigate();
   const [selectedDept, setSelectedDept] = useState("");
@@ -9,13 +12,11 @@ const StartAttendanceModal = ({ isOpen, onClose, allocations = [] }) => {
   const [selectedSec, setSelectedSec] = useState("");
   const [selectedCourseId, setSelectedCourseId] = useState("");
 
-  // Step 1: Unique Departments
   const departments = useMemo(() => {
     const depts = new Set(allocations.map((a) => a.department));
     return Array.from(depts).sort();
   }, [allocations]);
 
-  // Step 2: Unique Semesters for selected Department
   const semesters = useMemo(() => {
     if (!selectedDept) return [];
     const sems = new Set(
@@ -26,7 +27,6 @@ const StartAttendanceModal = ({ isOpen, onClose, allocations = [] }) => {
     return Array.from(sems).sort((a, b) => a - b);
   }, [allocations, selectedDept]);
 
-  // Step 3: Unique Sections for selected Department + Semester
   const sections = useMemo(() => {
     if (!selectedDept || !selectedSem) return [];
     const secs = new Set(
@@ -42,7 +42,6 @@ const StartAttendanceModal = ({ isOpen, onClose, allocations = [] }) => {
     return Array.from(secs).sort();
   }, [allocations, selectedDept, selectedSem]);
 
-  // Step 4: Unique Courses for selected Department + Semester + Section
   const availableCourses = useMemo(() => {
     if (!selectedDept || !selectedSem || !selectedSec) return [];
     return allocations.filter(
@@ -54,7 +53,6 @@ const StartAttendanceModal = ({ isOpen, onClose, allocations = [] }) => {
     );
   }, [allocations, selectedDept, selectedSem, selectedSec]);
 
-  // Handlers to clear dependent downstream fields
   const handleDeptChange = (e) => {
     setSelectedDept(e.target.value);
     setSelectedSem("");
@@ -77,30 +75,29 @@ const StartAttendanceModal = ({ isOpen, onClose, allocations = [] }) => {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 animate-fadeIn">
-      <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 relative animate-slideUp">
+      <div className="relative w-full max-w-md animate-slideUp rounded-2xl bg-white p-6 shadow-xl dark:bg-slate-900">
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition"
+          className="absolute right-4 top-4 text-slate-400 transition hover:text-slate-600 dark:hover:text-slate-200"
         >
-          <CloseSVG className="w-5 h-5" />
+          <CloseSVG className="h-5 w-5" />
         </button>
 
-        <h2 className="text-xl font-bold text-gray-900 pr-8">
+        <h2 className="pr-8 text-xl font-bold text-slate-900 dark:text-slate-100">
           Start Attendance Session
         </h2>
-        <p className="text-sm text-gray-500 mt-1 mb-6">
+        <p className="mb-6 mt-1 text-sm text-slate-500 dark:text-slate-400">
           Select department, course, and section to begin taking attendance.
         </p>
 
-        <div className="space-y-4 mb-8">
-          {/* 1. Department */}
+        <div className="mb-8 space-y-4">
           <div>
-            <label className="block text-sm font-bold text-[#1e293b] mb-2">
+            <label className="mb-2 block text-sm font-bold text-slate-800 dark:text-slate-100">
               Department
             </label>
             <div className="relative">
               <select
-                className="w-full appearance-none border border-gray-200 text-gray-700 text-sm font-medium rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 hover:border-gray-300 transition"
+                className={selectClass}
                 value={selectedDept}
                 onChange={handleDeptChange}
               >
@@ -113,21 +110,20 @@ const StartAttendanceModal = ({ isOpen, onClose, allocations = [] }) => {
                   </option>
                 ))}
               </select>
-              <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-gray-400">
-                <ChevronDownSVG className="w-4 h-4" />
+              <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-slate-400 dark:text-slate-500">
+                <ChevronDownSVG className="h-4 w-4" />
               </div>
             </div>
           </div>
 
-          {/* 2. Semester */}
           {selectedDept && (
             <div className="animate-fadeIn">
-              <label className="block text-sm font-bold text-[#1e293b] mb-2">
+              <label className="mb-2 block text-sm font-bold text-slate-800 dark:text-slate-100">
                 Semester
               </label>
               <div className="relative">
                 <select
-                  className="w-full appearance-none border border-gray-200 text-gray-700 text-sm font-medium rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 hover:border-gray-300 transition"
+                  className={selectClass}
                   value={selectedSem}
                   onChange={handleSemChange}
                 >
@@ -140,34 +136,21 @@ const StartAttendanceModal = ({ isOpen, onClose, allocations = [] }) => {
                     </option>
                   ))}
                 </select>
-                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-gray-400">
-                  <svg
-                    className="w-4 h-4"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M19 9l-7 7-7-7"
-                    />
-                  </svg>
+                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-slate-400 dark:text-slate-500">
+                  <ChevronDownSVG className="h-4 w-4" />
                 </div>
               </div>
             </div>
           )}
 
-          {/* 3. Section */}
           {selectedSem && (
             <div className="animate-fadeIn">
-              <label className="block text-sm font-bold text-[#1e293b] mb-2">
+              <label className="mb-2 block text-sm font-bold text-slate-800 dark:text-slate-100">
                 Section
               </label>
               <div className="relative">
                 <select
-                  className="w-full appearance-none border border-gray-200 text-gray-700 text-sm font-medium rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 hover:border-gray-300 transition"
+                  className={selectClass}
                   value={selectedSec}
                   onChange={handleSecChange}
                 >
@@ -180,34 +163,21 @@ const StartAttendanceModal = ({ isOpen, onClose, allocations = [] }) => {
                     </option>
                   ))}
                 </select>
-                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-gray-400">
-                  <svg
-                    className="w-4 h-4"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M19 9l-7 7-7-7"
-                    />
-                  </svg>
+                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-slate-400 dark:text-slate-500">
+                  <ChevronDownSVG className="h-4 w-4" />
                 </div>
               </div>
             </div>
           )}
 
-          {/* 4. Subject */}
           {selectedSec && (
             <div className="animate-fadeIn">
-              <label className="block text-sm font-bold text-[#1e293b] mb-2">
+              <label className="mb-2 block text-sm font-bold text-slate-800 dark:text-slate-100">
                 Subject
               </label>
               <div className="relative">
                 <select
-                  className="w-full appearance-none border border-gray-200 text-gray-700 text-sm font-medium rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 hover:border-gray-300 transition"
+                  className={selectClass}
                   value={selectedCourseId}
                   onChange={(e) => setSelectedCourseId(e.target.value)}
                 >
@@ -216,35 +186,22 @@ const StartAttendanceModal = ({ isOpen, onClose, allocations = [] }) => {
                   </option>
                   {availableCourses.map((alloc) => (
                     <option key={alloc.id} value={alloc.id}>
-                      {alloc.course?.name || "Unknown"} (
-                      {alloc.course?.code || "N/A"})
+                      {alloc.course?.name || "Unknown"} ({alloc.course?.code || "N/A"})
                     </option>
                   ))}
                 </select>
-                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-gray-400">
-                  <svg
-                    className="w-4 h-4"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M19 9l-7 7-7-7"
-                    />
-                  </svg>
+                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-slate-400 dark:text-slate-500">
+                  <ChevronDownSVG className="h-4 w-4" />
                 </div>
               </div>
             </div>
           )}
         </div>
 
-        <div className="flex items-center justify-end gap-3 mt-6">
+        <div className="mt-6 flex items-center justify-end gap-3">
           <button
             onClick={onClose}
-            className="px-5 py-2.5 rounded-lg border border-gray-200 text-sm font-bold text-gray-700 hover:bg-gray-50 transition"
+            className="rounded-lg border border-slate-300 px-5 py-2.5 text-sm font-bold text-slate-700 transition hover:bg-slate-50 dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-800"
           >
             Cancel
           </button>
@@ -255,7 +212,6 @@ const StartAttendanceModal = ({ isOpen, onClose, allocations = [] }) => {
               const alloc = availableCourses.find(
                 (a) => a.id.toString() === selectedCourseId.toString(),
               );
-              // Persist the session so the dashboard can show it as active
               localStorage.setItem(
                 "activeSession",
                 JSON.stringify({
@@ -271,13 +227,13 @@ const StartAttendanceModal = ({ isOpen, onClose, allocations = [] }) => {
               navigate(`/teacher/attendance/live/${alloc.id}`);
               onClose();
             }}
-            className={`px-5 py-2.5 rounded-lg text-sm font-bold flex items-center gap-2 transition ${
+            className={`flex items-center gap-2 rounded-lg px-5 py-2.5 text-sm font-bold transition ${
               selectedCourseId
-                ? "bg-[#818cf8] text-white hover:bg-indigo-500 shadow-sm cursor-pointer"
-                : "bg-gray-100 text-gray-400 cursor-not-allowed"
+                ? "cursor-pointer bg-[#818cf8] text-white shadow-sm hover:bg-indigo-500"
+                : "cursor-not-allowed bg-slate-200 text-slate-400 dark:bg-slate-800 dark:text-slate-500"
             }`}
           >
-            <PlayCircleSVG className="w-4 h-4" />
+            <PlayCircleSVG className="h-4 w-4" />
             Start Session
           </button>
         </div>

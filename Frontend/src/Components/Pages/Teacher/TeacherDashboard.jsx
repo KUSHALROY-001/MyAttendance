@@ -64,7 +64,7 @@ const TeacherDashboard = () => {
   }
 
   return (
-    <div className="mx-4">
+    <div className="mx-4 text-slate-900 dark:text-slate-100">
       <div className="max-w-6xl mx-auto space-y-6 animate-fadeIn pb-12 mt-6">
         <TeacherHeader
           teacherName={teacherName}

@@ -12,7 +12,6 @@ export const useTheme = () => {
 
 export const ThemeProvider = ({ children }) => {
   const [theme, setTheme] = useState(() => {
-    // Check local storage or system preference on initial load
     if (typeof window !== "undefined") {
       const savedTheme = localStorage.getItem("theme");
       if (savedTheme) {
@@ -22,11 +21,13 @@ export const ThemeProvider = ({ children }) => {
         return "dark";
       }
     }
-    return "dark"; // Defaulting to dark as requested in design style
+    return "dark";
   });
 
   useEffect(() => {
     localStorage.setItem("theme", theme);
+    document.documentElement.classList.toggle("dark", theme === "dark");
+    document.documentElement.style.colorScheme = theme;
   }, [theme]);
 
   const toggleTheme = () => {

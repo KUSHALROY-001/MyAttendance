@@ -17,7 +17,7 @@ const TakeAttendance = () => {
 
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [attendance, setAttendance] = useState({}); // { studentId: "Present" | "Absent" | "Late" }
+  const [attendance, setAttendance] = useState({});
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
@@ -28,15 +28,13 @@ const TakeAttendance = () => {
         );
         setData(res.data);
 
-        // Try to rehydrate saved marks from a previous visit
         const savedMarks = localStorage.getItem(`attendance_${allocationId}`);
         if (savedMarks) {
           setAttendance(JSON.parse(savedMarks));
         } else {
-          // Default everyone to present on a fresh session
           const initialAttendance = {};
-          res.data.students.forEach((s) => {
-            initialAttendance[s.id] = "Present";
+          res.data.students.forEach((student) => {
+            initialAttendance[student.id] = "Present";
           });
           setAttendance(initialAttendance);
         }
@@ -46,10 +44,10 @@ const TakeAttendance = () => {
         setLoading(false);
       }
     };
+
     fetchClass();
   }, [allocationId]);
 
-  // Auto-save marks to localStorage whenever they change
   useEffect(() => {
     if (Object.keys(attendance).length > 0) {
       localStorage.setItem(
@@ -61,11 +59,11 @@ const TakeAttendance = () => {
 
   const handleMarkAll = (status) => {
     if (!data) return;
-    const newAtt = {};
-    data.students.forEach((s) => {
-      newAtt[s.id] = status;
+    const nextAttendance = {};
+    data.students.forEach((student) => {
+      nextAttendance[student.id] = status;
     });
-    setAttendance(newAtt);
+    setAttendance(nextAttendance);
   };
 
   const handleSave = async () => {
@@ -85,7 +83,6 @@ const TakeAttendance = () => {
 
       localStorage.removeItem("activeSession");
       localStorage.removeItem(`attendance_${allocationId}`);
-      // Navigate back to dashboard on success
       navigate("/teacher");
     } catch (err) {
       console.error(err);
@@ -95,46 +92,51 @@ const TakeAttendance = () => {
     }
   };
 
-  // remove the redundant code
   if (loading) {
     return <LoadingAnimation />;
   }
 
   if (!data) {
-    return <PremiumErrorState title="Class Roster Not Found" message="We couldn't locate the class roster for this session." errorCode="404" />;
+    return (
+      <PremiumErrorState
+        title="Class Roster Not Found"
+        message="We couldn't locate the class roster for this session."
+        errorCode="404"
+      />
+    );
   }
 
   const { allocation, students } = data;
-
   const stats = {
     total: students.length,
-    present: Object.values(attendance).filter((v) => v === "Present").length,
-    absent: Object.values(attendance).filter((v) => v === "Absent").length,
-    late: Object.values(attendance).filter((v) => v === "Late").length,
+    present: Object.values(attendance).filter((value) => value === "Present")
+      .length,
+    absent: Object.values(attendance).filter((value) => value === "Absent")
+      .length,
+    late: Object.values(attendance).filter((value) => value === "Late").length,
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8 px-4 pb-28">
-      <div className="max-w-4xl mx-auto space-y-6">
-        {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+    <div className="min-h-screen bg-slate-50 px-4 py-8 pb-28 dark:bg-slate-950">
+      <div className="mx-auto max-w-4xl space-y-6">
+        <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
           <div className="flex items-center gap-4">
             <button
               onClick={() => navigate(-1)}
-              className="p-2 bg-white rounded-full shadow-sm hover:bg-gray-50 border border-gray-200 transition shrink-0"
+              className="shrink-0 rounded-full border border-slate-200 bg-white p-2 shadow-sm transition hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:hover:bg-slate-800"
             >
-              <BackArrowSVG className="w-5 h-5 text-gray-600" />
+              <BackArrowSVG className="h-5 w-5 text-slate-600 dark:text-slate-300" />
             </button>
             <div>
               <div className="flex items-center gap-3">
-                <h1 className="text-2xl font-black text-gray-900 tracking-tight">
+                <h1 className="text-2xl font-black tracking-tight text-slate-900 dark:text-slate-100">
                   {allocation.course?.name || "Unknown Subject"}
                 </h1>
-                <span className="px-2 py-0.5 rounded text-[10px] uppercase font-bold tracking-widest bg-emerald-100 text-emerald-700">
+                <span className="rounded bg-emerald-100 px-2 py-0.5 text-[10px] font-bold uppercase tracking-widest text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-300">
                   Live
                 </span>
               </div>
-              <p className="text-sm font-semibold text-gray-500 mt-1">
+              <p className="mt-1 text-sm font-semibold text-slate-500 dark:text-slate-400">
                 {allocation.course?.code || "N/A"} •{" "}
                 {new Date().toLocaleDateString("en-US", {
                   month: "short",
@@ -152,149 +154,159 @@ const TakeAttendance = () => {
                 localStorage.removeItem(`attendance_${allocationId}`);
                 navigate("/teacher");
               }}
-              className="px-5 py-2.5 rounded-lg border-2 border-red-100 text-red-600 font-bold text-sm hover:bg-red-50 transition"
+              className="rounded-lg border-2 border-red-100 px-5 py-2.5 text-sm font-bold text-red-600 transition hover:bg-red-50 dark:border-red-500/20 dark:hover:bg-red-500/10"
             >
               Cancel
             </button>
             <button
               disabled={saving || students.length === 0}
               onClick={handleSave}
-              className={`px-6 py-2.5 rounded-lg font-black text-sm flex items-center gap-2 transition ${saving ? "bg-emerald-300 cursor-not-allowed" : "bg-emerald-600 hover:bg-emerald-700 shadow-sm"} text-white`}
+              className={`flex items-center gap-2 rounded-lg px-6 py-2.5 text-sm font-black text-white transition ${
+                saving
+                  ? "cursor-not-allowed bg-emerald-300"
+                  : "bg-emerald-600 shadow-sm hover:bg-emerald-700"
+              }`}
             >
               {saving ? "Saving..." : "Submit Session"}
             </button>
           </div>
         </div>
 
-        {/* Stats Row */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-          <div className="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm flex items-center gap-4">
-            <div className="w-10 h-10 rounded-xl bg-gray-50 flex items-center justify-center text-gray-400">
-              <UsersSVG className="w-5 h-5" />
+        <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+          <div className="flex items-center gap-4 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-slate-50 text-slate-400 dark:bg-slate-800 dark:text-slate-500">
+              <UsersSVG className="h-5 w-5" />
             </div>
             <div>
-              <h3 className="text-xl font-black text-gray-900">
+              <h3 className="text-xl font-black text-slate-900 dark:text-slate-100">
                 {stats.total}
               </h3>
-              <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-0.5">
+              <p className="mt-0.5 text-[10px] font-bold uppercase tracking-widest text-slate-400 dark:text-slate-500">
                 Total
               </p>
             </div>
           </div>
 
-          <div className="bg-white p-4 rounded-2xl border border-emerald-100 shadow-sm flex items-center gap-4">
-            <div className="w-10 h-10 rounded-xl bg-emerald-50 flex items-center justify-center text-emerald-500">
-              <CheckCircleSVG className="w-5 h-5" />
+          <div className="flex items-center gap-4 rounded-2xl border border-emerald-100 bg-white p-4 shadow-sm dark:border-emerald-500/20 dark:bg-slate-900">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-50 text-emerald-500 dark:bg-emerald-500/10 dark:text-emerald-300">
+              <CheckCircleSVG className="h-5 w-5" />
             </div>
             <div>
               <h3 className="text-xl font-black text-emerald-600">
                 {stats.present}
               </h3>
-              <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-0.5">
+              <p className="mt-0.5 text-[10px] font-bold uppercase tracking-widest text-slate-400 dark:text-slate-500">
                 Present
               </p>
             </div>
           </div>
 
-          <div className="bg-white p-4 rounded-2xl border border-red-100 shadow-sm flex items-center gap-4">
-            <div className="w-10 h-10 rounded-xl bg-red-50 flex items-center justify-center text-red-500">
-              <XCircleSVG className="w-5 h-5" />
+          <div className="flex items-center gap-4 rounded-2xl border border-red-100 bg-white p-4 shadow-sm dark:border-red-500/20 dark:bg-slate-900">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-red-50 text-red-500 dark:bg-red-500/10 dark:text-red-300">
+              <XCircleSVG className="h-5 w-5" />
             </div>
             <div>
               <h3 className="text-xl font-black text-red-600">
                 {stats.absent}
               </h3>
-              <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-0.5">
+              <p className="mt-0.5 text-[10px] font-bold uppercase tracking-widest text-slate-400 dark:text-slate-500">
                 Absent
               </p>
             </div>
           </div>
 
-          <div className="bg-white p-4 rounded-2xl border border-amber-100 shadow-sm flex items-center gap-4">
-            <div className="w-10 h-10 rounded-xl bg-amber-50 flex items-center justify-center text-amber-500">
-              <MissingSVG className="w-5 h-5" />
+          <div className="flex items-center gap-4 rounded-2xl border border-amber-100 bg-white p-4 shadow-sm dark:border-amber-500/20 dark:bg-slate-900">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-50 text-amber-500 dark:bg-amber-500/10 dark:text-amber-300">
+              <MissingSVG className="h-5 w-5" />
             </div>
             <div>
               <h3 className="text-xl font-black text-amber-600">
                 {stats.late}
               </h3>
-              <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-0.5">
+              <p className="mt-0.5 text-[10px] font-bold uppercase tracking-widest text-slate-400 dark:text-slate-500">
                 Late
               </p>
             </div>
           </div>
         </div>
 
-        {/* Action Bar */}
-        <div className="flex flex-wrap gap-3 items-center pt-2">
+        <div className="flex flex-wrap items-center gap-3 pt-2">
           <button
             onClick={() => handleMarkAll("Present")}
-            className="px-4 py-2 rounded-lg border-2 border-emerald-100 text-emerald-600 text-sm font-bold hover:bg-emerald-50 transition"
+            className="rounded-lg border-2 border-emerald-100 px-4 py-2 text-sm font-bold text-emerald-600 transition hover:bg-emerald-50 dark:border-emerald-500/20 dark:hover:bg-emerald-500/10"
           >
             Mark All Present
           </button>
           <button
             onClick={() => handleMarkAll("Absent")}
-            className="px-4 py-2 rounded-lg border-2 border-red-100 text-red-600 text-sm font-bold hover:bg-red-50 transition"
+            className="rounded-lg border-2 border-red-100 px-4 py-2 text-sm font-bold text-red-600 transition hover:bg-red-50 dark:border-red-500/20 dark:hover:bg-red-500/10"
           >
             Mark All Absent
           </button>
           <button
             onClick={() => handleMarkAll("Late")}
-            className="px-4 py-2 rounded-lg border-2 border-amber-100 text-amber-600 text-sm font-bold hover:bg-amber-50 transition"
+            className="rounded-lg border-2 border-amber-100 px-4 py-2 text-sm font-bold text-amber-600 transition hover:bg-amber-50 dark:border-amber-500/20 dark:hover:bg-amber-500/10"
           >
             Mark All Late
           </button>
         </div>
 
-        {/* Student List */}
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden mt-6">
-          <div className="px-6 py-4 border-b border-gray-100 bg-gray-50/50">
-            <h3 className="text-sm font-bold text-gray-900">
+        <div className="mt-6 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900">
+          <div className="border-b border-slate-200 bg-slate-50/50 px-6 py-4 dark:border-slate-800 dark:bg-slate-800/50">
+            <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100">
               Student Attendance List
             </h3>
           </div>
 
-          <div className="divide-y divide-gray-50">
+          <div className="divide-y divide-slate-100 dark:divide-slate-800">
             {students.map((student) => {
               const status = attendance[student.id];
 
-              let cardBg = "bg-white";
-              if (status === "Present") cardBg = "bg-emerald-50/30";
-              if (status === "Absent") cardBg = "bg-red-50/30";
-              if (status === "Late") cardBg = "bg-amber-50/30";
+              let cardBg = "bg-white dark:bg-slate-900";
+              if (status === "Present") {
+                cardBg = "bg-emerald-50/30 dark:bg-emerald-500/10";
+              }
+              if (status === "Absent") {
+                cardBg = "bg-red-50/30 dark:bg-red-500/10";
+              }
+              if (status === "Late") {
+                cardBg = "bg-amber-50/30 dark:bg-amber-500/10";
+              }
 
               return (
                 <div
                   key={student.id}
-                  className={`flex flex-col sm:flex-row sm:items-center justify-between p-4 px-6 transition-colors ${cardBg}`}
+                  className={`flex flex-col justify-between px-6 py-4 transition-colors sm:flex-row sm:items-center ${cardBg}`}
                 >
-                  <div className="flex items-center space-x-4 mb-4 sm:mb-0">
+                  <div className="mb-4 flex items-center space-x-4 sm:mb-0">
                     {student.avatar ? (
                       <img
                         src={student.avatar}
                         alt={student.name}
-                        className="w-10 h-10 rounded-full object-cover border-2 border-white shadow-sm"
+                        className="h-10 w-10 rounded-full border-2 border-white object-cover shadow-sm dark:border-slate-800"
                       />
                     ) : (
-                      <div className="w-10 h-10 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center font-bold text-sm shadow-sm">
+                      <div className="flex h-10 w-10 items-center justify-center rounded-full bg-indigo-100 text-sm font-bold text-indigo-600 shadow-sm dark:bg-indigo-500/10 dark:text-indigo-300">
                         {student.name.charAt(0)}
                       </div>
                     )}
                     <div>
-                      <p className="text-sm font-bold text-gray-900">
+                      <p className="text-sm font-bold text-slate-900 dark:text-slate-100">
                         {student.name}
                       </p>
-                      <p className="text-[11px] font-bold text-gray-500 uppercase tracking-widest">
+                      <p className="text-[11px] font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400">
                         {student.rollNumber}
                       </p>
                     </div>
                   </div>
 
-                  {/* Radio Group manually styled */}
-                  <div className="flex bg-white rounded-lg p-1 border border-gray-200 shadow-sm shrink-0 self-start sm:self-auto">
+                  <div className="flex self-start rounded-lg border border-slate-200 bg-white p-1 shadow-sm dark:border-slate-700 dark:bg-slate-950 sm:self-auto">
                     <label
-                      className={`cursor-pointer px-4 py-1.5 rounded-md text-xs font-bold transition flex items-center gap-2 ${status === "Present" ? "bg-emerald-100 text-emerald-700" : "text-gray-500 hover:bg-gray-50"}`}
+                      className={`flex cursor-pointer items-center gap-2 rounded-md px-4 py-1.5 text-xs font-bold transition ${
+                        status === "Present"
+                          ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-300"
+                          : "text-slate-500 hover:bg-slate-50 dark:text-slate-400 dark:hover:bg-slate-800"
+                      }`}
                     >
                       <input
                         type="radio"
@@ -309,12 +321,20 @@ const TakeAttendance = () => {
                         }
                       />
                       <div
-                        className={`w-3 h-3 rounded-full border-[3px] transition-colors ${status === "Present" ? "border-emerald-500" : "border-gray-300"}`}
+                        className={`h-3 w-3 rounded-full border-[3px] transition-colors ${
+                          status === "Present"
+                            ? "border-emerald-500"
+                            : "border-slate-300 dark:border-slate-600"
+                        }`}
                       ></div>
                       Present
                     </label>
                     <label
-                      className={`cursor-pointer px-4 py-1.5 rounded-md text-xs font-bold transition flex items-center gap-2 ${status === "Late" ? "bg-amber-100 text-amber-700" : "text-gray-500 hover:bg-gray-50"}`}
+                      className={`flex cursor-pointer items-center gap-2 rounded-md px-4 py-1.5 text-xs font-bold transition ${
+                        status === "Late"
+                          ? "bg-amber-100 text-amber-700 dark:bg-amber-500/15 dark:text-amber-300"
+                          : "text-slate-500 hover:bg-slate-50 dark:text-slate-400 dark:hover:bg-slate-800"
+                      }`}
                     >
                       <input
                         type="radio"
@@ -329,12 +349,20 @@ const TakeAttendance = () => {
                         }
                       />
                       <div
-                        className={`w-3 h-3 rounded-full border-[3px] transition-colors ${status === "Late" ? "border-amber-500" : "border-gray-300"}`}
+                        className={`h-3 w-3 rounded-full border-[3px] transition-colors ${
+                          status === "Late"
+                            ? "border-amber-500"
+                            : "border-slate-300 dark:border-slate-600"
+                        }`}
                       ></div>
                       Late
                     </label>
                     <label
-                      className={`cursor-pointer px-4 py-1.5 rounded-md text-xs font-bold transition flex items-center gap-2 ${status === "Absent" ? "bg-red-100 text-red-700" : "text-gray-500 hover:bg-gray-50"}`}
+                      className={`flex cursor-pointer items-center gap-2 rounded-md px-4 py-1.5 text-xs font-bold transition ${
+                        status === "Absent"
+                          ? "bg-red-100 text-red-700 dark:bg-red-500/15 dark:text-red-300"
+                          : "text-slate-500 hover:bg-slate-50 dark:text-slate-400 dark:hover:bg-slate-800"
+                      }`}
                     >
                       <input
                         type="radio"
@@ -349,7 +377,11 @@ const TakeAttendance = () => {
                         }
                       />
                       <div
-                        className={`w-3 h-3 rounded-full border-[3px] transition-colors ${status === "Absent" ? "border-red-500" : "border-gray-300"}`}
+                        className={`h-3 w-3 rounded-full border-[3px] transition-colors ${
+                          status === "Absent"
+                            ? "border-red-500"
+                            : "border-slate-300 dark:border-slate-600"
+                        }`}
                       ></div>
                       Absent
                     </label>
@@ -360,7 +392,7 @@ const TakeAttendance = () => {
 
             {students.length === 0 && (
               <div className="p-8 text-center">
-                <p className="text-gray-500 font-medium">
+                <p className="font-medium text-slate-500 dark:text-slate-400">
                   No students found matching this class section.
                 </p>
               </div>

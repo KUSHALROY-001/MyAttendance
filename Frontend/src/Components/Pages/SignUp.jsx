@@ -2,9 +2,9 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 const inputClass =
-  "block w-full rounded-lg border border-slate-600 bg-slate-900/70 px-3 py-2 text-sm text-slate-50 placeholder:text-slate-500 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/60";
+  "block w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/60 dark:border-slate-600 dark:bg-slate-900/70 dark:text-slate-50 dark:placeholder:text-slate-500";
 
-const labelClass = "block text-xs font-medium text-slate-200";
+const labelClass = "block text-xs font-medium text-slate-700 dark:text-slate-200";
 
 function SignUp() {
   const [role, setRole] = useState("student");
@@ -35,36 +35,30 @@ function SignUp() {
         designation: data.designation,
       };
     }
-    // admin has no extra fields
 
     console.log("Signup payload:", payload);
-    // TODO: POST to /api/auth/signup
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
-
-      <main className="flex-1 flex items-center justify-center px-4 py-12">
-        {/* Adjusted Container: Takes full width with margin on large screens, max-width keeps it contained */}
-        <div className="w-full max-w-md min-[950px]:max-w-4xl rounded-2xl bg-slate-900/60 border border-slate-700 shadow-xl shadow-slate-900/40 backdrop-blur-md p-8 min-[950px]:p-10">
+    <div className="min-h-screen flex flex-col bg-gradient-to-br from-slate-100 via-white to-indigo-50 transition-colors dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
+      <main className="flex flex-1 items-center justify-center px-4 py-12">
+        <div className="w-full max-w-md min-[950px]:max-w-4xl rounded-2xl border border-slate-200 bg-white/85 p-8 shadow-xl shadow-slate-200/60 backdrop-blur-md dark:border-slate-700 dark:bg-slate-900/60 dark:shadow-slate-900/40 min-[950px]:p-10">
           <div className="mb-8 text-center min-[950px]:mb-10">
             <p className="text-xs font-semibold uppercase tracking-[0.2em] text-indigo-400">
               Get started
             </p>
-            <h1 className="mt-2 text-2xl font-semibold tracking-tight text-slate-50 min-[950px]:text-3xl">
+            <h1 className="mt-2 text-2xl font-semibold tracking-tight text-slate-900 dark:text-slate-50 min-[950px]:text-3xl">
               Create your account
             </h1>
-            <p className="mt-2 text-xs text-slate-400 min-[950px]:text-sm">
+            <p className="mt-2 text-xs text-slate-500 dark:text-slate-400 min-[950px]:text-sm">
               Sign up to start managing attendance for your class or team.
             </p>
           </div>
 
-          {/* Form wrapper changed to a CSS Grid */}
           <form
             onSubmit={handleSubmit}
-            className="grid grid-cols-1 min-[950px]:grid-cols-2 gap-5 min-[950px]:gap-6"
+            className="grid grid-cols-1 gap-5 min-[950px]:grid-cols-2 min-[950px]:gap-6"
           >
-            {/* 1. Name */}
             <div className="space-y-1.5">
               <label htmlFor="name" className={labelClass}>
                 Name
@@ -80,7 +74,6 @@ function SignUp() {
               />
             </div>
 
-            {/* 2. Email */}
             <div className="space-y-1.5">
               <label htmlFor="email" className={labelClass}>
                 Email
@@ -96,7 +89,6 @@ function SignUp() {
               />
             </div>
 
-            {/* 3. Password (Moved up to visually balance the 2-column grid alongside Role) */}
             <div className="space-y-1.5">
               <label htmlFor="password" className={labelClass}>
                 Password
@@ -113,7 +105,6 @@ function SignUp() {
               />
             </div>
 
-            {/* 4. Role */}
             <div className="space-y-1.5">
               <label htmlFor="role" className={labelClass}>
                 Role
@@ -132,14 +123,12 @@ function SignUp() {
               </select>
             </div>
 
-            {/* 5. Role-based fields (Spans full width so it drops to a new row) */}
             {role === "student" && (
-              <div className="col-span-1 min-[950px]:col-span-2 space-y-4 rounded-lg border border-slate-600/60 bg-slate-800/40 p-5 mt-2">
-                <p className="text-sm font-medium text-indigo-300">
+              <div className="col-span-1 mt-2 space-y-4 rounded-lg border border-slate-200 bg-slate-50/90 p-5 dark:border-slate-600/60 dark:bg-slate-800/40 min-[950px]:col-span-2">
+                <p className="text-sm font-medium text-indigo-600 dark:text-indigo-300">
                   Student details
                 </p>
-                {/* Internal Grid for sub-fields - Plural items per line on large screens */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 min-[950px]:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 min-[950px]:grid-cols-2">
                   <div className="space-y-1.5">
                     <label htmlFor="rollNumber" className={labelClass}>
                       Roll number
@@ -199,12 +188,11 @@ function SignUp() {
             )}
 
             {role === "teacher" && (
-              <div className="col-span-1 min-[950px]:col-span-2 space-y-4 rounded-lg border border-slate-600/60 bg-slate-800/40 p-5 mt-2">
-                <p className="text-sm font-medium text-indigo-300">
+              <div className="col-span-1 mt-2 space-y-4 rounded-lg border border-slate-200 bg-slate-50/90 p-5 dark:border-slate-600/60 dark:bg-slate-800/40 min-[950px]:col-span-2">
+                <p className="text-sm font-medium text-indigo-600 dark:text-indigo-300">
                   Teacher details
                 </p>
-                {/* Internal Grid for Teacher fields */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                   <div className="space-y-1.5">
                     <label htmlFor="department" className={labelClass}>
                       Department
@@ -235,8 +223,7 @@ function SignUp() {
               </div>
             )}
 
-            {/* 6. Submit Button (Spans full width at the bottom) */}
-            <div className="col-span-1 min-[950px]:col-span-2 mt-4">
+            <div className="col-span-1 mt-4 min-[950px]:col-span-2">
               <button
                 type="submit"
                 className="inline-flex w-full items-center justify-center rounded-lg bg-indigo-500 px-4 py-3 text-sm font-bold tracking-wide text-white shadow-md shadow-indigo-900/40 transition hover:bg-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-400/80"
@@ -246,19 +233,18 @@ function SignUp() {
             </div>
           </form>
 
-          <p className="mt-6 text-center text-sm text-slate-400">
+          <p className="mt-6 text-center text-sm text-slate-500 dark:text-slate-400">
             Already have an account?{" "}
             <button
               type="button"
               onClick={() => navigate("/login")}
-              className="font-semibold text-indigo-300 hover:text-indigo-200"
+              className="font-semibold text-indigo-500 hover:text-indigo-400 dark:text-indigo-300 dark:hover:text-indigo-200"
             >
               Login
             </button>
           </p>
         </div>
       </main>
-
     </div>
   );
 }

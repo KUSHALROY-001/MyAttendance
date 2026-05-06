@@ -88,7 +88,7 @@ const CourseDetail = () => {
 
   if (!stuData) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-950">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
       </div>
     );
@@ -99,8 +99,10 @@ const CourseDetail = () => {
       <div className="min-h-screen flex flex-col">
         <main className="flex-1 flex items-center justify-center p-8">
           <div className="text-center">
-            <h1 className="text-2xl font-bold">Course not found</h1>
-            <p className="text-gray-500 mt-2">
+            <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100">
+              Course not found
+            </h1>
+            <p className="mt-2 text-slate-500 dark:text-slate-400">
               The course you are looking for does not exist or you are not
               enrolled.
             </p>
@@ -118,20 +120,20 @@ const CourseDetail = () => {
 
   return (
     <>
-      <div className="mx-4">
+      <div className="mx-4 text-slate-900 dark:text-slate-100">
         <div className="max-w-6xl mx-auto space-y-6 animate-fadeIn pb-12">
           <div className="flex items-start justify-between gap-4">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">
+              <h1 className="text-3xl font-bold text-slate-900 dark:text-slate-100">
                 {courseSummary.courseName}
               </h1>
-              <p className="text-gray-500 font-medium text-sm mt-1">
+              <p className="mt-1 text-sm font-medium text-slate-500 dark:text-slate-400">
                 {courseSummary.courseCode} • {teacher?.name ?? "Instructor"}
               </p>
             </div>
             <Link
               to="/student"
-              className="inline-flex items-center gap-2 rounded-full border border-gray-200 bg-white px-4 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-50 transition"
+              className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800"
             >
               ← Back to dashboard
             </Link>

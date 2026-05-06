@@ -30,7 +30,8 @@ const StudentDashboard = () => {
       .catch((err) => {
         setFetchError({
           status: err.response?.status || 500,
-          message: err.response?.data?.message || "Failed to load dashboard data",
+          message:
+            err.response?.data?.message || "Failed to load dashboard data",
         });
       });
   }, []); // only run once on mount
@@ -50,7 +51,8 @@ const StudentDashboard = () => {
     return map;
   }, [stuData]);
 
-  const { calendarMonth, calendarDays, goToPreviousMonth, goToNextMonth } = useCalendar(attendanceByDate);
+  const { calendarMonth, calendarDays, goToPreviousMonth, goToNextMonth } =
+    useCalendar(attendanceByDate);
 
   // ─────────────────────── Aggregate stats (safe against empty summaries) ───────────────────────
 
@@ -75,10 +77,12 @@ const StudentDashboard = () => {
 
   if (fetchError) {
     return (
-      <PremiumErrorState 
+      <PremiumErrorState
         title={fetchError.status === 404 ? "Student Not Found" : "System Error"}
-        message={fetchError.message} 
-        errorCode={fetchError.status === 404 ? "404" : fetchError.status.toString()} 
+        message={fetchError.message}
+        errorCode={
+          fetchError.status === 404 ? "404" : fetchError.status.toString()
+        }
       />
     );
   }
@@ -93,14 +97,14 @@ const StudentDashboard = () => {
   const semester = stuData.batch ?? "—";
 
   return (
-    <div className="mx-4">
+    <div className="mx-4 text-slate-900 dark:text-slate-100">
       <div className="max-w-6xl mx-auto space-y-6 animate-fadeIn pb-12">
         {/* Header */}
         <div className="mb-4">
-          <h1 className="text-3xl font-bold text-gray-900">
+          <h1 className="text-3xl font-bold text-slate-900 dark:text-slate-100">
             Welcome back, {safeUserName}
           </h1>
-          <p className="text-gray-500 font-medium text-sm mt-1">
+          <p className="mt-1 text-sm font-medium text-slate-500 dark:text-slate-400">
             Enrollment: {enrollmentNo} • {department} • {semester}
           </p>
         </div>
@@ -129,7 +133,9 @@ const StudentDashboard = () => {
                     <span className="font-bold text-red-700">
                       {sub.courseName}
                     </span>
-                    <span className="text-red-400">({sub.courseCode})</span>
+                    <span className="text-red-400 dark:text-red-300">
+                      ({sub.courseCode})
+                    </span>
                   </div>
                   <span className="font-black">
                     {sub.percentage.toFixed(1)}%
@@ -137,7 +143,7 @@ const StudentDashboard = () => {
                 </div>
               ))}
             </div>
-            <p className="text-xs text-red-500">
+            <p className="text-xs text-red-500 dark:text-red-300">
               Maintain at least 75% attendance to be eligible for examinations.
             </p>
           </div>
@@ -182,7 +188,9 @@ const StudentDashboard = () => {
 
         {/* My Courses */}
         <div>
-          <h2 className="text-2xl font-bold text-gray-900 mb-6">My Courses</h2>
+          <h2 className="mb-6 text-2xl font-bold text-slate-900 dark:text-slate-100">
+            My Courses
+          </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {summaries.map((course) => (
               <CourseCard

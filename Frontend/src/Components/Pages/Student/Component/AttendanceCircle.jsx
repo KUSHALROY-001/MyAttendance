@@ -2,13 +2,13 @@ const AttendanceCircle = ({ periods }) => {
   const getColor = (status) => {
     switch (status) {
       case "PRESENT":
-        return "#22c55e"; // Green
+        return "#22c55e";
       case "LATE":
-        return "#f59e0b"; // Orange
+        return "#f59e0b";
       case "ABSENT":
-        return "#ef4444"; // Red
+        return "#ef4444";
       default:
-        return "#f1f5f9"; // Light Gray
+        return "#cbd5e1";
     }
   };
 
@@ -17,7 +17,7 @@ const AttendanceCircle = ({ periods }) => {
       width="36"
       height="36"
       viewBox="0 0 100 100"
-      className="drop-shadow-sm group-hover:scale-110 transition-transform"
+      className="group-hover:scale-110 text-white drop-shadow-sm transition-transform dark:text-slate-900"
     >
       <path
         d="M 50 50 L 50 0 A 50 50 0 0 1 100 50 Z"
@@ -43,7 +43,7 @@ const AttendanceCircle = ({ periods }) => {
         stroke="white"
         strokeWidth="2"
       />
-      <circle cx="50" cy="50" r="30" fill="white" />
+      <circle cx="50" cy="50" r="30" fill="currentColor" />
     </svg>
   );
 };

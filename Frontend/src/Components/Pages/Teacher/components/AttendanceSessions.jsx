@@ -3,11 +3,10 @@ import { Link } from "react-router-dom";
 import SessionCard from "./SessionCard";
 import { ChevronRightSVG, PlayCircleSVG } from "../../../UI/SVG";
 
-const AttendanceSessions = ({ sessions = [] }) => {
+const AttendanceSessions = ({ sessions = [], onSessionClick }) => {
   const [activeTab, setActiveTab] = useState("completed");
   const [liveSession, setLiveSession] = useState(null);
 
-  // Read active session from localStorage on mount (and whenever the tab re-focuses)
   useEffect(() => {
     const read = () => {
       const raw = localStorage.getItem("activeSession");
@@ -18,7 +17,6 @@ const AttendanceSessions = ({ sessions = [] }) => {
     return () => window.removeEventListener("focus", read);
   }, []);
 
-  // Auto-switch to Active tab when a live session exists
   useEffect(() => {
     if (liveSession) setActiveTab("active");
   }, [liveSession]);
@@ -28,58 +26,58 @@ const AttendanceSessions = ({ sessions = [] }) => {
   );
 
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 h-full flex flex-col">
-      <h2 className="text-lg font-bold text-gray-900 mb-6">
+    <div className="flex h-full flex-col rounded-xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+      <h2 className="mb-6 text-lg font-bold text-slate-900 dark:text-slate-100">
         Attendance Sessions
       </h2>
 
-      <div className="flex bg-gray-50 self-start p-1 rounded-lg border border-gray-100 mb-6">
+      <div className="mb-6 flex self-start rounded-lg border border-slate-200 bg-slate-50 p-1 dark:border-slate-800 dark:bg-slate-800">
         <button
           onClick={() => setActiveTab("active")}
-          className={`px-4 py-1.5 text-xs font-bold rounded-md transition-all ${
+          className={`rounded-md px-4 py-1.5 text-xs font-bold transition-all ${
             activeTab === "active"
-              ? "bg-white text-gray-900 shadow-sm border border-gray-200/50"
-              : "text-gray-500 hover:text-gray-700 hover:bg-gray-100"
+              ? "border border-slate-200/50 bg-white text-slate-900 shadow-sm dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
+              : "text-slate-500 hover:bg-slate-100 hover:text-slate-700 dark:text-slate-400 dark:hover:bg-slate-700 dark:hover:text-slate-200"
           }`}
         >
           Active ({liveSession ? 1 : 0})
         </button>
         <button
           onClick={() => setActiveTab("completed")}
-          className={`px-4 py-1.5 text-xs font-bold rounded-md transition-all ${
+          className={`rounded-md px-4 py-1.5 text-xs font-bold transition-all ${
             activeTab === "completed"
-              ? "bg-white text-gray-900 shadow-sm border border-gray-200/50"
-              : "text-gray-500 hover:text-gray-700 hover:bg-gray-100"
+              ? "border border-slate-200/50 bg-white text-slate-900 shadow-sm dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
+              : "text-slate-500 hover:bg-slate-100 hover:text-slate-700 dark:text-slate-400 dark:hover:bg-slate-700 dark:hover:text-slate-200"
           }`}
         >
           Completed ({sessions.length})
         </button>
       </div>
 
-      <div className="flex-1 overflow-y-auto pr-2 max-h-[350px]">
+      <div className="max-h-[350px] flex-1 overflow-y-auto pr-2">
         {activeTab === "active" ? (
           liveSession ? (
             <Link
               to={`/teacher/attendance/live/${liveSession.allocationId}`}
-              className="block group"
+              className="group block"
             >
-              <div className="rounded-xl border-2 border-emerald-200 bg-emerald-50/40 p-4 hover:bg-emerald-50 transition-colors">
+              <div className="rounded-xl border-2 border-emerald-200 bg-emerald-50/40 p-4 transition-colors hover:bg-emerald-50 dark:border-emerald-500/20 dark:bg-emerald-500/10 dark:hover:bg-emerald-500/15">
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0">
-                    <div className="flex items-center gap-2 mb-1">
-                      <span className="flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-700">
-                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse inline-block"></span>
+                    <div className="mb-1 flex items-center gap-2">
+                      <span className="flex items-center gap-1.5 rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-bold text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-300">
+                        <span className="inline-block h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-500"></span>
                         LIVE
                       </span>
                     </div>
-                    <p className="font-bold text-sm text-gray-900 truncate">
+                    <p className="truncate text-sm font-bold text-slate-900 dark:text-slate-100">
                       {liveSession.courseName}
                     </p>
-                    <p className="text-[11px] font-semibold text-gray-500 mt-0.5">
-                      {liveSession.courseCode} • Sem {liveSession.semester} •
-                      Sec {liveSession.section}
+                    <p className="mt-0.5 text-[11px] font-semibold text-slate-500 dark:text-slate-400">
+                      {liveSession.courseCode} • Sem {liveSession.semester} • Sec{" "}
+                      {liveSession.section}
                     </p>
-                    <p className="text-[11px] text-gray-400 mt-1">
+                    <p className="mt-1 text-[11px] text-slate-400 dark:text-slate-500">
                       Started{" "}
                       {new Date(liveSession.startedAt).toLocaleTimeString(
                         "en-US",
@@ -87,40 +85,44 @@ const AttendanceSessions = ({ sessions = [] }) => {
                       )}
                     </p>
                   </div>
-                  <div className="shrink-0 w-8 h-8 rounded-lg bg-emerald-100 flex items-center justify-center text-emerald-600 group-hover:bg-emerald-200 transition-colors">
-                    <ChevronRightSVG className="w-4 h-4" />
+                  <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-emerald-100 text-emerald-600 transition-colors group-hover:bg-emerald-200 dark:bg-emerald-500/15 dark:text-emerald-300">
+                    <ChevronRightSVG className="h-4 w-4" />
                   </div>
                 </div>
               </div>
             </Link>
           ) : (
-            <div className="h-full flex flex-col justify-center items-center text-center py-6">
-              <div className="w-12 h-12 bg-gray-50 rounded-full flex items-center justify-center mb-4 border border-gray-100">
-                <PlayCircleSVG className="w-6 h-6 text-indigo-400" />
+            <div className="flex h-full flex-col items-center justify-center py-6 text-center">
+              <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full border border-slate-200 bg-slate-50 dark:border-slate-800 dark:bg-slate-800">
+                <PlayCircleSVG className="h-6 w-6 text-indigo-400" />
               </div>
-              <h3 className="text-sm font-bold text-gray-400">
+              <h3 className="text-sm font-bold text-slate-400 dark:text-slate-500">
                 No active sessions
               </h3>
-              <p className="text-xs text-gray-400 mt-1">
+              <p className="mt-1 text-xs text-slate-400 dark:text-slate-500">
                 Start a new attendance session above
               </p>
             </div>
           )
         ) : sortedSessions.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             {sortedSessions.map((session, index) => (
-              <SessionCard key={index} session={session} />
+              <SessionCard
+                key={index}
+                session={session}
+                onClick={onSessionClick}
+              />
             ))}
           </div>
         ) : (
-          <div className="h-full flex flex-col justify-center items-center text-center py-6">
-            <div className="w-12 h-12 bg-gray-50 rounded-full flex items-center justify-center mb-4 border border-gray-100">
-              <PlayCircleSVG className="w-6 h-6 text-indigo-400" />
+          <div className="flex h-full flex-col items-center justify-center py-6 text-center">
+            <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full border border-slate-200 bg-slate-50 dark:border-slate-800 dark:bg-slate-800">
+              <PlayCircleSVG className="h-6 w-6 text-indigo-400" />
             </div>
-            <h3 className="text-sm font-bold text-gray-400">
+            <h3 className="text-sm font-bold text-slate-400 dark:text-slate-500">
               No completed sessions
             </h3>
-            <p className="text-xs text-gray-400 mt-1">
+            <p className="mt-1 text-xs text-slate-400 dark:text-slate-500">
               Start a new attendance session above
             </p>
           </div>

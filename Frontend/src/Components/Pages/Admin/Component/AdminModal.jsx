@@ -36,7 +36,7 @@ const AdminModal = ({ isOpen, onClose, title, children }) => {
         </div>
 
         {/* Body */}
-        <div className="p-6 overflow-y-auto">{children}</div>
+        <div className="p-2 md:p-6 overflow-y-auto">{children}</div>
       </div>
     </div>
   );

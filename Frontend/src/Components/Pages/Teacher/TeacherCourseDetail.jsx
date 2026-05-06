@@ -38,25 +38,31 @@ const TeacherCourseDetail = () => {
   }
 
   if (!courseData) {
-    return <PremiumErrorState title="Course Not Found" message="No details found for this course assignment." errorCode="404" />;
+    return (
+      <PremiumErrorState
+        title="Course Not Found"
+        message="No details found for this course assignment."
+        errorCode="404"
+      />
+    );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8 px-4">
+    <div className="min-h-screen bg-slate-50 py-8 px-4 dark:bg-slate-950">
       <div className="max-w-4xl mx-auto">
         {/* Header Section */}
         <div className="flex items-center space-x-4 mb-6">
           <button
             onClick={() => navigate(-1)}
-            className="p-2 bg-white rounded-full shadow-sm hover:bg-gray-50 border border-gray-200 transition"
+            className="rounded-full border border-slate-200 bg-white p-2 shadow-sm transition hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:hover:bg-slate-800"
           >
-            <BackArrowSVG className="w-5 h-5 text-gray-600" />
+            <BackArrowSVG className="w-5 h-5 text-slate-600 dark:text-slate-300" />
           </button>
           <div>
-            <h1 className="text-2xl font-black text-gray-900 tracking-tight">
+            <h1 className="text-2xl font-black tracking-tight text-slate-900 dark:text-slate-100">
               {courseData.courseName}
             </h1>
-            <p className="text-sm font-semibold text-gray-500 uppercase tracking-widest mt-1">
+            <p className="mt-1 text-sm font-semibold uppercase tracking-widest text-slate-500 dark:text-slate-400">
               {courseData.courseCode}
             </p>
           </div>
@@ -79,7 +85,9 @@ const TeacherCourseDetail = () => {
         </div>
 
         {/* Sessions List */}
-        <h2 className="text-lg font-bold text-gray-900 mb-4">Past Sessions</h2>
+        <h2 className="mb-4 text-lg font-bold text-slate-900 dark:text-slate-100">
+          Past Sessions
+        </h2>
 
         {courseData.sessions?.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -92,14 +100,14 @@ const TeacherCourseDetail = () => {
             ))}
           </div>
         ) : (
-          <div className="bg-white rounded-2xl border border-gray-100 p-10 flex flex-col items-center justify-center text-center">
-            <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mb-4 border border-gray-100">
-              <MissingSVG className="w-8 h-8 text-gray-400" />
+          <div className="flex flex-col items-center justify-center rounded-2xl border border-slate-200 bg-white p-10 text-center dark:border-slate-800 dark:bg-slate-900">
+            <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full border border-slate-200 bg-slate-50 dark:border-slate-700 dark:bg-slate-800">
+              <MissingSVG className="w-8 h-8 text-slate-400 dark:text-slate-500" />
             </div>
-            <h3 className="text-base font-bold text-gray-600">
+            <h3 className="text-base font-bold text-slate-600 dark:text-slate-300">
               No sessions found
             </h3>
-            <p className="text-sm text-gray-400 mt-1">
+            <p className="mt-1 text-sm text-slate-400 dark:text-slate-500">
               You haven't conducted any classes for this course yet.
             </p>
           </div>

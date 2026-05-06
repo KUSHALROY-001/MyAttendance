@@ -2,16 +2,14 @@ import { useState, useEffect } from "react";
 import api from "../../../api/axios";
 import toast from "react-hot-toast";
 import { FolderOpen } from "lucide-react";
-
-// Subcomponents
 import LibraryHeader from "./components/LibraryHeader";
 import LibraryFilters from "./components/LibraryFilters";
 import LibraryResourceCard from "./components/LibraryResourceCard";
 import LibraryModal from "./components/LibraryModal";
 
 const inputClass =
-  "block w-full rounded-lg border border-slate-600 bg-slate-900/70 px-3 py-2 text-sm text-slate-50 placeholder:text-slate-500 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/60";
-const labelClass = "block text-xs font-medium text-slate-200";
+  "block w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/60 dark:border-slate-600 dark:bg-slate-900/70 dark:text-slate-50 dark:placeholder:text-slate-500";
+const labelClass = "block text-xs font-medium text-slate-700 dark:text-slate-200";
 
 export default function Library() {
   const [resources, setResources] = useState([]);
@@ -21,7 +19,6 @@ export default function Library() {
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-
   const [filters, setFilters] = useState({
     department: "",
     semester: "",
@@ -70,13 +67,12 @@ export default function Library() {
     const formData = new FormData(e.currentTarget);
     const data = Object.fromEntries(formData.entries());
 
-    // Assuming user details are in localStorage or context, grabbing ID for now
     const userString = localStorage.getItem("user");
     let contributorId = 18;
     if (userString) {
       try {
         contributorId = JSON.parse(userString).id;
-      } catch (e) {}
+      } catch (_error) {}
     }
 
     try {
@@ -96,8 +92,8 @@ export default function Library() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-slate-50 py-10 px-4">
-      <div className="max-w-7xl mx-auto space-y-8">
+    <div className="min-h-screen bg-gradient-to-br from-slate-100 via-white to-indigo-50 px-4 py-10 text-slate-900 transition-colors dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 dark:text-slate-50">
+      <div className="mx-auto max-w-7xl space-y-8">
         <LibraryHeader setIsModalOpen={setIsModalOpen} />
 
         <LibraryFilters
@@ -111,23 +107,22 @@ export default function Library() {
           labelClass={labelClass}
         />
 
-        {/* Resources Grid */}
         {loading ? (
           <div className="flex justify-center py-20">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-500"></div>
+            <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-indigo-500"></div>
           </div>
         ) : resources.length === 0 ? (
-          <div className="text-center py-20 bg-slate-900/40 border border-slate-700 rounded-2xl">
-            <FolderOpen className="mx-auto h-12 w-12 text-slate-500 mb-4" />
-            <h3 className="text-lg font-medium text-slate-300">
+          <div className="rounded-2xl border border-slate-200 bg-white/80 py-20 text-center dark:border-slate-700 dark:bg-slate-900/40">
+            <FolderOpen className="mx-auto mb-4 h-12 w-12 text-slate-400 dark:text-slate-500" />
+            <h3 className="text-lg font-medium text-slate-700 dark:text-slate-300">
               No resources found
             </h3>
-            <p className="text-slate-500 mt-1">
+            <p className="mt-1 text-slate-500 dark:text-slate-500">
               Try adjusting your filters or be the first to share!
             </p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
             {resources.map((res) => (
               <LibraryResourceCard key={res.id} res={res} />
             ))}

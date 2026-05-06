@@ -20,59 +20,67 @@ const WeeklySchedule = ({ schedule }) => {
   ];
 
   const colors = [
-    "bg-red-50", "bg-blue-50", "bg-green-50", 
-    "bg-yellow-50", "bg-purple-50", "bg-orange-50", 
-    "bg-indigo-50", "bg-pink-50", "bg-teal-50"
+    "bg-red-50 dark:bg-red-500/10",
+    "bg-blue-50 dark:bg-blue-500/10",
+    "bg-green-50 dark:bg-green-500/10",
+    "bg-yellow-50 dark:bg-yellow-500/10",
+    "bg-purple-50 dark:bg-purple-500/10",
+    "bg-orange-50 dark:bg-orange-500/10",
+    "bg-indigo-50 dark:bg-indigo-500/10",
+    "bg-pink-50 dark:bg-pink-500/10",
+    "bg-teal-50 dark:bg-teal-500/10",
   ];
 
   const timetable = React.useMemo(() => {
     const map = {};
-    times.forEach(t => map[t] = {});
-    
+    times.forEach((t) => (map[t] = {}));
+
     if (!schedule || schedule.length === 0) return map;
 
     schedule.forEach((cls) => {
       const slots = cls.slots || [];
       if (slots.length === 0) return;
-      
-      const sortedSlots = [...slots].sort((a,b) => a - b);
+
+      const sortedSlots = [...slots].sort((a, b) => a - b);
       const startSlot = sortedSlots[0];
-      const timeLabel = times[startSlot - 1]; // slots are 1-indexed
-      
+      const timeLabel = times[startSlot - 1];
+
       if (timeLabel && cls.day) {
         const randomColor = colors[Math.floor(Math.random() * colors.length)];
-        
+
         map[timeLabel][cls.day] = {
           name: cls.subject,
           section: `${cls.department} Sem ${cls.semester} Sec ${cls.section}`,
           room: cls.room || "TBA",
           color: randomColor,
-          colSpan: sortedSlots.length
+          colSpan: sortedSlots.length,
         };
       }
     });
-    
+
     return map;
   }, [schedule]);
 
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-gray-300 p-6 overflow-hidden">
-      <div className="flex items-center space-x-2 mb-6">
-        <BookSVG className="w-5 h-5 text-indigo-500" />
-        <h2 className="text-lg font-bold text-gray-900">Weekly Schedule</h2>
+    <div className="overflow-hidden rounded-xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+      <div className="mb-6 flex items-center space-x-2">
+        <BookSVG className="h-5 w-5 text-indigo-500" />
+        <h2 className="text-lg font-bold text-slate-900 dark:text-slate-100">
+          Weekly Schedule
+        </h2>
       </div>
 
       <div className="overflow-x-auto">
-        <table className="w-full border-collapse min-w-[800px]">
+        <table className="min-w-[800px] w-full border-collapse">
           <thead>
             <tr>
-              <th className="p-3 text-left border-b border-r border-gray-300 text-[10px] uppercase font-bold text-gray-500 bg-gray-200 w-32">
+              <th className="w-32 border-b border-r border-slate-300 bg-slate-100 p-3 text-left text-[10px] font-bold uppercase text-slate-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-400">
                 Day / Time
               </th>
               {times.map((time) => (
                 <th
                   key={time}
-                  className="p-3 text-center border-b border-gray-300 text-[12px] uppercase font-bold text-gray-600 bg-gray-200 min-w-[120px]"
+                  className="min-w-[120px] border-b border-slate-300 bg-slate-100 p-3 text-center text-[12px] font-bold uppercase text-slate-600 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300"
                 >
                   {time}
                 </th>
@@ -83,15 +91,15 @@ const WeeklySchedule = ({ schedule }) => {
             {days.map((day) => (
               <tr
                 key={day}
-                className="border-b border-gray-300 hover:bg-gray-50/20"
+                className="border-b border-slate-300 hover:bg-slate-50/40 dark:border-slate-700 dark:hover:bg-slate-800/40"
               >
-                <td className="p-3 border-r border-gray-300 bg-white">
+                <td className="border-r border-slate-300 bg-white p-3 dark:border-slate-700 dark:bg-slate-900">
                   <div className="flex items-center space-x-2">
-                    <span className="text-sm font-bold text-gray-900">
+                    <span className="text-sm font-bold text-slate-900 dark:text-slate-100">
                       {day}
                     </span>
                     {day === "Monday" && (
-                      <span className="bg-indigo-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">
+                      <span className="rounded-full bg-indigo-500 px-2 py-0.5 text-[10px] font-bold text-white">
                         Today
                       </span>
                     )}
@@ -100,7 +108,6 @@ const WeeklySchedule = ({ schedule }) => {
                 {times.map((time, index) => {
                   const cellData = timetable[time]?.[day];
 
-                  // Skip rendering cell if standard slot but has colSpan covered by previous slot
                   if (
                     index > 0 &&
                     timetable[times[index - 1]]?.[day]?.colSpan > 1
@@ -112,24 +119,24 @@ const WeeklySchedule = ({ schedule }) => {
                     <td
                       key={`${day}-${time}`}
                       colSpan={cellData?.colSpan || 1}
-                      className={`p-2 border border-gray-300 text-center ${
-                        cellData ? cellData.color : "bg-white"
+                      className={`border border-slate-300 p-2 text-center dark:border-slate-700 ${
+                        cellData ? cellData.color : "bg-white dark:bg-slate-900"
                       }`}
                     >
                       {cellData ? (
-                        <div className="flex flex-col items-center justify-center h-full space-y-0.5">
-                          <span className="text-[13px] font-bold text-gray-900 leading-tight">
+                        <div className="flex h-full flex-col items-center justify-center space-y-0.5">
+                          <span className="text-[13px] font-bold leading-tight text-slate-900 dark:text-slate-100">
                             {cellData.name}
                           </span>
-                          <span className="text-[12px] text-gray-500 leading-tight">
+                          <span className="text-[12px] leading-tight text-slate-500 dark:text-slate-400">
                             {cellData.section}
                           </span>
-                          <span className="text-[12px] text-gray-400 font-medium">
+                          <span className="text-[12px] font-medium text-slate-400 dark:text-slate-500">
                             {cellData.room}
                           </span>
                         </div>
                       ) : (
-                        <span className="text-gray-300">-</span>
+                        <span className="text-slate-300 dark:text-slate-600">-</span>
                       )}
                     </td>
                   );

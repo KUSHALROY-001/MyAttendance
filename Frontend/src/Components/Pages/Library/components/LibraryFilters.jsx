@@ -9,9 +9,9 @@ export default function LibraryFilters({
   labelClass,
 }) {
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 bg-slate-800/40 border border-slate-600/60 p-4 rounded-xl">
+    <div className="grid grid-cols-1 gap-4 rounded-xl border border-slate-200 bg-white/70 p-4 dark:border-slate-600/60 dark:bg-slate-800/40 sm:grid-cols-2 md:grid-cols-4">
       <div>
-        <label className={labelClass + " mb-1"}>Department</label>
+        <label className={`${labelClass} mb-1`}>Department</label>
         <select
           name="department"
           value={filters.department}
@@ -27,7 +27,7 @@ export default function LibraryFilters({
         </select>
       </div>
       <div>
-        <label className={labelClass + " mb-1"}>Semester</label>
+        <label className={`${labelClass} mb-1`}>Semester</label>
         <select
           name="semester"
           value={filters.semester}
@@ -43,7 +43,7 @@ export default function LibraryFilters({
         </select>
       </div>
       <div>
-        <label className={labelClass + " mb-1"}>Subject</label>
+        <label className={`${labelClass} mb-1`}>Subject</label>
         <select
           name="subjectName"
           value={filters.subjectName}
@@ -62,7 +62,7 @@ export default function LibraryFilters({
       <div className="flex items-end">
         <button
           onClick={clearFilters}
-          className="w-full bg-slate-700 hover:bg-slate-600 text-slate-200 px-4 py-2 rounded-lg text-sm font-medium transition h-[38px]"
+          className="h-[38px] w-full rounded-lg bg-slate-200 px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-300 dark:bg-slate-700 dark:text-slate-200 dark:hover:bg-slate-600"
         >
           Clear Filters
         </button>

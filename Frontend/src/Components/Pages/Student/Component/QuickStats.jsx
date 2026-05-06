@@ -1,20 +1,22 @@
 const QuickStats = ({ summaries }) => {
   return (
-    <div className="lg:col-span-1 bg-white rounded-2xl shadow-sm border border-gray-100 p-6 flex flex-col h-full">
-      <h2 className="text-lg font-bold text-gray-900 mb-6">Quick Stats</h2>
-      <div className="space-y-6 flex-grow">
+    <div className="lg:col-span-1 flex h-full flex-col rounded-2xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+      <h2 className="mb-6 text-lg font-bold text-slate-900 dark:text-slate-100">
+        Quick Stats
+      </h2>
+      <div className="flex-grow space-y-6">
         {summaries.map((subject, idx) => {
           const isLow = subject.percentage < 75;
           return (
             <div
               key={idx}
-              className="flex justify-between items-center transition-all hover:bg-gray-50 -mx-2 px-2 py-1 rounded-lg"
+              className="mx-[-0.5rem] flex items-center justify-between rounded-lg px-2 py-1 transition-all hover:bg-slate-50 dark:hover:bg-slate-800"
             >
               <div>
-                <p className="text-[15px] font-bold text-gray-900 leading-tight mb-1">
+                <p className="mb-1 text-[15px] font-bold leading-tight text-slate-900 dark:text-slate-100">
                   {subject.courseCode}
                 </p>
-                <p className="text-[13px] text-slate-500 leading-tight">
+                <p className="text-[13px] leading-tight text-slate-500 dark:text-slate-400">
                   {subject.courseName}
                 </p>
               </div>
