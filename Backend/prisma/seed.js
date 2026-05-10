@@ -12,9 +12,10 @@ async function main() {
   await prisma.studentAttendanceStat.deleteMany();
   await prisma.attendanceRecord.deleteMany();
   await prisma.attendanceSession.deleteMany();
+  await prisma.classScheduleEntry.deleteMany();
+  await prisma.classTimetable.deleteMany();
   await prisma.courseAllocation.deleteMany();
   await prisma.studentCourse.deleteMany();
-  await prisma.teacherSchedule.deleteMany();
   await prisma.libraryResource.deleteMany();
   await prisma.course.deleteMany();
   await prisma.student.deleteMany();

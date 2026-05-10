@@ -26,7 +26,7 @@ const AttendanceSessions = ({ sessions = [], onSessionClick }) => {
   );
 
   return (
-    <div className="flex h-full flex-col rounded-xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+    <div className="flex h-full flex-col rounded-xl border border-slate-200 bg-white p-2 md:p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900">
       <h2 className="mb-6 text-lg font-bold text-slate-900 dark:text-slate-100">
         Attendance Sessions
       </h2>
@@ -54,7 +54,7 @@ const AttendanceSessions = ({ sessions = [], onSessionClick }) => {
         </button>
       </div>
 
-      <div className="max-h-[350px] flex-1 overflow-y-auto pr-2">
+      <div className="max-h-[350px] flex-1 overflow-y-auto">
         {activeTab === "active" ? (
           liveSession ? (
             <Link
@@ -74,8 +74,8 @@ const AttendanceSessions = ({ sessions = [], onSessionClick }) => {
                       {liveSession.courseName}
                     </p>
                     <p className="mt-0.5 text-[11px] font-semibold text-slate-500 dark:text-slate-400">
-                      {liveSession.courseCode} • Sem {liveSession.semester} • Sec{" "}
-                      {liveSession.section}
+                      {liveSession.courseCode} • Sem {liveSession.semester} •
+                      Sec {liveSession.section}
                     </p>
                     <p className="mt-1 text-[11px] text-slate-400 dark:text-slate-500">
                       Started{" "}

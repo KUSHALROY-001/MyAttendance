@@ -10,7 +10,7 @@ const {
 
 router.get("/dashboard/:teacherId", getTeacherDashboard);
 router.get("/attendance/:sessionId", getAttendanceSession);
-router.get("/:teacherId/course/:courseCode", getCourseAttendance);
+router.get("/:teacherId/allocation/:allocationId/course", getCourseAttendance);
 router.get("/attendance/live/:allocationId", getLiveAttendance);
 router.post("/attendance/submit", submitAttendance);
 

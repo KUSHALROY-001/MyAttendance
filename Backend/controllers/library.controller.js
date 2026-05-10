@@ -1,26 +1,17 @@
-const { PrismaClient } = require("@prisma/client");
-const prisma = new PrismaClient();
+const { prisma } = require("../utils/prisma.js");
 const ApiError = require("../utils/ApiError");
 const asyncHandler = require("../utils/asyncHandler");
 
-// ── GET  /api/library?department=BCA&semester=3&subjectName=OS ──────────────────
-// Returns resources AND filter options (departments, semesters, subjects) in one call.
 const getLibraryResources = asyncHandler(async (req, res) => {
   const { department, semester, subjectName } = req.query;
+  const parsedSemester = semester ? parseInt(semester, 10) : undefined;
 
-  // Build where clause for resources
   const where = {};
   if (department) where.department = department;
-  if (semester) where.semester = parseInt(semester, 10);
+  if (parsedSemester) where.semester = parsedSemester;
   if (subjectName) where.subjectName = subjectName;
 
-  // Build where clause for subject filter (scoped by dept/sem only, not by subject itself)
-  const subjectWhere = {};
-  if (department) subjectWhere.department = department;
-  if (semester) subjectWhere.semester = parseInt(semester, 10);
-
-  // Fire all queries in parallel — single round-trip to the DB
-  const [resources, deptRows, semRows, subjectRows] = await Promise.all([
+  const [resources, deptRows, selectedDepartment] = await Promise.all([
     prisma.libraryResource.findMany({
       where,
       orderBy: { createdAt: "desc" },
@@ -38,34 +29,55 @@ const getLibraryResources = asyncHandler(async (req, res) => {
         },
       },
     }),
-    prisma.department.findMany({
+    prisma.departmentInfo.findMany({
       select: { code: true },
     }),
-    prisma.course.findMany({
-      select: { semester: true },
-      distinct: ["semester"],
-    }),
-    prisma.libraryResource.findMany({
-      where: subjectWhere,
-      select: { subjectName: true },
-      distinct: ["subjectName"],
-    }),
+    department
+      ? prisma.departmentInfo.findFirst({
+          where: { code: department },
+          select: { semesterDetails: true },
+        })
+      : Promise.resolve(null),
   ]);
+
+  const semesters = selectedDepartment?.semesterDetails
+    ? selectedDepartment.semesterDetails
+        .map((detail) => detail.semester)
+        .filter((value) => Number.isInteger(value))
+        .sort((a, b) => a - b)
+    : (
+        await prisma.course.findMany({
+          where: department ? { department } : undefined,
+          select: { semester: true },
+          distinct: ["semester"],
+        })
+      )
+        .map((course) => course.semester)
+        .sort((a, b) => a - b);
+
+  const subjectRows = await prisma.course.findMany({
+    where: {
+      ...(department && { department }),
+      ...(parsedSemester && { semester: parsedSemester }),
+    },
+    select: { name: true },
+    distinct: ["name"],
+    orderBy: { name: "asc" },
+  });
 
   return res.status(200).json({
     resources,
     filters: {
-      departments: deptRows.map((r) => r.code).sort(),
-      semesters: semRows.map((r) => r.semester).sort((a, b) => a - b),
+      departments: deptRows.map((row) => row.code).sort(),
+      semesters: [...new Set(semesters)],
       subjects: subjectRows
-        .map((r) => r.subjectName)
+        .map((row) => row.name)
         .filter(Boolean)
         .sort(),
     },
   });
 });
 
-// ── POST  /api/library ───────────────────────────────────────────
 const createLibraryResource = asyncHandler(async (req, res) => {
   const {
     title,
@@ -77,7 +89,6 @@ const createLibraryResource = asyncHandler(async (req, res) => {
     contributorId,
   } = req.body;
 
-  // Basic validation
   if (
     !title ||
     !subjectName ||
@@ -92,16 +103,17 @@ const createLibraryResource = asyncHandler(async (req, res) => {
     );
   }
 
-  // Validate Google Drive link format (basic check)
   if (!driveLink.includes("drive.google.com")) {
     throw new ApiError(400, "Please provide a valid Google Drive link.");
   }
 
-  // Ensure user exists
   const user = await prisma.user.findUnique({
     where: { id: parseInt(contributorId, 10) },
   });
-  if (!user) throw new ApiError(404, "Contributor user not found.");
+
+  if (!user) {
+    throw new ApiError(404, "Contributor user not found.");
+  }
 
   const resource = await prisma.libraryResource.create({
     data: {
@@ -120,26 +132,32 @@ const createLibraryResource = asyncHandler(async (req, res) => {
     .json({ message: "Resource shared successfully!", resource });
 });
 
-// ── DELETE  /api/library/:id ─────────────────────────────────────
 const deleteLibraryResource = asyncHandler(async (req, res) => {
   const { id } = req.params;
-  const { userId } = req.body; // The user attempting the delete
+  const { userId } = req.body;
 
   const resource = await prisma.libraryResource.findUnique({
     where: { id: parseInt(id, 10) },
   });
-  if (!resource) throw new ApiError(404, "Resource not found.");
 
-  // Only the contributor or an ADMIN can delete
+  if (!resource) {
+    throw new ApiError(404, "Resource not found.");
+  }
+
   const user = await prisma.user.findUnique({
     where: { id: parseInt(userId, 10) },
   });
-  if (!user) throw new ApiError(404, "User not found.");
+
+  if (!user) {
+    throw new ApiError(404, "User not found.");
+  }
+
   if (resource.contributorId !== user.id && user.role !== "ADMIN") {
     throw new ApiError(403, "You are not authorized to delete this resource.");
   }
 
   await prisma.libraryResource.delete({ where: { id: parseInt(id, 10) } });
+
   return res.status(200).json({ message: "Resource deleted." });
 });
 

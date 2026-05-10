@@ -103,6 +103,82 @@ const getcourseAllocations = async (whereClause) => {
   return courseAllocations;
 };
 
+const syncStudentsForCourseAllocation = async (
+  tx,
+  { courseId, department, semester, section },
+) => {
+  const normalizedSemester = Number(semester);
+  const students = await tx.student.findMany({
+    where: {
+      department,
+      semester: normalizedSemester,
+      section,
+    },
+    select: {
+      id: true,
+    },
+  });
+
+  if (!students.length) {
+    return;
+  }
+
+  const enrollmentRows = students.map((student) => ({
+    studentId: student.id,
+    courseId: Number(courseId),
+  }));
+
+  await tx.studentCourse.createMany({
+    data: enrollmentRows,
+    skipDuplicates: true,
+  });
+
+  await tx.studentAttendanceStat.createMany({
+    data: enrollmentRows.map((row) => ({
+      ...row,
+      totalSessions: 0,
+      totalAttended: 0,
+    })),
+    skipDuplicates: true,
+  });
+};
+
+const syncExistingStudentsForCourse = async (tx, { courseId, department, semester }) => {
+  const normalizedSemester = Number(semester);
+  const students = await tx.student.findMany({
+    where: {
+      department,
+      semester: normalizedSemester,
+    },
+    select: {
+      id: true,
+    },
+  });
+
+  if (!students.length) {
+    return;
+  }
+
+  const enrollmentRows = students.map((student) => ({
+    studentId: student.id,
+    courseId: Number(courseId),
+  }));
+
+  await tx.studentCourse.createMany({
+    data: enrollmentRows,
+    skipDuplicates: true,
+  });
+
+  await tx.studentAttendanceStat.createMany({
+    data: enrollmentRows.map((row) => ({
+      ...row,
+      totalSessions: 0,
+      totalAttended: 0,
+    })),
+    skipDuplicates: true,
+  });
+};
+
 const parseNumberFilter = (value) => {
   if (value === undefined || value === null || value === "") {
     return undefined;
@@ -746,14 +822,24 @@ const createCourse = asyncHandler(async (req, res) => {
   if (existingCourse) {
     throw new ApiError(409, "A course with this code already exists.");
   }
-  const newCourse = await prisma.course.create({
-    data: {
-      name,
-      code,
-      department,
-      semester: Number(semester),
-      credits: credits ? Number(credits) : 3,
-    },
+  const newCourse = await prisma.$transaction(async (tx) => {
+    const createdCourse = await tx.course.create({
+      data: {
+        name,
+        code,
+        department,
+        semester: Number(semester),
+        credits: credits ? Number(credits) : 3,
+      },
+    });
+
+    await syncExistingStudentsForCourse(tx, {
+      courseId: createdCourse.id,
+      department: createdCourse.department,
+      semester: createdCourse.semester,
+    });
+
+    return createdCourse;
   });
   res.status(201).json(newCourse);
 });
@@ -819,35 +905,42 @@ const createCourseAllocation = asyncHandler(async (req, res) => {
   }
 
   try {
-    const newCourseAllocation = await prisma.courseAllocation.create({
-      data: {
-        courseId: Number(courseId),
-        teacherId: Number(teacherId),
-        department,
-        semester: Number(semester),
-        section,
-        academicYear: academicYear || "2023-2024",
-      },
-      select: {
-        id: true,
-        department: true,
-        semester: true,
-        section: true,
-        academicYear: true,
-        courseId: true,
-        teacherId: true,
-        course: {
-          select: { id: true, name: true, code: true },
+    const newCourseAllocation = await prisma.$transaction(async (tx) => {
+      const createdAllocation = await tx.courseAllocation.create({
+        data: {
+          courseId: Number(courseId),
+          teacherId: Number(teacherId),
+          department,
+          semester: Number(semester),
+          section,
+          academicYear: academicYear || "2023-2024",
         },
-        teacher: {
-          select: {
-            id: true,
-            employeeId: true,
-            user: { select: { name: true } },
+        select: {
+          id: true,
+          department: true,
+          semester: true,
+          section: true,
+          academicYear: true,
+          courseId: true,
+          teacherId: true,
+          course: {
+            select: { id: true, name: true, code: true },
+          },
+          teacher: {
+            select: {
+              id: true,
+              employeeId: true,
+              user: { select: { name: true } },
+            },
           },
         },
-      },
+      });
+
+      await syncStudentsForCourseAllocation(tx, createdAllocation);
+
+      return createdAllocation;
     });
+
     res.status(201).json(formatCourseAllocation(newCourseAllocation));
   } catch (error) {
     if (error.code === "P2002") {
@@ -871,36 +964,43 @@ const updateCourseAllocation = asyncHandler(async (req, res) => {
   }
 
   try {
-    const updatedCourseAllocation = await prisma.courseAllocation.update({
-      where: { id: Number(id) },
-      data: {
-        ...(courseId && { courseId: Number(courseId) }),
-        ...(teacherId && { teacherId: Number(teacherId) }),
-        ...(department && { department }),
-        ...(semester && { semester: Number(semester) }),
-        ...(section && { section }),
-        ...(academicYear && { academicYear }),
-      },
-      select: {
-        id: true,
-        department: true,
-        semester: true,
-        section: true,
-        academicYear: true,
-        courseId: true,
-        teacherId: true,
-        course: {
-          select: { id: true, name: true, code: true },
+    const updatedCourseAllocation = await prisma.$transaction(async (tx) => {
+      const nextAllocation = await tx.courseAllocation.update({
+        where: { id: Number(id) },
+        data: {
+          ...(courseId && { courseId: Number(courseId) }),
+          ...(teacherId && { teacherId: Number(teacherId) }),
+          ...(department && { department }),
+          ...(semester && { semester: Number(semester) }),
+          ...(section && { section }),
+          ...(academicYear && { academicYear }),
         },
-        teacher: {
-          select: {
-            id: true,
-            employeeId: true,
-            user: { select: { name: true } },
+        select: {
+          id: true,
+          department: true,
+          semester: true,
+          section: true,
+          academicYear: true,
+          courseId: true,
+          teacherId: true,
+          course: {
+            select: { id: true, name: true, code: true },
+          },
+          teacher: {
+            select: {
+              id: true,
+              employeeId: true,
+              user: { select: { name: true } },
+            },
           },
         },
-      },
+      });
+
+      await syncStudentsForCourseAllocation(tx, nextAllocation);
+
+      return nextAllocation;
     });
+
     res.status(200).json(formatCourseAllocation(updatedCourseAllocation));
   } catch (error) {
     if (error.code === "P2002") {
@@ -1088,28 +1188,7 @@ const readClassTimetable = asyncHandler(async (req, res) => {
     if (!timetable) throw new ApiError(404, "Timetable not found.");
 
     await prisma.$transaction(async (tx) => {
-      // 1. Find entries for this period to clean up TeacherSchedule
-      const entriesToDelete = await tx.classScheduleEntry.findMany({
-        where: {
-          classTimetableId: timetable.id,
-          periodNumber: Number(periodNumber),
-        },
-        include: { courseAllocation: true },
-      });
-
-      // 2. Remove synced TeacherSchedule entries
-      for (const entry of entriesToDelete) {
-        await tx.teacherSchedule.deleteMany({
-          where: {
-            teacherId: entry.courseAllocation.teacherId,
-            courseAllocationId: entry.courseAllocationId,
-            day: entry.day,
-            slots: entry.periodNumber.toString(),
-          },
-        });
-      }
-
-      // 3. Delete all ClassScheduleEntry rows for this period
+      // Delete all source timetable entries for this period.
       await tx.classScheduleEntry.deleteMany({
         where: {
           classTimetableId: timetable.id,
@@ -1117,7 +1196,7 @@ const readClassTimetable = asyncHandler(async (req, res) => {
         },
       });
 
-      // 4. Remove the period from the JSON array
+      // Remove the period from the JSON array.
       const periods = Array.isArray(timetable.periods)
         ? timetable.periods.filter((p) => p.period !== Number(periodNumber))
         : [];
@@ -1151,12 +1230,14 @@ const createClassScheduleEntry = asyncHandler(async (req, res) => {
   });
   if (!allocation) throw new ApiError(404, "Course allocation not found.");
 
-  // Conflict detection: check if this teacher already has a class at the same day+period
-  const conflict = await prisma.teacherSchedule.findFirst({
+  // Conflict detection now checks the source class timetable entries directly.
+  const conflict = await prisma.classScheduleEntry.findFirst({
     where: {
-      teacherId: allocation.teacherId,
       day,
-      slots: periodNumber.toString(),
+      periodNumber: Number(periodNumber),
+      courseAllocation: {
+        teacherId: allocation.teacherId,
+      },
     },
     include: {
       courseAllocation: {
@@ -1172,32 +1253,15 @@ const createClassScheduleEntry = asyncHandler(async (req, res) => {
     );
   }
 
-  const result = await prisma.$transaction(async (tx) => {
-    // 1. Create the class schedule entry
-    const entry = await tx.classScheduleEntry.create({
-      data: {
-        classTimetableId: Number(classTimetableId),
-        periodNumber: Number(periodNumber),
-        day,
-        courseAllocationId: Number(courseAllocationId),
-        room: room || null,
-        classType: classType || "class",
-      },
-    });
-
-    // 2. Auto-sync: create TeacherSchedule entry
-    await tx.teacherSchedule.create({
-      data: {
-        teacherId: allocation.teacherId,
-        courseAllocationId: Number(courseAllocationId),
-        day,
-        slots: periodNumber.toString(),
-        room: room || null,
-        classType: classType || "class",
-      },
-    });
-
-    return entry;
+  const result = await prisma.classScheduleEntry.create({
+    data: {
+      classTimetableId: Number(classTimetableId),
+      periodNumber: Number(periodNumber),
+      day,
+      courseAllocationId: Number(courseAllocationId),
+      room: room || null,
+      classType: classType || "class",
+    },
   });
 
   res.status(201).json(result);
@@ -1209,22 +1273,10 @@ const deleteClassScheduleEntry = asyncHandler(async (req, res) => {
 
   const entry = await prisma.classScheduleEntry.findUnique({
     where: { id: Number(id) },
-    include: { courseAllocation: true },
   });
   if (!entry) throw new ApiError(404, "Schedule entry not found.");
 
-  await prisma.$transaction(async (tx) => {
-    await tx.classScheduleEntry.delete({ where: { id: Number(id) } });
-
-    await tx.teacherSchedule.deleteMany({
-      where: {
-        teacherId: entry.courseAllocation.teacherId,
-        courseAllocationId: entry.courseAllocationId,
-        day: entry.day,
-        slots: entry.periodNumber.toString(),
-      },
-    });
-  });
+  await prisma.classScheduleEntry.delete({ where: { id: Number(id) } });
 
   res.status(200).json({ message: "Schedule entry deleted." });
 });

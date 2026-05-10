@@ -1,10 +1,9 @@
 import React from "react";
-import { Link } from "react-router-dom";
 
-const TeacherCourses = ({ courses }) => {
+const TeacherCourses = ({ courses, onCourseClick }) => {
   return (
-    <div className="flex max-h-[450px] h-full flex-col rounded-xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900">
-      <div className="mb-6 flex items-center justify-between">
+    <div className="flex max-h-[450px] h-full flex-col rounded-xl border border-slate-200 bg-white p-2 md:p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+      <div className="mb-2 md:mb-6 flex items-center justify-between">
         <h2 className="text-lg font-bold text-slate-900 dark:text-slate-100">
           My Courses
         </h2>
@@ -12,13 +11,14 @@ const TeacherCourses = ({ courses }) => {
 
       <div className="flex flex-1 flex-col gap-4 overflow-y-auto pr-2">
         {courses.map((course) => (
-          <Link
-            to={`/teacher/course/${course.id}`}
+          <button
+            type="button"
+            onClick={() => onCourseClick?.(course.allocationId)}
             key={course.id}
-            className="block flex-1 rounded-xl border border-slate-200 bg-white p-5 shadow-sm transition-colors cursor-pointer group hover:border-indigo-200 dark:border-slate-800 dark:bg-slate-950"
+            className="block flex-1 rounded-xl border border-slate-200 bg-white p-2 md:p-5 text-left shadow-sm transition-colors cursor-pointer group hover:border-indigo-200 dark:border-slate-800 dark:bg-slate-950"
           >
             <div className="mb-4">
-              <div className="mb-1 flex justify-between">
+              <div className="mb-1 flex gap-2 justify-between">
                 <h3 className="text-base font-bold text-slate-900 transition-colors group-hover:text-indigo-600 dark:text-slate-100">
                   {course.name}
                 </h3>
@@ -35,7 +35,7 @@ const TeacherCourses = ({ courses }) => {
                 </p>
               </div>
             </div>
-          </Link>
+          </button>
         ))}
 
         {courses.length === 0 && (

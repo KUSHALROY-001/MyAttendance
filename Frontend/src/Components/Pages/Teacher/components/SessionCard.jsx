@@ -13,7 +13,7 @@ const SessionCard = ({ session, showCourseName = true, onClick }) => {
   return (
     <div
       onClick={() => onClick && onClick(session.id)}
-      className="group flex cursor-pointer flex-col rounded-2xl border border-slate-200 bg-white p-4 transition-all hover:border-indigo-200 hover:shadow-md dark:border-slate-800 dark:bg-slate-900"
+      className="group flex cursor-pointer flex-col rounded-2xl border border-slate-200 bg-white p-2 md:p-4 transition-all hover:border-indigo-200 hover:shadow-md dark:border-slate-800 dark:bg-slate-900"
     >
       <div className="mb-4 flex items-start justify-between">
         <div>
@@ -32,7 +32,8 @@ const SessionCard = ({ session, showCourseName = true, onClick }) => {
           )}
 
           <p className="mt-1 text-[13px] font-semibold text-slate-500 dark:text-slate-400">
-            {session.department} • Sem {session.semester} • Sec {session.section}
+            {session.department} • Sem {session.semester} • Sec{" "}
+            {session.section}
           </p>
         </div>
 
@@ -72,4 +73,3 @@ const SessionCard = ({ session, showCourseName = true, onClick }) => {
 };
 
 export default SessionCard;
-

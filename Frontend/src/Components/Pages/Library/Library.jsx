@@ -9,7 +9,8 @@ import LibraryModal from "./components/LibraryModal";
 
 const inputClass =
   "block w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/60 dark:border-slate-600 dark:bg-slate-900/70 dark:text-slate-50 dark:placeholder:text-slate-500";
-const labelClass = "block text-xs font-medium text-slate-700 dark:text-slate-200";
+const labelClass =
+  "block text-xs font-medium text-slate-700 dark:text-slate-200";
 
 export default function Library() {
   const [resources, setResources] = useState([]);
@@ -20,8 +21,8 @@ export default function Library() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [filters, setFilters] = useState({
-    department: "",
-    semester: "",
+    department: "BCA",
+    semester: "1",
     subjectName: "",
   });
 
@@ -31,7 +32,8 @@ export default function Library() {
       const params = new URLSearchParams();
       if (filters.department) params.append("department", filters.department);
       if (filters.semester) params.append("semester", filters.semester);
-      if (filters.subjectName) params.append("subjectName", filters.subjectName);
+      if (filters.subjectName)
+        params.append("subjectName", filters.subjectName);
 
       const response = await api.get(`/api/library?${params.toString()}`);
       setResources(response.data.resources || []);
@@ -51,11 +53,29 @@ export default function Library() {
 
   const handleFilterChange = (e) => {
     const { name, value } = e.target;
-    setFilters((prev) => ({
-      ...prev,
-      [name]: value,
-      ...(name !== "subjectName" && { subjectName: "" }),
-    }));
+    setFilters((prev) => {
+      if (name === "department") {
+        return {
+          ...prev,
+          department: value,
+          semester: "",
+          subjectName: "",
+        };
+      }
+
+      if (name === "semester") {
+        return {
+          ...prev,
+          semester: value,
+          subjectName: "",
+        };
+      }
+
+      return {
+        ...prev,
+        [name]: value,
+      };
+    });
   };
 
   const clearFilters = () => {

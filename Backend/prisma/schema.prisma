@@ -85,7 +85,6 @@ model Teacher {
   // Relations
   user              User               @relation(fields: [userId], references: [id], onDelete: Cascade)
   courseAllocations CourseAllocation[]
-  schedules         TeacherSchedule[]
 }
 
 // ─────────────────────────────────────────────
@@ -194,7 +193,6 @@ model CourseAllocation {
   teacher            Teacher             @relation(fields: [teacherId], references: [id], onDelete: Cascade)
   course             Course              @relation(fields: [courseId], references: [id], onDelete: Cascade)
   attendanceSessions AttendanceSession[]
-  schedules          TeacherSchedule[]
   classScheduleEntries ClassScheduleEntry[]
 
   @@unique([teacherId, courseId, department, semester, section]) // A teacher can't be assigned same course+section twice

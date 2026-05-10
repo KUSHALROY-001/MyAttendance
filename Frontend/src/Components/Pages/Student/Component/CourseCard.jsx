@@ -1,13 +1,12 @@
-import { Link } from "react-router-dom";
 import { BookSVG, ExclamationCircleSVG } from "../../../UI/SVG";
 
-const CourseCard = ({ course, to, state }) => {
+const CourseCard = ({ course, onClick }) => {
   const isLow = course.percentage < 75;
 
   return (
-    <Link
-      to={to}
-      state={state}
+    <button
+      type="button"
+      onClick={() => onClick?.(course.courseCode)}
       className={`group block rounded-2xl border bg-white p-6 transition-all dark:bg-slate-900 ${
         isLow
           ? "border-red-200 shadow-md shadow-red-50/50 dark:border-red-500/20 dark:shadow-none"
@@ -78,7 +77,7 @@ const CourseCard = ({ course, to, state }) => {
           Dr. Smith
         </span>
       </div> */}
-    </Link>
+    </button>
   );
 };
 

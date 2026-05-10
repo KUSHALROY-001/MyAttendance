@@ -1,18 +1,10 @@
 import React, { useEffect, useMemo, useState } from "react";
 import AdminTable from "./Component/AdminTable";
-import AdminModal from "./Component/AdminModal";
 import AdminToolbar from "./Component/AdminToolbar";
 import api from "../../../api/axios";
-
-const STATUS_STYLES = {
-  PRESENT:
-    "bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 ring-emerald-600/20",
-  ABSENT:
-    "bg-red-50 dark:bg-red-500/10 text-red-700 dark:text-red-400 ring-red-600/20",
-  LATE: "bg-amber-50 dark:bg-amber-500/10 text-amber-700 dark:text-amber-400 ring-amber-600/20",
-  LEAVE:
-    "bg-slate-100 dark:bg-slate-700/60 text-slate-700 dark:text-slate-300 ring-slate-500/20",
-};
+import AttendanceSessionModal, {
+  AttendanceStatusBadge,
+} from "../../UI/AttendanceSessionModal";
 
 const SESSION_EMPTY_STATE =
   "No attendance sessions found for the current filters.";
@@ -21,20 +13,16 @@ const DEFAULTER_EMPTY_STATE = "No defaulters found for the current filters.";
 const AdminReports = () => {
   const [activeTab, setActiveTab] = useState("sessions");
   const [departments, setDepartments] = useState([]);
-
   const [dept, setDept] = useState("BCA");
   const [sem, setSem] = useState(1);
   const [sec, setSec] = useState("");
-
   const [sessionSearch, setSessionSearch] = useState("");
   const [filterSessionCourse, setFilterSessionCourse] = useState("");
   const [filterSessionTeacher, setFilterSessionTeacher] = useState("");
   const [filterSessionDate, setFilterSessionDate] = useState("");
-
   const [defaulterSearch, setDefaulterSearch] = useState("");
   const [filterDefaulterCourse, setFilterDefaulterCourse] = useState("");
   const [filterDefaulterDept, setFilterDefaulterDept] = useState("");
-
   const [sessions, setSessions] = useState([]);
   const [defaulters, setDefaulters] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -111,9 +99,7 @@ const AdminReports = () => {
     setSessionDetailLoading(false);
   };
 
-  const currentDept = departments.find(
-    (department) => department.code === dept,
-  );
+  const currentDept = departments.find((department) => department.code === dept);
   const semOptions =
     currentDept?.semesterDetails.map((semesterItem) => semesterItem.semester) ||
     [];
@@ -179,6 +165,44 @@ const AdminReports = () => {
     [defaulters, defaulterSearch, filterDefaulterCourse, filterDefaulterDept],
   );
 
+  const sessionModalDetail = useMemo(() => {
+    if (!sessionDetail) return null;
+
+    const absentCount = sessionDetail.total - sessionDetail.present;
+    const lateCount =
+      sessionDetail.students?.filter((student) => student.status === "LATE")
+        .length || 0;
+
+    return {
+      summary: {
+        title: sessionDetail.courseName,
+        subtitle: `${sessionDetail.courseCode} • ${sessionDetail.teacherName}`,
+        meta: `${new Date(sessionDetail.date).toLocaleString()} • ${sessionDetail.department} Sem-${sessionDetail.semester} Sec-${sessionDetail.section}`,
+        metrics: [
+          { label: "Present", value: sessionDetail.present, tone: "success" },
+          { label: "Absent", value: absentCount, tone: "danger" },
+          { label: "Late", value: lateCount, tone: "warning" },
+        ],
+      },
+      listTitle: "Student Attendance List",
+      rows: sessionDetail.students,
+      emptyMessage: "No student records found for this session.",
+      renderRow: (student) => (
+        <div className="flex items-center justify-between gap-4 px-4 py-3">
+          <div>
+            <p className="font-medium text-slate-900 dark:text-white">
+              {student.name}
+            </p>
+            <p className="text-xs font-mono text-slate-500">
+              {student.rollNumber}
+            </p>
+          </div>
+          <AttendanceStatusBadge status={student.status} />
+        </div>
+      ),
+    };
+  }, [sessionDetail]);
+
   const sessionColumns = [
     {
       header: "Date & Time",
@@ -217,9 +241,9 @@ const AdminReports = () => {
 
         return (
           <div className="flex items-center gap-2">
-            <div className="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-1.5 max-w-[60px]">
+            <div className="h-1.5 w-full max-w-[60px] rounded-full bg-slate-200 dark:bg-slate-700">
               <div
-                className="bg-emerald-500 h-1.5 rounded-full"
+                className="h-1.5 rounded-full bg-emerald-500"
                 style={{ width: `${attendancePercent}%` }}
               ></div>
             </div>
@@ -237,7 +261,7 @@ const AdminReports = () => {
       header: "Roll Num",
       accessor: "rollNumber",
       render: (row) => (
-        <span className="font-mono text-xs font-semibold px-2 py-1 bg-slate-100 dark:bg-slate-800 rounded">
+        <span className="rounded bg-slate-100 px-2 py-1 font-mono text-xs font-semibold dark:bg-slate-800">
           {row.rollNumber}
         </span>
       ),
@@ -272,7 +296,7 @@ const AdminReports = () => {
       header: "Attendance",
       accessor: "percentage",
       render: (row) => (
-        <span className="inline-flex items-center px-2.5 py-0.5 rounded-md text-xs font-bold ring-1 ring-inset bg-red-50 dark:bg-red-500/10 text-red-700 dark:text-red-400 ring-red-600/20">
+        <span className="inline-flex items-center rounded-md bg-red-50 px-2.5 py-0.5 text-xs font-bold text-red-700 ring-1 ring-inset ring-red-600/20 dark:bg-red-500/10 dark:text-red-400">
           {row.percentage}% ({row.attended}/{row.total})
         </span>
       ),
@@ -280,12 +304,12 @@ const AdminReports = () => {
   ];
 
   return (
-    <div className="space-y-6 animate-in fade-in duration-300">
+    <div className="animate-in space-y-6 fade-in duration-300">
       <div>
         <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
           Attendance Reports
         </h1>
-        <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
+        <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
           Review attendance sessions by day and track attendance defaulters.
         </p>
       </div>
@@ -327,24 +351,24 @@ const AdminReports = () => {
         <nav className="-mb-px flex space-x-8">
           <button
             onClick={() => setActiveTab("sessions")}
-            className={`whitespace-nowrap pb-4 px-1 border-b-2 font-medium text-sm transition-colors ${
+            className={`whitespace-nowrap border-b-2 px-1 pb-4 text-sm font-medium transition-colors ${
               activeTab === "sessions"
                 ? "border-indigo-500 text-indigo-600 dark:text-indigo-400"
-                : "border-transparent text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-300 hover:border-slate-300"
+                : "border-transparent text-slate-500 hover:border-slate-300 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-300"
             }`}
           >
             All Sessions
           </button>
           <button
             onClick={() => setActiveTab("defaulters")}
-            className={`whitespace-nowrap pb-4 px-1 border-b-2 font-medium text-sm transition-colors flex items-center gap-2 ${
+            className={`flex items-center gap-2 whitespace-nowrap border-b-2 px-1 pb-4 text-sm font-medium transition-colors ${
               activeTab === "defaulters"
                 ? "border-red-500 text-red-600 dark:text-red-400"
-                : "border-transparent text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-300 hover:border-slate-300"
+                : "border-transparent text-slate-500 hover:border-slate-300 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-300"
             }`}
           >
             Defaulters List
-            <span className="bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 py-0.5 px-2 rounded-full text-[10px] font-bold">
+            <span className="rounded-full bg-red-100 px-2 py-0.5 text-[10px] font-bold text-red-600 dark:bg-red-900/30 dark:text-red-400">
               {filteredDefaulters.length}
             </span>
           </button>
@@ -353,7 +377,7 @@ const AdminReports = () => {
 
       <div className="mt-4">
         {activeTab === "sessions" ? (
-          <div className="space-y-4 animate-in fade-in slide-in-from-bottom-2">
+          <div className="animate-in space-y-4 fade-in slide-in-from-bottom-2">
             <AdminToolbar
               searchProps={{
                 value: sessionSearch,
@@ -376,14 +400,14 @@ const AdminReports = () => {
               ]}
               actions={
                 <div className="flex items-center gap-2">
-                  <label className="text-xs font-semibold text-slate-500 dark:text-slate-400 whitespace-nowrap">
+                  <label className="whitespace-nowrap text-xs font-semibold text-slate-500 dark:text-slate-400">
                     Date
                   </label>
                   <input
                     type="date"
                     value={filterSessionDate}
                     onChange={(e) => setFilterSessionDate(e.target.value)}
-                    className="rounded-full border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-2 text-sm text-slate-700 dark:text-slate-200 outline-none focus:ring-2 focus:ring-indigo-500"
+                    className="rounded-full border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 outline-none focus:ring-2 focus:ring-indigo-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200"
                   />
                 </div>
               }
@@ -397,7 +421,7 @@ const AdminReports = () => {
               actions={(row) => (
                 <button
                   onClick={() => openSessionModal(row)}
-                  className="px-3 py-1.5 text-xs font-semibold text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-900/20 hover:bg-indigo-100 dark:hover:bg-indigo-900/40 rounded transition"
+                  className="rounded bg-indigo-50 px-3 py-1.5 text-xs font-semibold text-indigo-600 transition hover:bg-indigo-100 dark:bg-indigo-900/20 dark:text-indigo-400 dark:hover:bg-indigo-900/40"
                 >
                   View Detail
                 </button>
@@ -405,7 +429,7 @@ const AdminReports = () => {
             />
           </div>
         ) : (
-          <div className="space-y-4 animate-in fade-in slide-in-from-bottom-2">
+          <div className="animate-in space-y-4 fade-in slide-in-from-bottom-2">
             <AdminToolbar
               searchProps={{
                 value: defaulterSearch,
@@ -438,74 +462,14 @@ const AdminReports = () => {
         )}
       </div>
 
-      <AdminModal
+      <AttendanceSessionModal
         isOpen={!!selectedSession}
         onClose={closeSessionModal}
         title="Session Roster"
-      >
-        {sessionDetailLoading ? (
-          <p className="text-sm text-slate-500 text-center py-8">
-            Loading session detail...
-          </p>
-        ) : sessionDetail ? (
-          <div className="space-y-4">
-            <div className="bg-slate-50 dark:bg-slate-800/50 p-4 rounded-lg border border-slate-200 dark:border-slate-700">
-              <div className="flex items-start justify-between gap-4">
-                <div>
-                  <p className="font-bold text-slate-900 dark:text-white">
-                    {sessionDetail.courseName}
-                  </p>
-                  <p className="text-xs text-slate-500 mt-1">
-                    {sessionDetail.courseCode} • {sessionDetail.teacherName}
-                  </p>
-                  <p className="text-xs text-slate-500 mt-1">
-                    {new Date(sessionDetail.date).toLocaleString()} •{" "}
-                    {sessionDetail.department} Sem-{sessionDetail.semester} Sec-
-                    {sessionDetail.section}
-                  </p>
-                </div>
-                <div className="text-right">
-                  <p className="text-sm font-semibold text-emerald-600 dark:text-emerald-400">
-                    {sessionDetail.present} Present
-                  </p>
-                  <p className="text-xs text-slate-500">
-                    {sessionDetail.total - sessionDetail.present} Absent
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            <div className="max-h-[360px] overflow-y-auto divide-y divide-slate-100 dark:divide-slate-800 rounded-lg border border-slate-200 dark:border-slate-800">
-              {sessionDetail.students.map((student) => (
-                <div
-                  key={student.id}
-                  className="flex items-center justify-between gap-4 px-4 py-3"
-                >
-                  <div>
-                    <p className="font-medium text-slate-900 dark:text-white">
-                      {student.name}
-                    </p>
-                    <p className="text-xs font-mono text-slate-500">
-                      {student.rollNumber}
-                    </p>
-                  </div>
-                  <span
-                    className={`inline-flex items-center px-2.5 py-0.5 rounded-md text-xs font-bold ring-1 ring-inset ${
-                      STATUS_STYLES[student.status] || STATUS_STYLES.LEAVE
-                    }`}
-                  >
-                    {student.status}
-                  </span>
-                </div>
-              ))}
-            </div>
-          </div>
-        ) : (
-          <p className="text-sm text-slate-500 text-center py-8">
-            Unable to load this session detail.
-          </p>
-        )}
-      </AdminModal>
+        loading={sessionDetailLoading}
+        errorMessage="Unable to load this session detail."
+        detail={sessionModalDetail}
+      />
     </div>
   );
 };

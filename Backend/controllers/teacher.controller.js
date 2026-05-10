@@ -10,6 +10,48 @@ const STATUS_MAP = {
   LEAVE: "Leave",
 };
 
+const DAYS = [
+  "Monday",
+  "Tuesday",
+  "Wednesday",
+  "Thursday",
+  "Friday",
+  "Saturday",
+];
+
+const normalizePeriods = (periods) =>
+  Array.isArray(periods)
+    ? periods
+        .map((period) => ({
+          periodNumber: Number(period?.period),
+          startTime: period?.startTime || null,
+          endTime: period?.endTime || null,
+          type: period?.type || "class",
+        }))
+        .filter((period) => Number.isInteger(period.periodNumber))
+        .sort((a, b) => a.periodNumber - b.periodNumber)
+    : [];
+
+const buildTeacherRoutineEntry = (entry) => {
+  const periods = normalizePeriods(entry.classTimetable?.periods);
+  const period = periods.find((item) => item.periodNumber === entry.periodNumber);
+
+  return {
+    id: entry.id,
+    day: entry.day,
+    periodNumber: entry.periodNumber,
+    startTime: period?.startTime || null,
+    endTime: period?.endTime || null,
+    room: entry.room,
+    classType: entry.classType,
+    courseName: entry.courseAllocation?.course?.name || "Unknown Course",
+    courseCode: entry.courseAllocation?.course?.code || "",
+    department: entry.courseAllocation?.department,
+    semester: entry.courseAllocation?.semester,
+    section: entry.courseAllocation?.section,
+  };
+};
+
 const getTeacherDashboard = asyncHandler(async (req, res) => {
   const { teacherId } = req.params;
 
@@ -21,23 +63,6 @@ const getTeacherDashboard = asyncHandler(async (req, res) => {
       designation: true,
       department: true,
       user: { select: { name: true, email: true } },
-      schedules: {
-        select: {
-          id: true,
-          day: true,
-          slots: true,
-          room: true,
-          classType: true,
-          courseAllocation: {
-            select: {
-              department: true,
-              semester: true,
-              section: true,
-              course: { select: { name: true, code: true } },
-            },
-          },
-        },
-      },
       courseAllocations: {
         select: {
           id: true,
@@ -75,16 +100,48 @@ const getTeacherDashboard = asyncHandler(async (req, res) => {
     course: alloc.course,
   }));
 
-  const formattedSchedules = teacher.schedules.map((sch) => ({
-    id: sch.id,
-    day: sch.day,
-    slots: sch.slots,
-    room: sch.room,
-    classType: sch.classType,
-    department: sch.courseAllocation.department,
-    semester: sch.courseAllocation.semester,
-    section: sch.courseAllocation.section,
-    course: sch.courseAllocation.course,
+  const routineEntriesRaw = await prisma.classScheduleEntry.findMany({
+    where: {
+      courseAllocation: {
+        teacher: { employeeId: teacherId },
+      },
+    },
+    select: {
+      id: true,
+      day: true,
+      periodNumber: true,
+      room: true,
+      classType: true,
+      classTimetable: {
+        select: {
+          periods: true,
+        },
+      },
+      courseAllocation: {
+        select: {
+          department: true,
+          semester: true,
+          section: true,
+          course: { select: { name: true, code: true } },
+        },
+      },
+    },
+  });
+
+  const routineEntries = routineEntriesRaw
+    .map(buildTeacherRoutineEntry)
+    .sort((a, b) => {
+      const dayDifference = DAYS.indexOf(a.day) - DAYS.indexOf(b.day);
+      if (dayDifference !== 0) {
+        return dayDifference;
+      }
+
+      return a.periodNumber - b.periodNumber;
+    });
+
+  const teacherWeeklyRoutine = DAYS.map((day) => ({
+    day,
+    entries: routineEntries.filter((entry) => entry.day === day),
   }));
 
   // Flatten and format recent attendance history from all allocations
@@ -139,7 +196,10 @@ const getTeacherDashboard = asyncHandler(async (req, res) => {
     designation: teacher.designation,
     department: teacher.department,
     user: teacher.user,
-    schedules: formattedSchedules,
+    weeklyRoutine: {
+      days: teacherWeeklyRoutine,
+      entries: routineEntries,
+    },
     allocations: formattedAllocations,
     recentAttendance,
     totalSessions,
@@ -204,12 +264,12 @@ const getAttendanceSession = asyncHandler(async (req, res) => {
 
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+*/
 const getCourseAttendance = asyncHandler(async (req, res) => {
-  const { teacherId, courseCode } = req.params;
+  const { teacherId, allocationId } = req.params;
 
-  const courseAllocations = await prisma.courseAllocation.findMany({
+  const allocation = await prisma.courseAllocation.findFirst({
     where: {
+      id: Number(allocationId),
       teacher: { employeeId: teacherId },
-      course: { code: courseCode },
     },
     select: {
       id: true,
@@ -228,50 +288,46 @@ const getCourseAttendance = asyncHandler(async (req, res) => {
     },
   });
 
-  if (courseAllocations.length === 0) {
-    throw new ApiError(404, "Course or Teacher not found");
+  if (!allocation) {
+    throw new ApiError(404, "Course allocation not found for this teacher");
   }
 
-  const courseDetail = courseAllocations[0].course;
   let totalPresent = 0;
   let totalStudentsAgg = 0;
-  const formattedSessions = [];
 
-  // Map through allocations and their embedded sessions to calculate stats in memory
-  courseAllocations.forEach((alloc) => {
-    alloc.attendanceSessions.forEach((session) => {
-      const totalCount = session.records.length;
-      const presentCount = session.records.reduce(
-        (sum, r) =>
-          sum + (r.status === "PRESENT" || r.status === "LATE" ? 1 : 0),
-        0,
-      );
+  const formattedSessions = allocation.attendanceSessions.map((session) => {
+    const totalCount = session.records.length;
+    const presentCount = session.records.reduce(
+      (sum, record) =>
+        sum + (record.status === "PRESENT" || record.status === "LATE" ? 1 : 0),
+      0,
+    );
 
-      totalPresent += presentCount;
-      totalStudentsAgg += totalCount;
+    totalPresent += presentCount;
+    totalStudentsAgg += totalCount;
 
-      formattedSessions.push({
-        id: session.id,
-        date: session.date,
-        name: courseDetail.name,
-        department: alloc.department,
-        semester: alloc.semester,
-        section: alloc.section,
-        presentCount,
-        totalCount,
-      });
-    });
+    return {
+      id: session.id,
+      date: session.date,
+      name: allocation.course.name,
+      department: allocation.department,
+      semester: allocation.semester,
+      section: allocation.section,
+      presentCount,
+      totalCount,
+    };
   });
-
-  // Sort by date descending
-  formattedSessions.sort((a, b) => new Date(b.date) - new Date(a.date));
 
   const overallAttendance =
     totalStudentsAgg > 0 ? (totalPresent / totalStudentsAgg) * 100 : 0;
 
   return res.status(200).json({
-    courseCode: courseDetail.code,
-    courseName: courseDetail.name,
+    allocationId: allocation.id,
+    courseCode: allocation.course.code,
+    courseName: allocation.course.name,
+    department: allocation.department,
+    semester: allocation.semester,
+    section: allocation.section,
     totalSessions: formattedSessions.length,
     overallAttendance: Math.round(overallAttendance),
     sessions: formattedSessions,
@@ -322,11 +378,24 @@ const getLiveAttendance = asyncHandler(async (req, res) => {
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+*/
 const submitAttendance = asyncHandler(async (req, res) => {
   const { courseAllocationId, date, records } = req.body;
+  const normalizedCourseAllocationId = parseInt(courseAllocationId);
+
+  const allocation = await prisma.courseAllocation.findUnique({
+    where: { id: normalizedCourseAllocationId },
+    select: {
+      id: true,
+      courseId: true,
+    },
+  });
+
+  if (!allocation) {
+    throw new ApiError(404, "Course allocation not found");
+  }
 
   // Step 1: Create the attendance session with all student records in one nested write
   const session = await prisma.attendanceSession.create({
     data: {
-      courseAllocationId: parseInt(courseAllocationId),
+      courseAllocationId: normalizedCourseAllocationId,
       date: date ? new Date(date) : new Date(),
       records: {
         create: records.map(({ student, status }) => ({
@@ -350,18 +419,42 @@ const submitAttendance = asyncHandler(async (req, res) => {
     )
     .map((r) => parseInt(r.student));
 
-  // Run both updates simultaneously inside a transaction for safety
+  const allStatRows = allStudentIds.map((studentId) => ({
+    studentId,
+    courseId: allocation.courseId,
+    totalSessions: 0,
+    totalAttended: 0,
+  }));
+
+  const presentStatRows = presentStudentIds.map((studentId) => ({
+    studentId,
+    courseId: allocation.courseId,
+  }));
+
+  // Ensure stat rows exist, then increment only the exact course stats.
   await prisma.$transaction([
-    // Increment totalSessions for every student in the class
+    prisma.studentAttendanceStat.createMany({
+      data: allStatRows,
+      skipDuplicates: true,
+    }),
     prisma.studentAttendanceStat.updateMany({
-      where: { studentId: { in: allStudentIds } },
+      where: {
+        studentId: { in: allStudentIds },
+        courseId: allocation.courseId,
+      },
       data: { totalSessions: { increment: 1 } },
     }),
-    // Increment totalAttended only for students who were present/late
-    prisma.studentAttendanceStat.updateMany({
-      where: { studentId: { in: presentStudentIds } },
-      data: { totalAttended: { increment: 1 } },
-    }),
+    ...(presentStatRows.length
+      ? [
+          prisma.studentAttendanceStat.updateMany({
+            where: {
+              studentId: { in: presentStudentIds },
+              courseId: allocation.courseId,
+            },
+            data: { totalAttended: { increment: 1 } },
+          }),
+        ]
+      : []),
   ]);
 
   return res

@@ -10,6 +10,7 @@ import {
 } from "../../UI/SVG";
 import LoadingAnimation from "../../UI/LoadingAnimation";
 import PremiumErrorState from "../../UI/PremiumErrorState";
+import StatCard from "../../UI/StatCard";
 
 const TakeAttendance = () => {
   const { allocationId } = useParams();
@@ -154,14 +155,14 @@ const TakeAttendance = () => {
                 localStorage.removeItem(`attendance_${allocationId}`);
                 navigate("/teacher");
               }}
-              className="rounded-lg border-2 border-red-100 px-5 py-2.5 text-sm font-bold text-red-600 transition hover:bg-red-50 dark:border-red-500/20 dark:hover:bg-red-500/10"
+              className="rounded-lg border-2 border-red-100 px-2 md:px-5 py-1.5 md:py-2.5 text-sm font-bold text-red-600 transition hover:bg-red-50 dark:border-red-500/20 dark:hover:bg-red-500/10"
             >
               Cancel
             </button>
             <button
               disabled={saving || students.length === 0}
               onClick={handleSave}
-              className={`flex items-center gap-2 rounded-lg px-6 py-2.5 text-sm font-black text-white transition ${
+              className={`flex items-center gap-2 rounded-lg px-2.5 md:px-6 py-1.5 md:py-2.5 text-sm font-black text-white transition ${
                 saving
                   ? "cursor-not-allowed bg-emerald-300"
                   : "bg-emerald-600 shadow-sm hover:bg-emerald-700"
@@ -172,80 +173,60 @@ const TakeAttendance = () => {
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-          <div className="flex items-center gap-4 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-slate-50 text-slate-400 dark:bg-slate-800 dark:text-slate-500">
-              <UsersSVG className="h-5 w-5" />
-            </div>
-            <div>
-              <h3 className="text-xl font-black text-slate-900 dark:text-slate-100">
-                {stats.total}
-              </h3>
-              <p className="mt-0.5 text-[10px] font-bold uppercase tracking-widest text-slate-400 dark:text-slate-500">
-                Total
-              </p>
-            </div>
-          </div>
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <StatCard
+            title="Total"
+            value={stats.total}
+            icon={
+              <UsersSVG className="h-5 w-5 text-slate-400 dark:text-slate-500" />
+            }
+            iconBg="bg-slate-50 dark:bg-slate-800"
+          />
 
-          <div className="flex items-center gap-4 rounded-2xl border border-emerald-100 bg-white p-4 shadow-sm dark:border-emerald-500/20 dark:bg-slate-900">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-50 text-emerald-500 dark:bg-emerald-500/10 dark:text-emerald-300">
-              <CheckCircleSVG className="h-5 w-5" />
-            </div>
-            <div>
-              <h3 className="text-xl font-black text-emerald-600">
-                {stats.present}
-              </h3>
-              <p className="mt-0.5 text-[10px] font-bold uppercase tracking-widest text-slate-400 dark:text-slate-500">
-                Present
-              </p>
-            </div>
-          </div>
+          <StatCard
+            title="Present"
+            value={stats.present}
+            icon={
+              <CheckCircleSVG className="h-5 w-5 text-emerald-500 dark:text-emerald-300" />
+            }
+            iconBg="bg-emerald-50 dark:bg-emerald-500/10"
+          />
 
-          <div className="flex items-center gap-4 rounded-2xl border border-red-100 bg-white p-4 shadow-sm dark:border-red-500/20 dark:bg-slate-900">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-red-50 text-red-500 dark:bg-red-500/10 dark:text-red-300">
-              <XCircleSVG className="h-5 w-5" />
-            </div>
-            <div>
-              <h3 className="text-xl font-black text-red-600">
-                {stats.absent}
-              </h3>
-              <p className="mt-0.5 text-[10px] font-bold uppercase tracking-widest text-slate-400 dark:text-slate-500">
-                Absent
-              </p>
-            </div>
-          </div>
+          <StatCard
+            title="Absent"
+            value={stats.absent}
+            icon={
+              <XCircleSVG className="h-5 w-5 text-red-500 dark:text-red-300" />
+            }
+            iconBg="bg-red-50 dark:bg-red-500/10"
+          />
 
-          <div className="flex items-center gap-4 rounded-2xl border border-amber-100 bg-white p-4 shadow-sm dark:border-amber-500/20 dark:bg-slate-900">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-50 text-amber-500 dark:bg-amber-500/10 dark:text-amber-300">
-              <MissingSVG className="h-5 w-5" />
-            </div>
-            <div>
-              <h3 className="text-xl font-black text-amber-600">
-                {stats.late}
-              </h3>
-              <p className="mt-0.5 text-[10px] font-bold uppercase tracking-widest text-slate-400 dark:text-slate-500">
-                Late
-              </p>
-            </div>
-          </div>
+          <StatCard
+            title="Absent"
+            value={stats.absent}
+            icon={
+              <MissingSVG className="h-5 w-5 text-amber-500 dark:text-amber-300" />
+            }
+            iconBg="bg-amber-50 dark:bg-amber-500/10"
+          />
         </div>
 
         <div className="flex flex-wrap items-center gap-3 pt-2">
           <button
             onClick={() => handleMarkAll("Present")}
-            className="rounded-lg border-2 border-emerald-100 px-4 py-2 text-sm font-bold text-emerald-600 transition hover:bg-emerald-50 dark:border-emerald-500/20 dark:hover:bg-emerald-500/10"
+            className="rounded-lg border-2 max-sm:w-full border-emerald-100 px-4 py-2 text-sm font-bold text-emerald-600 transition hover:bg-emerald-50 dark:border-emerald-500/20 dark:hover:bg-emerald-500/10"
           >
             Mark All Present
           </button>
           <button
             onClick={() => handleMarkAll("Absent")}
-            className="rounded-lg border-2 border-red-100 px-4 py-2 text-sm font-bold text-red-600 transition hover:bg-red-50 dark:border-red-500/20 dark:hover:bg-red-500/10"
+            className="rounded-lg border-2 max-sm:w-full border-red-100 px-4 py-2 text-sm font-bold text-red-600 transition hover:bg-red-50 dark:border-red-500/20 dark:hover:bg-red-500/10"
           >
             Mark All Absent
           </button>
           <button
             onClick={() => handleMarkAll("Late")}
-            className="rounded-lg border-2 border-amber-100 px-4 py-2 text-sm font-bold text-amber-600 transition hover:bg-amber-50 dark:border-amber-500/20 dark:hover:bg-amber-500/10"
+            className="rounded-lg border-2 max-sm:w-full border-amber-100 px-4 py-2 text-sm font-bold text-amber-600 transition hover:bg-amber-50 dark:border-amber-500/20 dark:hover:bg-amber-500/10"
           >
             Mark All Late
           </button>
@@ -276,7 +257,7 @@ const TakeAttendance = () => {
               return (
                 <div
                   key={student.id}
-                  className={`flex flex-col justify-between px-6 py-4 transition-colors sm:flex-row sm:items-center ${cardBg}`}
+                  className={`flex flex-col justify-between px-2 md:px-6 py-2 md:py-4 transition-colors sm:flex-row sm:items-center ${cardBg}`}
                 >
                   <div className="mb-4 flex items-center space-x-4 sm:mb-0">
                     {student.avatar ? (
@@ -300,7 +281,7 @@ const TakeAttendance = () => {
                     </div>
                   </div>
 
-                  <div className="flex self-start rounded-lg border border-slate-200 bg-white p-1 shadow-sm dark:border-slate-700 dark:bg-slate-950 sm:self-auto">
+                  <div className="flex flex-col sm:flex-row rounded-lg border border-slate-200 bg-white p-1 shadow-sm dark:border-slate-700 dark:bg-slate-950">
                     <label
                       className={`flex cursor-pointer items-center gap-2 rounded-md px-4 py-1.5 text-xs font-bold transition ${
                         status === "Present"
