@@ -10,9 +10,11 @@ import axios from "../../../api/axios";
 import AttendanceSessionModal, {
   AttendanceStatusBadge,
 } from "../../UI/AttendanceSessionModal";
+import { useAuth } from "../../../contexts/AuthContext";
 
 const TeacherDashboard = () => {
-  const teacherId = "EMP-001";
+  const { user } = useAuth();
+  const teacherId = user?.profile?.employeeId;
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [teacherData, setTeacherData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -25,6 +27,7 @@ const TeacherDashboard = () => {
   const [courseDetailLoading, setCourseDetailLoading] = useState(false);
 
   useEffect(() => {
+    if (!teacherId) return;
     const fetchTeacher = async () => {
       try {
         const res = await axios.get(`/api/teacher/dashboard/${teacherId}`);

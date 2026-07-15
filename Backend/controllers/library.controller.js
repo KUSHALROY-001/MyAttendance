@@ -86,8 +86,8 @@ const createLibraryResource = asyncHandler(async (req, res) => {
     semester,
     driveLink,
     description,
-    contributorId,
   } = req.body;
+  const contributorId = req.user?.userId;
 
   if (
     !title ||
@@ -99,7 +99,7 @@ const createLibraryResource = asyncHandler(async (req, res) => {
   ) {
     throw new ApiError(
       400,
-      "title, subjectName, department, semester, driveLink, and contributorId are required.",
+      "title, subjectName, department, semester, and driveLink are required.",
     );
   }
 
@@ -134,7 +134,7 @@ const createLibraryResource = asyncHandler(async (req, res) => {
 
 const deleteLibraryResource = asyncHandler(async (req, res) => {
   const { id } = req.params;
-  const { userId } = req.body;
+  const userId = req.user?.userId;
 
   const resource = await prisma.libraryResource.findUnique({
     where: { id: parseInt(id, 10) },

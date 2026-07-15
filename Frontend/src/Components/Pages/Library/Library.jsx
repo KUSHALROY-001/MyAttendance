@@ -2,10 +2,12 @@ import { useState, useEffect } from "react";
 import api from "../../../api/axios";
 import toast from "react-hot-toast";
 import { FolderOpen } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import LibraryHeader from "./components/LibraryHeader";
 import LibraryFilters from "./components/LibraryFilters";
 import LibraryResourceCard from "./components/LibraryResourceCard";
 import LibraryModal from "./components/LibraryModal";
+import { useAuth } from "../../../contexts/AuthContext";
 
 const inputClass =
   "block w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/60 dark:border-slate-600 dark:bg-slate-900/70 dark:text-slate-50 dark:placeholder:text-slate-500";
@@ -13,6 +15,8 @@ const labelClass =
   "block text-xs font-medium text-slate-700 dark:text-slate-200";
 
 export default function Library() {
+  const navigate = useNavigate();
+  const { isAuthenticated } = useAuth();
   const [resources, setResources] = useState([]);
   const [departments, setDepartments] = useState([]);
   const [semesters, setSemesters] = useState([]);
@@ -87,20 +91,15 @@ export default function Library() {
     const formData = new FormData(e.currentTarget);
     const data = Object.fromEntries(formData.entries());
 
-    const userString = localStorage.getItem("user");
-    let contributorId = 18;
-    if (userString) {
-      try {
-        contributorId = JSON.parse(userString).id;
-      } catch (_error) {}
+    if (!isAuthenticated) {
+      toast.error("Please log in to share notes.");
+      navigate("/login");
+      return;
     }
 
     try {
       setIsSubmitting(true);
-      await api.post("/api/library", {
-        ...data,
-        contributorId,
-      });
+      await api.post("/api/library", data);
       toast.success("Resource shared successfully!");
       setIsModalOpen(false);
       fetchLibrary();
@@ -114,7 +113,11 @@ export default function Library() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-100 via-white to-indigo-50 px-4 py-10 text-slate-900 transition-colors dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 dark:text-slate-50">
       <div className="mx-auto max-w-7xl space-y-8">
-        <LibraryHeader setIsModalOpen={setIsModalOpen} />
+        <LibraryHeader
+          setIsModalOpen={setIsModalOpen}
+          canShare={isAuthenticated}
+          onRequestLogin={() => navigate("/login")}
+        />
 
         <LibraryFilters
           filters={filters}

@@ -109,7 +109,7 @@ const buildCourseSummaries = ({
 };
 
 const getStudentDashboard = asyncHandler(async (req, res) => {
-  const { roll } = req.params;
+  const roll = req.params.roll || req.authProfile?.rollNumber;
 
   // OPTIMIZATION 1 & 2: A single, highly-filtered query
   const studentData = await prisma.student.findUnique({
@@ -259,7 +259,7 @@ const getStudentDashboard = asyncHandler(async (req, res) => {
 
 const getCourseDetails = asyncHandler(async (req, res) => {
   const courseCode = req.params.code;
-  const rollNumber = req.query.rollNumber;
+  const rollNumber = req.authProfile?.rollNumber || req.query.rollNumber;
 
   if (!rollNumber) {
     throw new ApiError(400, "Roll number is required");
