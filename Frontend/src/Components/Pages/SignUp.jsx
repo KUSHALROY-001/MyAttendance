@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
+import { Eye, EyeOff } from "lucide-react";
 
 const inputClass =
   "block w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/60 dark:border-slate-600 dark:bg-slate-900/70 dark:text-slate-50 dark:placeholder:text-slate-500";
@@ -8,35 +10,12 @@ const labelClass = "block text-xs font-medium text-slate-700 dark:text-slate-200
 
 function SignUp() {
   const [role, setRole] = useState("student");
+  const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    const formData = new FormData(e.currentTarget);
-    const data = Object.fromEntries(formData.entries());
-
-    const payload = {
-      name: data.name,
-      email: data.email,
-      role: data.role,
-      password: data.password,
-    };
-
-    if (data.role === "student") {
-      payload.studentInfo = {
-        rollNumber: data.rollNumber,
-        branch: data.branch,
-        year: parseInt(data.year, 10),
-        section: data.section,
-      };
-    } else if (data.role === "teacher") {
-      payload.teacherInfo = {
-        department: data.department,
-        designation: data.designation,
-      };
-    }
-
-    console.log("Signup payload:", payload);
+    toast("Accounts are created by admin. Please contact your admin for credentials.");
   };
 
   return (
@@ -93,16 +72,26 @@ function SignUp() {
               <label htmlFor="password" className={labelClass}>
                 Password
               </label>
-              <input
-                id="password"
-                name="password"
-                type="password"
-                required
-                minLength={6}
-                autoComplete="new-password"
-                className={inputClass}
-                placeholder="Create a secure password (min 6 characters)"
-              />
+              <div className="relative">
+                <input
+                  id="password"
+                  name="password"
+                  type={showPassword ? "text" : "password"}
+                  required
+                  minLength={6}
+                  autoComplete="new-password"
+                  className={`${inputClass} pr-11`}
+                  placeholder="Create a secure password (min 6 characters)"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((value) => !value)}
+                  className="absolute inset-y-0 right-0 flex items-center px-3 text-slate-400 transition hover:text-indigo-500 dark:text-slate-500 dark:hover:text-indigo-300"
+                  aria-label={showPassword ? "Hide password" : "Show password"}
+                >
+                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
+              </div>
             </div>
 
             <div className="space-y-1.5">
@@ -228,8 +217,8 @@ function SignUp() {
                 type="submit"
                 className="inline-flex w-full items-center justify-center rounded-lg bg-indigo-500 px-4 py-3 text-sm font-bold tracking-wide text-white shadow-md shadow-indigo-900/40 transition hover:bg-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-400/80"
               >
-                Sign up
-              </button>
+              Request Access
+            </button>
             </div>
           </form>
 

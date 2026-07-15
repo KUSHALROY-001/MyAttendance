@@ -1,6 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
 import axios from "../../../api/axios";
-import { useLocation } from "react-router-dom";
 import PremiumErrorState from "../../UI/PremiumErrorState";
 import AttendanceCalendar from "./Component/AttendanceCalendar";
 import CourseCard from "./Component/CourseCard";
@@ -20,19 +19,22 @@ import {
   ChartSVG,
 } from "../../UI/SVG";
 import { useCalendar } from "../../../hooks/useCalendar";
+import { useAuth } from "../../../contexts/AuthContext";
 
 const StudentDashboard = () => {
-  const location = useLocation();
-  const [stuData, setStuData] = useState(location.state?.user || null);
+  const { user } = useAuth();
+  const [stuData, setStuData] = useState(null);
   const [fetchError, setFetchError] = useState(null);
   const [selectedCourseCode, setSelectedCourseCode] = useState(null);
   const [courseDetail, setCourseDetail] = useState(null);
   const [courseDetailLoading, setCourseDetailLoading] = useState(false);
 
   useEffect(() => {
-    if (stuData) return;
+    if (!user?.profile?.rollNumber) return;
     axios
-      .get("/api/student/dashboard/BCA-002", { hideGlobalToast: true })
+      .get(`/api/student/dashboard/${user.profile.rollNumber}`, {
+        hideGlobalToast: true,
+      })
       .then((res) => setStuData(res.data))
       .catch((err) => {
         setFetchError({
@@ -41,7 +43,7 @@ const StudentDashboard = () => {
             err.response?.data?.message || "Failed to load dashboard data",
         });
       });
-  }, [stuData]);
+  }, [user?.profile?.rollNumber]);
 
   const openCourseModal = async (courseCode) => {
     if (!stuData?.rollNumber) return;
@@ -52,7 +54,7 @@ const StudentDashboard = () => {
 
     try {
       const res = await axios.get(
-        `/api/student/course/${courseCode}?rollNumber=${stuData.rollNumber}`,
+        `/api/student/course/${courseCode}`,
       );
       setCourseDetail(res.data);
     } catch (error) {

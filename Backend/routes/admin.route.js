@@ -1,5 +1,7 @@
 const express = require("express");
 const router = express.Router();
+const { authenticate } = require("../middlewares/auth.middleware");
+const { authorizeRoles } = require("../middlewares/authorize.middleware");
 const {
   getAdminDashboard,
   getDepartment,
@@ -32,6 +34,8 @@ const {
   updateUserRole,
   deleteUser,
 } = require("../controllers/admin.controller");
+
+router.use(authenticate, authorizeRoles("ADMIN"));
 
 router.get("/dashboard", getAdminDashboard);
 router.get("/departments", getDepartment);

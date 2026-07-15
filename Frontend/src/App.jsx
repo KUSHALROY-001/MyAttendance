@@ -11,6 +11,8 @@ import About from "./Components/Pages/About.jsx";
 import SignUp from "./Components/Pages/SignUp.jsx";
 import Login from "./Components/Pages/Login.jsx";
 import { Routes, Route, Outlet } from "react-router-dom";
+import ProtectedRoute from "./Components/Auth/ProtectedRoute.jsx";
+import PublicOnlyRoute from "./Components/Auth/PublicOnlyRoute.jsx";
 import StudentDashboard from "./Components/Pages/Student/StudentDash.jsx";
 import TeacherDashboard from "./Components/Pages/Teacher/TeacherDashboard.jsx";
 import TakeAttendance from "./Components/Pages/Teacher/TakeAttendance.jsx";
@@ -47,15 +49,24 @@ function App() {
             <Route path="/" element={<Home />} />
             <Route path="/features" element={<Features />} />
             <Route path="/about" element={<About />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/signup" element={<SignUp />} />
-            <Route path="/student" element={<StudentDashboard />} />
             <Route path="/library" element={<Library />} />
-            <Route path="/teacher" element={<TeacherDashboard />} />
-            <Route
-              path="/teacher/attendance/live/:allocationId"
-              element={<TakeAttendance />}
-            />
+
+            <Route element={<PublicOnlyRoute />}>
+              <Route path="/login" element={<Login />} />
+              <Route path="/signup" element={<SignUp />} />
+            </Route>
+
+            <Route element={<ProtectedRoute allowedRoles={["STUDENT"]} />}>
+              <Route path="/student" element={<StudentDashboard />} />
+            </Route>
+
+            <Route element={<ProtectedRoute allowedRoles={["TEACHER"]} />}>
+              <Route path="/teacher" element={<TeacherDashboard />} />
+              <Route
+                path="/teacher/attendance/live/:allocationId"
+                element={<TakeAttendance />}
+              />
+            </Route>
 
             {/* Fallback for unmatched routes inside Main */}
             <Route
@@ -71,15 +82,17 @@ function App() {
           </Route>
 
           {/* Admin Routes */}
-          <Route path="/admin" element={<AdminLayout />}>
-            <Route index element={<AdminDashboard />} />
-            <Route path="students" element={<AdminStudents />} />
-            <Route path="teachers" element={<AdminTeachers />} />
-            <Route path="courses" element={<AdminCourses />} />
-            <Route path="allocations" element={<AdminAllocations />} />
-            <Route path="schedules" element={<AdminSchedules />} />
-            <Route path="reports" element={<AdminReports />} />
-            <Route path="users" element={<AdminUsers />} />
+          <Route element={<ProtectedRoute allowedRoles={["ADMIN"]} />}>
+            <Route path="/admin" element={<AdminLayout />}>
+              <Route index element={<AdminDashboard />} />
+              <Route path="students" element={<AdminStudents />} />
+              <Route path="teachers" element={<AdminTeachers />} />
+              <Route path="courses" element={<AdminCourses />} />
+              <Route path="allocations" element={<AdminAllocations />} />
+              <Route path="schedules" element={<AdminSchedules />} />
+              <Route path="reports" element={<AdminReports />} />
+              <Route path="users" element={<AdminUsers />} />
+            </Route>
           </Route>
         </Routes>
       </ErrorBoundary>

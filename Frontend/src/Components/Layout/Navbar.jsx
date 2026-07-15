@@ -2,20 +2,29 @@ import { Link } from "react-router-dom";
 import { Menu, Moon, Sun, X } from "lucide-react";
 import { useState } from "react";
 import { useTheme } from "../../contexts/ThemeContext";
+import { useAuth } from "../../contexts/AuthContext";
 
 function Navbar() {
   const { theme, toggleTheme } = useTheme();
+  const { isAuthenticated, user, logout, getDefaultRouteForRole } = useAuth();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const navLinks = [
     { to: "/", label: "Home" },
     { to: "/features", label: "Features" },
     { to: "/about", label: "About" },
-    { to: "/student", label: "Get Started" },
+    {
+      to: isAuthenticated ? getDefaultRouteForRole(user?.role) : "/login",
+      label: isAuthenticated ? "Dashboard" : "Get Started",
+    },
     { to: "/library", label: "Library" },
   ];
 
   const closeMobileMenu = () => setIsMobileMenuOpen(false);
+  const handleLogout = async () => {
+    await logout();
+    closeMobileMenu();
+  };
 
   return (
     <header className="sticky top-0 z-20 border-b border-slate-200 bg-white/80 backdrop-blur-sm transition-colors dark:border-slate-800 dark:bg-slate-950/80">
@@ -65,13 +74,23 @@ function Navbar() {
             >
               {theme === "dark" ? <Sun size={18} /> : <Moon size={18} />}
             </button>
-            <Link
-              to="/login"
-              onClick={closeMobileMenu}
-              className="inline-flex items-center rounded-full border border-indigo-600 px-4 py-1.5 text-xs font-semibold text-indigo-600 transition hover:bg-indigo-50 dark:border-indigo-400 dark:text-indigo-300 dark:hover:bg-indigo-500/10 sm:text-sm"
-            >
-              Login
-            </Link>
+            {isAuthenticated ? (
+              <button
+                type="button"
+                onClick={handleLogout}
+                className="inline-flex items-center rounded-full border border-indigo-600 px-4 py-1.5 text-xs font-semibold text-indigo-600 transition hover:bg-indigo-50 dark:border-indigo-400 dark:text-indigo-300 dark:hover:bg-indigo-500/10 sm:text-sm"
+              >
+                Logout
+              </button>
+            ) : (
+              <Link
+                to="/login"
+                onClick={closeMobileMenu}
+                className="inline-flex items-center rounded-full border border-indigo-600 px-4 py-1.5 text-xs font-semibold text-indigo-600 transition hover:bg-indigo-50 dark:border-indigo-400 dark:text-indigo-300 dark:hover:bg-indigo-500/10 sm:text-sm"
+              >
+                Login
+              </Link>
+            )}
           </div>
         </div>
 
@@ -88,13 +107,23 @@ function Navbar() {
                   {link.label}
                 </Link>
               ))}
-              <Link
-                to="/signup"
-                onClick={closeMobileMenu}
-                className="mt-2 inline-flex items-center justify-center rounded-2xl bg-indigo-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-indigo-500"
-              >
-                Create Account
-              </Link>
+              {isAuthenticated ? (
+                <button
+                  type="button"
+                  onClick={handleLogout}
+                  className="mt-2 inline-flex items-center justify-center rounded-2xl bg-indigo-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-indigo-500"
+                >
+                  Logout
+                </button>
+              ) : (
+                <Link
+                  to="/signup"
+                  onClick={closeMobileMenu}
+                  className="mt-2 inline-flex items-center justify-center rounded-2xl bg-indigo-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-indigo-500"
+                >
+                  Create Account
+                </Link>
+              )}
             </div>
           </div>
         ) : null}
