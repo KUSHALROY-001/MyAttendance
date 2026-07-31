@@ -56,7 +56,7 @@ const ClassRoutineTable = ({
   }, [entries]);
 
   return (
-    <div className="overflow-hidden rounded-xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+    <div className="overflow-hidden rounded-xl border border-slate-200 bg-white p-6 transition-all duration-300 hover:scale-[1.01] hover:border-indigo-500 dark:hover:border-indigo-500 dark:border-[#222228] dark:bg-[#151518] dark:hover:bg-[#1C1C22]">
       <div className="mb-6 flex items-start justify-between gap-4">
         <div className="flex items-center space-x-2">
           <BookSVG className="h-5 w-5 text-indigo-500" />
@@ -74,7 +74,7 @@ const ClassRoutineTable = ({
       </div>
 
       {periodColumns.length === 0 ? (
-        <div className="rounded-xl border border-dashed border-slate-200 px-4 py-12 text-center text-sm text-slate-500 dark:border-slate-800 dark:text-slate-400">
+        <div className="rounded-xl border border-dashed border-slate-200 px-4 py-12 text-center text-sm text-slate-500 dark:border-[#222228] dark:text-slate-400">
           {emptyMessage}
         </div>
       ) : (
@@ -82,13 +82,13 @@ const ClassRoutineTable = ({
           <table className="min-w-[820px] w-full border-collapse">
             <thead>
               <tr>
-                <th className="w-32 border-b border-r border-slate-300 bg-slate-100 p-3 text-left text-[10px] font-bold uppercase text-slate-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-400">
+                <th className="w-32 border-b border-r border-slate-300 bg-slate-100 p-3 text-left text-[10px] font-bold uppercase text-slate-500 dark:border-[#222228] dark:bg-[#19191D] dark:text-slate-400">
                   Day / Period
                 </th>
                 {periodColumns.map((period) => (
                   <th
                     key={period.periodNumber}
-                    className="min-w-[150px] border-b border-slate-300 bg-slate-100 p-3 text-center dark:border-slate-700 dark:bg-slate-800"
+                    className="min-w-[150px] border-b border-slate-300 bg-slate-100 p-3 text-center dark:border-[#222228] dark:bg-[#19191D]"
                   >
                     <p className="text-[11px] font-bold uppercase text-slate-600 dark:text-slate-300">
                       {period.type === "lunch"
@@ -107,9 +107,9 @@ const ClassRoutineTable = ({
               {DAYS.map((day) => (
                 <tr
                   key={day}
-                  className="border-b border-slate-300 dark:border-slate-700"
+                  className="border-b border-slate-300 dark:border-[#222228]"
                 >
-                  <td className="border-r border-slate-300 bg-white p-3 align-top dark:border-slate-700 dark:bg-slate-900">
+                  <td className="border-r border-slate-300 bg-white p-3 align-top dark:border-[#222228] dark:bg-[#151518]">
                     <div className="flex items-center gap-2">
                       <span className="text-sm font-bold text-slate-900 dark:text-slate-100">
                         {day}
@@ -127,7 +127,7 @@ const ClassRoutineTable = ({
                       return (
                         <td
                           key={`${day}-${period.periodNumber}`}
-                          className="border border-slate-300 bg-amber-50/60 p-2 text-center dark:border-slate-700 dark:bg-amber-500/10"
+                          className="border border-slate-300 bg-amber-50/60 p-2 text-center dark:border-[#222228] dark:bg-amber-500/10"
                         >
                           <span className="text-xs font-semibold text-amber-600 dark:text-amber-300">
                             Break
@@ -143,12 +143,12 @@ const ClassRoutineTable = ({
                     return (
                       <td
                         key={`${day}-${period.periodNumber}`}
-                        className={`border border-slate-300 p-2 align-top dark:border-slate-700 ${
+                        className={`border border-slate-300 p-2 align-top dark:border-[#222228] ${
                           entry
                             ? entry.classType === "lab"
                               ? "bg-amber-50/70 dark:bg-amber-500/10"
                               : "bg-indigo-50/60 dark:bg-indigo-500/10"
-                            : "bg-white dark:bg-slate-900"
+                            : "bg-white dark:bg-[#151518]"
                         }`}
                       >
                         {entry ? (

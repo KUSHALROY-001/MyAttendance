@@ -12,7 +12,7 @@ const RecentAttendanceList = ({ records }) => {
   );
 
   return (
-    <div className="lg:col-span-1 flex h-full flex-col rounded-2xl border border-slate-200 bg-white p-2 md:p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+    <div className="lg:col-span-1 flex h-full flex-col rounded-2xl border border-slate-200 bg-white p-2 md:p-6 transition-all duration-300 hover:scale-[1.01] hover:border-indigo-500 dark:hover:border-indigo-500 dark:border-[#222228] dark:bg-[#151518] dark:hover:bg-[#1C1C22]">
       <h2 className="mb-4 text-lg font-bold text-slate-900 dark:text-slate-100">
         Recent Attendance
       </h2>
@@ -32,8 +32,8 @@ const RecentAttendanceList = ({ records }) => {
                     : status === "ABSENT"
                       ? "border-red-100 bg-red-50/50 dark:border-red-500/20 dark:bg-red-500/10"
                       : status === "LEAVE"
-                        ? "border-gray-200 bg-gray-50 dark:border-slate-700 dark:bg-slate-800"
-                        : "border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900"
+                        ? "border-gray-200 bg-gray-50 dark:border-[#222228] dark:bg-[#1C1C20]"
+                        : "border-slate-200 bg-white dark:border-[#222228] dark:bg-[#151518]"
               }`}
             >
               <div className="flex items-center space-x-3">

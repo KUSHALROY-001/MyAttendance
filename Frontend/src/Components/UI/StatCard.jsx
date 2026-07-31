@@ -8,9 +8,9 @@ const StatCard = ({
 }) => {
   return (
     <div
-      className={`rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-4 shadow-sm overflow-hidden relative group ${
+      className={`rounded-xl border border-slate-200 dark:border-[#222228] bg-white dark:bg-[#151518] p-4 overflow-hidden relative group transition-all duration-300 ${
         isEffect
-          ? "hover:shadow-lg hover:-translate-y-1 transition-all duration-300 hover:bg-slate-100 dark:hover:bg-slate-800"
+          ? "hover:scale-[1.02] hover:border-indigo-500 dark:hover:border-indigo-500 hover:bg-slate-50 dark:hover:bg-[#1C1C22]"
           : ""
       }`}
     >

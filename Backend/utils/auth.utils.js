@@ -107,6 +107,7 @@ const buildSafeAuthUser = (user) => {
         semester: user.student.semester,
         section: user.student.section,
         batch: user.student.batch,
+        contactNumber: user.student.contactNumber,
       }
     : user.teacher
       ? {
@@ -115,6 +116,7 @@ const buildSafeAuthUser = (user) => {
           employeeId: user.teacher.employeeId,
           department: user.teacher.department,
           designation: user.teacher.designation,
+          contactNumber: user.teacher.contactNumber,
         }
       : {
           type: "admin",

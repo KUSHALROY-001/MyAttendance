@@ -51,7 +51,7 @@ const AttendanceSessionModal = ({
         </p>
       ) : detail ? (
         <div className="space-y-4">
-          <div className="rounded-lg border border-slate-200 bg-slate-50 p-4 dark:border-slate-700 dark:bg-slate-800/50">
+          <div className="rounded-lg border border-slate-200 bg-slate-50 p-4 dark:border-[#222228] dark:bg-[#19191D]">
             <div className="flex flex-col gap-4 min-[430px]:flex-row min-[430px]:items-start min-[430px]:justify-between">
               <div>
                 <p className="font-bold text-slate-900 dark:text-white">
@@ -90,14 +90,14 @@ const AttendanceSessionModal = ({
           </div>
 
           {detail.listTitle ? (
-            <div className="border-b border-slate-200 px-1 pb-2 dark:border-slate-800">
+            <div className="border-b border-slate-200 px-1 pb-2 dark:border-[#222228]">
               <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-200">
                 {detail.listTitle}
               </h3>
             </div>
           ) : null}
 
-          <div className="max-h-[360px] overflow-y-auto divide-y divide-slate-100 rounded-lg border border-slate-200 dark:divide-slate-800 dark:border-slate-800">
+          <div className="max-h-[360px] overflow-y-auto divide-y divide-slate-100 rounded-lg border border-slate-200 dark:divide-[#222228] dark:border-[#222228]">
             {detail.rows?.length ? (
               detail.rows.map((row, index) => (
                 <div key={row.id ?? index}>{detail.renderRow(row, index)}</div>

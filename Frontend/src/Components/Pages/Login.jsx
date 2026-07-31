@@ -102,13 +102,13 @@ function Login() {
           </form>
 
           <p className="mt-5 text-center text-xs text-slate-500 dark:text-slate-400">
-            Don&apos;t have an account?{" "}
+            Need an institution-approved account?{" "}
             <button
               type="button"
               onClick={() => navigate("/signup")}
               className="font-semibold text-indigo-500 hover:text-indigo-400 dark:text-indigo-300 dark:hover:text-indigo-200"
             >
-              Sign up
+              Request Access
             </button>
           </p>
         </div>

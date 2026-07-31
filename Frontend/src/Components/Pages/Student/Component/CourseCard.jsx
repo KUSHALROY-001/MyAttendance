@@ -7,10 +7,10 @@ const CourseCard = ({ course, onClick }) => {
     <button
       type="button"
       onClick={() => onClick?.(course.courseCode)}
-      className={`group block rounded-2xl border bg-white p-6 transition-all dark:bg-slate-900 ${
+      className={`group block rounded-2xl border bg-white p-6 transition-all duration-300 hover:scale-[1.02] dark:bg-[#151518] ${
         isLow
-          ? "border-red-200 shadow-md shadow-red-50/50 dark:border-red-500/20 dark:shadow-none"
-          : "border-slate-200 shadow-sm dark:border-slate-800"
+          ? "border-red-200 dark:border-red-500/20 hover:border-red-500 dark:hover:border-red-500 hover:bg-red-50/30 dark:hover:bg-[#1C1C22]"
+          : "border-slate-200 dark:border-[#222228] hover:border-indigo-500 dark:hover:border-indigo-500 hover:bg-slate-50/50 dark:hover:bg-[#1C1C22]"
       }`}
     >
       <div className="mb-4 flex items-start justify-between">
@@ -54,7 +54,7 @@ const CourseCard = ({ course, onClick }) => {
             {course.percentage.toFixed(1)}%
           </span>
         </div>
-        <div className="h-2 w-full overflow-hidden rounded-full bg-slate-100 dark:bg-slate-800">
+        <div className="h-2 w-full overflow-hidden rounded-full bg-slate-100 dark:bg-[#1C1C20]">
           <div
             className={`h-full rounded-full transition-all duration-1000 ${
               isLow ? "bg-red-500" : "bg-green-500"

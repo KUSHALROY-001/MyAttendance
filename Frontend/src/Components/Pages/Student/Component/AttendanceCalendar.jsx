@@ -11,7 +11,7 @@ const AttendanceCalendar = ({
   title = "Attendance Calendar",
 }) => {
   return (
-    <div className="rounded-2xl border border-slate-200 bg-white p-2 md:p-8 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+    <div className="rounded-2xl border border-slate-200 bg-white p-2 md:p-8 transition-all duration-300 hover:scale-[1.01] hover:border-indigo-500 dark:hover:border-indigo-500 dark:border-[#222228] dark:bg-[#151518] dark:hover:bg-[#1C1C22]">
       <div className="mb-6 flex items-center justify-between">
         <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100">
           {title}
@@ -19,7 +19,7 @@ const AttendanceCalendar = ({
         <div className="flex items-center space-x-4">
           <button
             onClick={onPreviousMonth}
-            className="rounded-full p-1 transition-colors hover:bg-slate-100 dark:hover:bg-slate-800"
+            className="rounded-full p-1 transition-colors hover:bg-slate-100 dark:hover:bg-[#1C1C20]"
             aria-label="Previous month"
           >
             <ChevronLeftSVG className="w-5 h-5" />
@@ -30,7 +30,7 @@ const AttendanceCalendar = ({
           </span>
           <button
             onClick={onNextMonth}
-            className="rounded-full p-1 transition-colors hover:bg-slate-100 dark:hover:bg-slate-800"
+            className="rounded-full p-1 transition-colors hover:bg-slate-100 dark:hover:bg-[#1C1C20]"
             aria-label="Next month"
           >
             <ChevronRightSVG className="w-5 h-5" />
@@ -52,7 +52,7 @@ const AttendanceCalendar = ({
           <span>Absent</span>
         </div>
         <div className="flex items-center space-x-1">
-          <div className="h-2 w-2 rounded-full bg-slate-200 dark:bg-slate-700" />
+          <div className="h-2 w-2 rounded-full bg-slate-200 dark:bg-[#26262B]" />
           <span>No class</span>
         </div>
         <span className="text-[10px] font-medium text-slate-400 dark:text-slate-500">
@@ -79,7 +79,7 @@ const AttendanceCalendar = ({
           >
             <div className="relative h-10 w-10">
               <div
-                className={`absolute inset-0 rounded-full bg-slate-100 dark:bg-slate-800 ${
+                className={`absolute inset-0 rounded-full bg-slate-100 dark:bg-[#1C1C20] ${
                   !day.isCurrentMonth ? "opacity-60" : ""
                 }`}
               />

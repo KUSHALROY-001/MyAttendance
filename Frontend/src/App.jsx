@@ -10,6 +10,7 @@ import Features from "./Components/Pages/Features.jsx";
 import About from "./Components/Pages/About.jsx";
 import SignUp from "./Components/Pages/SignUp.jsx";
 import Login from "./Components/Pages/Login.jsx";
+import EditProfile from "./Components/Pages/EditProfile.jsx";
 import { Routes, Route, Outlet } from "react-router-dom";
 import ProtectedRoute from "./Components/Auth/ProtectedRoute.jsx";
 import PublicOnlyRoute from "./Components/Auth/PublicOnlyRoute.jsx";
@@ -68,6 +69,14 @@ function App() {
               />
             </Route>
 
+            <Route
+              element={
+                <ProtectedRoute allowedRoles={["STUDENT", "TEACHER", "ADMIN"]} />
+              }
+            >
+              <Route path="/profile/edit" element={<EditProfile />} />
+            </Route>
+
             {/* Fallback for unmatched routes inside Main */}
             <Route
               path="*"
@@ -92,6 +101,7 @@ function App() {
               <Route path="schedules" element={<AdminSchedules />} />
               <Route path="reports" element={<AdminReports />} />
               <Route path="users" element={<AdminUsers />} />
+              <Route path="profile/edit" element={<EditProfile />} />
             </Route>
           </Route>
         </Routes>

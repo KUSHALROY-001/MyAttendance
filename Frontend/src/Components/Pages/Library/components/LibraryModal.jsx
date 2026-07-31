@@ -13,9 +13,9 @@ export default function LibraryModal({
   if (!isModalOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-0 backdrop-blur-sm md:p-4">
-      <div className="flex h-full w-full max-w-lg flex-col rounded-none border border-slate-200 bg-white shadow-2xl dark:border-slate-700 dark:bg-slate-900 md:h-auto md:max-h-[90vh] md:rounded-2xl max-h-[100dvh]">
-        <div className="flex shrink-0 items-center justify-between border-b border-slate-200 p-6 dark:border-slate-700">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-0 backdrop-blur-sm md:p-4">
+      <div className="flex h-full w-full max-w-lg flex-col rounded-none border border-slate-200 bg-white shadow-2xl dark:border-[#222228] dark:bg-[#151518] md:h-auto md:max-h-[90vh] md:rounded-2xl max-h-[100dvh]">
+        <div className="flex shrink-0 items-center justify-between border-b border-slate-200 p-6 dark:border-[#222228] dark:bg-[#161619] md:rounded-t-2xl">
           <h2 className="text-xl font-semibold text-slate-900 dark:text-slate-50">
             Share a Resource
           </h2>

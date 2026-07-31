@@ -1,4 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
+import { Link } from "react-router-dom";
+import { Pencil } from "lucide-react";
 import axios from "../../../api/axios";
 import PremiumErrorState from "../../UI/PremiumErrorState";
 import AttendanceCalendar from "./Component/AttendanceCalendar";
@@ -199,16 +201,25 @@ const StudentDashboard = () => {
     <div className="mx-4 text-slate-900 dark:text-slate-100">
       <div className="mx-auto max-w-6xl animate-fadeIn space-y-6 pb-12">
         <div className="mb-4">
-          <h1 className="text-3xl font-bold text-slate-900 dark:text-slate-100">
-            Welcome back, {safeUserName}
-          </h1>
+          <div className="flex flex-wrap items-center gap-3">
+            <h1 className="text-3xl font-bold text-slate-900 dark:text-slate-100">
+              Welcome back, {safeUserName}
+            </h1>
+            <Link
+              to="/profile/edit"
+              className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-600 transition hover:border-indigo-200 hover:bg-indigo-50 hover:text-indigo-600 dark:border-[#222228] dark:bg-[#151518] dark:text-slate-300 dark:hover:border-indigo-500/40 dark:hover:bg-[#1C1C20] dark:hover:text-indigo-400"
+              aria-label="Edit profile"
+            >
+              <Pencil size={16} />
+            </Link>
+          </div>
           <p className="mt-1 text-sm font-medium text-slate-500 dark:text-slate-400">
             Enrollment: {enrollmentNo} • {department} • {semester}
           </p>
         </div>
 
         {lowAttendanceSubjects.length > 0 && (
-          <div className="rounded-2xl border border-red-200 bg-red-50 p-6 text-red-900 dark:border-red-500/20 dark:bg-red-500/10 dark:text-red-100">
+          <div className="rounded-2xl border border-red-200 bg-red-50 p-6 text-red-900 dark:border-red-500/20 dark:bg-[#151518] dark:text-red-100">
             <div className="mb-4 flex items-center space-x-2">
               <ExclamationCircleSVG className="h-5 w-5 text-red-600" />
               <span className="text-sm font-bold uppercase tracking-tight">

@@ -6,7 +6,7 @@ export default function LibraryHeader({
   onRequestLogin,
 }) {
   return (
-    <div className="flex flex-col items-start justify-between gap-4 rounded-2xl border border-slate-200 bg-white/80 p-6 shadow-xl shadow-slate-200/60 backdrop-blur-md dark:border-slate-700 dark:bg-slate-900/60 dark:shadow-slate-900/40 md:flex-row md:items-center">
+    <div className="flex flex-col items-start justify-between gap-4 rounded-2xl border border-slate-200 bg-white/80 p-6 backdrop-blur-md transition-all duration-300 hover:scale-[1.01] hover:border-indigo-500 dark:hover:border-indigo-500 dark:border-[#222228] dark:bg-[#161619] dark:hover:bg-[#1C1C22] md:flex-row md:items-center">
       <div>
         <h1 className="flex items-center gap-2 text-2xl font-bold tracking-tight">
           <BookOpen className="text-indigo-400" /> Community Library

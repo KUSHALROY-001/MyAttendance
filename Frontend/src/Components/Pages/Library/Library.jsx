@@ -2,21 +2,18 @@ import { useState, useEffect } from "react";
 import api from "../../../api/axios";
 import toast from "react-hot-toast";
 import { FolderOpen } from "lucide-react";
-import { useNavigate } from "react-router-dom";
 import LibraryHeader from "./components/LibraryHeader";
 import LibraryFilters from "./components/LibraryFilters";
 import LibraryResourceCard from "./components/LibraryResourceCard";
 import LibraryModal from "./components/LibraryModal";
-import { useAuth } from "../../../contexts/AuthContext";
+import FolderStructureDiagram from "./components/FolderStructureDiagram";
 
 const inputClass =
-  "block w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/60 dark:border-slate-600 dark:bg-slate-900/70 dark:text-slate-50 dark:placeholder:text-slate-500";
+  "block w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/60 dark:border-[#222228] dark:bg-[#19191D] dark:text-slate-50 dark:placeholder:text-slate-500";
 const labelClass =
   "block text-xs font-medium text-slate-700 dark:text-slate-200";
 
 export default function Library() {
-  const navigate = useNavigate();
-  const { isAuthenticated } = useAuth();
   const [resources, setResources] = useState([]);
   const [departments, setDepartments] = useState([]);
   const [semesters, setSemesters] = useState([]);
@@ -91,15 +88,20 @@ export default function Library() {
     const formData = new FormData(e.currentTarget);
     const data = Object.fromEntries(formData.entries());
 
-    if (!isAuthenticated) {
-      toast.error("Please log in to share notes.");
-      navigate("/login");
-      return;
+    const userString = localStorage.getItem("user");
+    let contributorId = 18;
+    if (userString) {
+      try {
+        contributorId = JSON.parse(userString).id;
+      } catch (_error) {}
     }
 
     try {
       setIsSubmitting(true);
-      await api.post("/api/library", data);
+      await api.post("/api/library", {
+        ...data,
+        contributorId,
+      });
       toast.success("Resource shared successfully!");
       setIsModalOpen(false);
       fetchLibrary();
@@ -111,13 +113,9 @@ export default function Library() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-100 via-white to-indigo-50 px-4 py-10 text-slate-900 transition-colors dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 dark:text-slate-50">
+    <div className="min-h-screen bg-slate-100 px-4 py-10 text-slate-900 transition-colors dark:bg-[#0D0D0F] dark:text-slate-50">
       <div className="mx-auto max-w-7xl space-y-8">
-        <LibraryHeader
-          setIsModalOpen={setIsModalOpen}
-          canShare={isAuthenticated}
-          onRequestLogin={() => navigate("/login")}
-        />
+        <LibraryHeader setIsModalOpen={setIsModalOpen} />
 
         <LibraryFilters
           filters={filters}
@@ -135,7 +133,7 @@ export default function Library() {
             <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-indigo-500"></div>
           </div>
         ) : resources.length === 0 ? (
-          <div className="rounded-2xl border border-slate-200 bg-white/80 py-20 text-center dark:border-slate-700 dark:bg-slate-900/40">
+          <div className="rounded-2xl border border-slate-200 bg-white py-20 text-center dark:border-[#222228] dark:bg-[#151518]">
             <FolderOpen className="mx-auto mb-4 h-12 w-12 text-slate-400 dark:text-slate-500" />
             <h3 className="text-lg font-medium text-slate-700 dark:text-slate-300">
               No resources found
@@ -151,6 +149,24 @@ export default function Library() {
             ))}
           </div>
         )}
+
+        {/* ── Folder structure guide ── */}
+        <div className="rounded-2xl border border-slate-200 bg-white px-6 py-10 transition-all duration-300 hover:scale-[1.01] hover:border-indigo-500 dark:hover:border-indigo-500 dark:border-[#222228] dark:bg-[#151518] dark:hover:bg-[#1C1C22]">
+          <div className="mb-6 text-center">
+            <p className="text-xs font-semibold uppercase tracking-[0.35em] text-indigo-600 dark:text-indigo-400">
+              How to organise your Drive
+            </p>
+            <h2 className="mt-2 text-xl font-bold tracking-tight text-slate-900 dark:text-slate-100">
+              Recommended folder structure for sharing resources
+            </h2>
+            <p className="mx-auto mt-2 max-w-xl text-sm text-slate-500 dark:text-slate-400">
+              Create this structure in your Google Drive, then share the Subject
+              folder link (or Unit sub-folder link) when contributing to the
+              library.
+            </p>
+          </div>
+          <FolderStructureDiagram />
+        </div>
       </div>
 
       <LibraryModal
