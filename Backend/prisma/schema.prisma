@@ -1,5 +1,6 @@
 // MyAttendance - Prisma Schema (MySQL)
-// Replaces all Mongoose models: User, Student, Teacher, Course, CourseAllocation, Attendance
+// Multi-tenant: every institute using the platform gets its own isolated
+// slice of data via the `instituteId` column on tenant-scoped models.
 
 generator client {
   provider = "prisma-client-js"
@@ -12,39 +13,75 @@ datasource db {
 }
 
 // ─────────────────────────────────────────────
-// USER — Core auth entity (students & teachers login via this)
+// INSTITUTE — The tenant. Everything else hangs off this.
 // ─────────────────────────────────────────────
-model User {
+model Institute {
   id        Int      @id @default(autoincrement())
   name      String
-  email     String   @unique
-  password  String
-  role      Role     @default(STUDENT)
+  code      String   @unique // e.g. "GRNFLD" — shown to students/teachers as the join code, also usable as a URL slug
+  address   String?
+  isActive  Boolean  @default(true) // lets you disable an institute without deleting its data
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   // Relations
+  users            User[]
+  students         Student[]
+  teachers         Teacher[]
+  departments      DepartmentInfo[]
+  courses          Course[]
+  courseAllocations CourseAllocation[]
+  classTimetables  ClassTimetable[]
+  libraryResources LibraryResource[]
+}
+
+// ─────────────────────────────────────────────
+// USER — Core auth entity (students & teachers login via this)
+// ─────────────────────────────────────────────
+model User {
+  id          Int      @id @default(autoincrement())
+  // Nullable: only SUPER_ADMIN (the platform owner) has no institute.
+  // Every STUDENT / TEACHER / ADMIN belongs to exactly one institute.
+  instituteId Int?
+  name        String
+  email       String   @unique // account identity is global — one email, one account, across the whole platform
+  password    String
+  role        Role     @default(STUDENT)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  institute        Institute?        @relation(fields: [instituteId], references: [id], onDelete: Cascade)
   student          Student?
   teacher          Teacher?
   libraryResources LibraryResource[]
+
+  @@index([instituteId])
 }
 
 enum Role {
   STUDENT
   TEACHER
-  ADMIN
+  ADMIN // scoped to one institute — the institute's own admin(s)
+  SUPER_ADMIN // platform owner — instituteId is null, can see across institutes
 }
 
 // ─────────────────────────────────────────────
-// DEPARTMENT 
+// DEPARTMENT
 // ─────────────────────────────────────────────
 model DepartmentInfo {
   id              Int      @id @default(autoincrement())
+  instituteId     Int
   name            String
   code            String
   semesterDetails Json // Stores the array of objects mentioned above
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
+
+  institute Institute @relation(fields: [instituteId], references: [id], onDelete: Cascade)
+
+  @@unique([instituteId, code]) // department codes only need to be unique within an institute
+  @@index([instituteId])
 }
 
 // ─────────────────────────────────────────────
@@ -53,7 +90,8 @@ model DepartmentInfo {
 model Student {
   id            Int      @id @default(autoincrement())
   userId        Int      @unique
-  rollNumber    String   @unique
+  instituteId   Int
+  rollNumber    String
   department    String
   semester      Int
   section       String   @default("A")
@@ -64,27 +102,37 @@ model Student {
 
   // Relations
   user              User                    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  institute         Institute               @relation(fields: [instituteId], references: [id], onDelete: Cascade)
   enrolledCourses   StudentCourse[] // Many-to-many with Course
   attendanceRecords AttendanceRecord[] // All attendance records for this student
   attendanceStats   StudentAttendanceStat[] // Cached attendance per course
+
+  @@unique([instituteId, rollNumber]) // roll numbers only need to be unique within an institute
+  @@index([instituteId])
 }
 
 // ─────────────────────────────────────────────
 // TEACHER — Profile linked to a User
 // ─────────────────────────────────────────────
 model Teacher {
-  id          Int      @id @default(autoincrement())
-  userId      Int      @unique
-  employeeId  String   @unique
-  designation String
-  department  String
+  id            Int      @id @default(autoincrement())
+  userId        Int      @unique
+  instituteId   Int
+  employeeId    String
+  designation   String
+  department    String
   contactNumber String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 
   // Relations
   user              User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  institute         Institute          @relation(fields: [instituteId], references: [id], onDelete: Cascade)
   courseAllocations CourseAllocation[]
+  schedules         TeacherSchedule[]
+
+  @@unique([instituteId, employeeId]) // employee IDs only need to be unique within an institute
+  @@index([instituteId])
 }
 
 // ─────────────────────────────────────────────
@@ -110,33 +158,36 @@ model TeacherSchedule {
 // CLASS TIMETABLE — Stores period structure per class (dept+sem+sec)
 // ─────────────────────────────────────────────
 model ClassTimetable {
-  id         Int      @id @default(autoincrement())
-  department String
-  semester   Int
-  section    String
-  periods    Json     @default("[]") // [{period:1, startTime:"09:00", endTime:"10:00", type:"class"}]
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  id          Int      @id @default(autoincrement())
+  instituteId Int
+  department  String
+  semester    Int
+  section     String
+  periods     Json     @default("[]") // [{period:1, startTime:"09:00", endTime:"10:00", type:"class"}]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
-  entries ClassScheduleEntry[]
+  institute Institute            @relation(fields: [instituteId], references: [id], onDelete: Cascade)
+  entries   ClassScheduleEntry[]
 
-  @@unique([department, semester, section])
+  @@unique([instituteId, department, semester, section])
+  @@index([instituteId])
 }
 
 // ─────────────────────────────────────────────
 // CLASS SCHEDULE ENTRY — One cell in the class timetable grid
 // ─────────────────────────────────────────────
 model ClassScheduleEntry {
-  id                Int    @id @default(autoincrement())
-  classTimetableId  Int
-  periodNumber      Int
-  day               String
+  id                 Int    @id @default(autoincrement())
+  classTimetableId   Int
+  periodNumber       Int
+  day                String
   courseAllocationId Int
-  room              String?
-  classType         String @default("class")
+  room               String?
+  classType          String @default("class")
 
   classTimetable   ClassTimetable   @relation(fields: [classTimetableId], references: [id], onDelete: Cascade)
-  courseAllocation  CourseAllocation @relation(fields: [courseAllocationId], references: [id], onDelete: Cascade)
+  courseAllocation CourseAllocation @relation(fields: [courseAllocationId], references: [id], onDelete: Cascade)
 
   @@unique([classTimetableId, periodNumber, day])
   @@index([courseAllocationId])
@@ -146,19 +197,24 @@ model ClassScheduleEntry {
 // COURSE (was Subject) — A subject/paper
 // ─────────────────────────────────────────────
 model Course {
-  id         Int      @id @default(autoincrement())
-  name       String
-  code       String   @unique // e.g. "BCA-101"
-  department String
-  semester   Int
-  credits    Int      @default(3)
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  id          Int      @id @default(autoincrement())
+  instituteId Int
+  name        String
+  code        String // e.g. "BCA-101"
+  department  String
+  semester    Int
+  credits     Int      @default(3)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
   // Relations
+  institute        Institute               @relation(fields: [instituteId], references: [id], onDelete: Cascade)
   enrolledStudents StudentCourse[]
   allocations      CourseAllocation[]
   attendanceStats  StudentAttendanceStat[]
+
+  @@unique([instituteId, code]) // course codes only need to be unique within an institute
+  @@index([instituteId])
 }
 
 // ─────────────────────────────────────────────
@@ -180,6 +236,7 @@ model StudentCourse {
 // ─────────────────────────────────────────────
 model CourseAllocation {
   id           Int      @id @default(autoincrement())
+  instituteId  Int
   teacherId    Int
   courseId     Int
   department   String
@@ -190,17 +247,22 @@ model CourseAllocation {
   updatedAt    DateTime @updatedAt
 
   // Relations
-  teacher            Teacher             @relation(fields: [teacherId], references: [id], onDelete: Cascade)
-  course             Course              @relation(fields: [courseId], references: [id], onDelete: Cascade)
-  attendanceSessions AttendanceSession[]
+  institute            Institute            @relation(fields: [instituteId], references: [id], onDelete: Cascade)
+  teacher              Teacher              @relation(fields: [teacherId], references: [id], onDelete: Cascade)
+  course               Course               @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  attendanceSessions   AttendanceSession[]
   classScheduleEntries ClassScheduleEntry[]
+  teacherSchedules     TeacherSchedule[]
 
   @@unique([teacherId, courseId, department, semester, section]) // A teacher can't be assigned same course+section twice
+  @@index([instituteId])
   @@index([courseId])
 }
 
 // ─────────────────────────────────────────────
 // ATTENDANCE SESSION — One class session (was: Attendance document header)
+// Not directly instituteId-scoped — it's always reached through its
+// CourseAllocation, which already carries instituteId (indexed FK).
 // ─────────────────────────────────────────────
 model AttendanceSession {
   id                 Int      @id @default(autoincrement())
@@ -260,6 +322,7 @@ model StudentAttendanceStat {
 // ─────────────────────────────────────────────
 model LibraryResource {
   id            Int      @id @default(autoincrement())
+  instituteId   Int
   title         String
   subjectName   String
   department    String
@@ -270,8 +333,10 @@ model LibraryResource {
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
-  contributor User @relation(fields: [contributorId], references: [id], onDelete: Cascade)
+  institute   Institute @relation(fields: [instituteId], references: [id], onDelete: Cascade)
+  contributor User      @relation(fields: [contributorId], references: [id], onDelete: Cascade)
 
+  @@index([instituteId])
   @@index([contributorId])
-  @@index([department, semester])
+  @@index([instituteId, department, semester])
 }

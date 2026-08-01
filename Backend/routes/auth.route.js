@@ -3,6 +3,8 @@ const router = express.Router();
 const {
   getProfile,
   signupStudent,
+  registerInstitute,
+  verifyInstituteCode,
   login,
   refreshSession,
   logout,
@@ -17,6 +19,8 @@ const {
 } = require("../middlewares/auth.middleware");
 
 router.get("/academic-options", getAcademicOptions);
+router.get("/institute/verify", verifyInstituteCode);
+router.post("/institute/register", registerInstitute);
 router.post("/signup", signupStudent);
 router.post("/login", login);
 router.post("/refresh", refreshSession);

@@ -1,35 +1,35 @@
 import "./App.css";
 import { Toaster } from "react-hot-toast";
-import ErrorBoundary from "./Components/UI/ErrorBoundary";
-import PremiumErrorState from "./Components/UI/PremiumErrorState";
+import ErrorBoundary from "./components/common/ErrorBoundary";
+import PremiumErrorState from "./components/common/PremiumErrorState";
 
 import Navbar from "./Components/Layout/Navbar.jsx";
 import Footer from "./Components/Layout/Footer.jsx";
-import Home from "./Components/Pages/Home.jsx";
-import Features from "./Components/Pages/Features.jsx";
-import About from "./Components/Pages/About.jsx";
-import SignUp from "./Components/Pages/SignUp.jsx";
-import Login from "./Components/Pages/Login.jsx";
-import EditProfile from "./Components/Pages/EditProfile.jsx";
+import Home from "./pages/Home.jsx";
+import Features from "./pages/Features.jsx";
+import About from "./pages/About.jsx";
+import SignUp from "./pages/SignUp.jsx";
+import Login from "./pages/Login.jsx";
+import EditProfile from "./pages/EditProfile.jsx";
 import { Routes, Route, Outlet } from "react-router-dom";
 import ProtectedRoute from "./Components/Auth/ProtectedRoute.jsx";
 import PublicOnlyRoute from "./Components/Auth/PublicOnlyRoute.jsx";
-import StudentDashboard from "./Components/Pages/Student/StudentDash.jsx";
-import TeacherDashboard from "./Components/Pages/Teacher/TeacherDashboard.jsx";
-import TakeAttendance from "./Components/Pages/Teacher/TakeAttendance.jsx";
-import Library from "./Components/Pages/Library/Library.jsx";
+import StudentDashboard from "./pages/StudentDashboard.jsx";
+import TeacherDashboard from "./pages/TeacherDashboard.jsx";
+import TakeAttendance from "./pages/TakeAttendance.jsx";
+import Library from "./pages/Library.jsx";
 
 // Admin Imports
 import { ThemeProvider } from "./contexts/ThemeContext.jsx";
-import AdminLayout from "./Components/Pages/Admin/AdminLayout.jsx";
-import AdminDashboard from "./Components/Pages/Admin/AdminDashboard.jsx";
-import AdminStudents from "./Components/Pages/Admin/AdminStudents.jsx";
-import AdminTeachers from "./Components/Pages/Admin/AdminTeachers.jsx";
-import AdminCourses from "./Components/Pages/Admin/AdminCourses.jsx";
-import AdminAllocations from "./Components/Pages/Admin/AdminAllocations.jsx";
-import AdminSchedules from "./Components/Pages/Admin/AdminSchedules.jsx";
-import AdminReports from "./Components/Pages/Admin/AdminReports.jsx";
-import AdminUsers from "./Components/Pages/Admin/AdminUsers.jsx";
+import AdminLayout from "./pages/AdminLayout.jsx";
+import AdminDashboard from "./pages/AdminDashboard.jsx";
+import AdminStudents from "./pages/AdminStudents.jsx";
+import AdminTeachers from "./pages/AdminTeachers.jsx";
+import AdminCourses from "./pages/AdminCourses.jsx";
+import AdminAllocations from "./pages/AdminAllocations.jsx";
+import AdminSchedules from "./pages/AdminSchedules.jsx";
+import AdminReports from "./pages/AdminReports.jsx";
+import AdminUsers from "./pages/AdminUsers.jsx";
 
 const MainLayout = () => (
   <>

@@ -1,0 +1,73 @@
+import { BookOpen, AlertTriangle } from "lucide-react";
+
+const CourseCard = ({ course, onClick }) => {
+  const isLow = course.percentage < 75;
+
+  return (
+    <button
+      type="button"
+      onClick={() => onClick?.(course.courseCode)}
+      className={`group block rounded-2xl border bg-white p-6 transition-all duration-300 hover:scale-[1.02] dark:bg-[#151518] ${
+        isLow
+          ? "border-red-200 dark:border-red-500/20 hover:border-red-500 dark:hover:border-red-500 hover:bg-red-50/30 dark:hover:bg-[#1C1C22]"
+          : "border-slate-200 dark:border-[#222228] hover:border-indigo-500 dark:hover:border-indigo-500 hover:bg-slate-50/50 dark:hover:bg-[#1C1C22]"
+      }`}
+    >
+      <div className="mb-4 flex items-start justify-between">
+        <div className="flex items-center space-x-3">
+          <div
+            className={`flex h-10 w-10 items-center justify-center rounded-xl ${
+              isLow
+                ? "bg-red-50 text-red-500 dark:bg-red-500/10 dark:text-red-300"
+                : "bg-indigo-50 text-indigo-500 dark:bg-indigo-500/10 dark:text-indigo-300"
+            }`}
+          >
+            <BookOpen className="w-5 h-5" />
+          </div>
+          <div>
+            <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100">
+              {course.courseName}
+            </h3>
+            <p className="text-[10px] font-black uppercase text-slate-400 dark:text-slate-500">
+              {course.courseCode}
+            </p>
+          </div>
+        </div>
+        {isLow && (
+          <span className="flex items-center rounded border border-red-100 bg-red-50 px-2 py-1 text-[10px] font-black uppercase tracking-tight text-red-600 dark:border-red-500/20 dark:bg-red-500/10 dark:text-red-300">
+            <AlertTriangle className="mr-1 h-3 w-3" />
+            Low
+          </span>
+        )}
+      </div>
+
+      <div className="mt-6">
+        <div className="mb-2 flex items-center justify-between">
+          <span className="text-xs font-bold text-slate-400 dark:text-slate-500">
+            Attendance
+          </span>
+          <span
+            className={`text-sm font-black ${
+              isLow ? "text-red-500" : "text-green-500"
+            }`}
+          >
+            {course.percentage.toFixed(1)}%
+          </span>
+        </div>
+        <div className="h-2 w-full overflow-hidden rounded-full bg-slate-100 dark:bg-[#1C1C20]">
+          <div
+            className={`h-full rounded-full transition-all duration-1000 ${
+              isLow ? "bg-red-500" : "bg-green-500"
+            }`}
+            style={{ width: `${course.percentage}%` }}
+          />
+        </div>
+        <p className="mt-2 text-[10px] font-medium text-slate-400 dark:text-slate-500">
+          {course.attendedClasses} / {course.totalClasses} classes attended
+        </p>
+      </div>
+    </button>
+  );
+};
+
+export default CourseCard;

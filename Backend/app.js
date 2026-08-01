@@ -1,6 +1,5 @@
 const express = require("express");
 const dotenv = require("dotenv");
-const path = require("path");
 const cors = require("cors");
 // Route imports
 const studentRoutes = require("./routes/student.route");
@@ -10,8 +9,10 @@ const libraryRoutes = require("./routes/library.route");
 const authRoutes = require("./routes/auth.route");
 const errorHandler = require("./middlewares/error.middleware");
 
-// Load environment variables (looks for .env in project root)
-dotenv.config({ path: path.resolve(__dirname, "../.env") });
+// Load environment variables from backend/.env (dotenv defaults to the
+// current working directory, which is backend/ when you run `npm run dev`
+// or `npm start` from inside this folder).
+dotenv.config();
 
 const app = express();
 

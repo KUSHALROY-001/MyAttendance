@@ -1,5 +1,5 @@
 import { Navigate, Outlet } from "react-router-dom";
-import LoadingAnimation from "../UI/LoadingAnimation";
+import LoadingAnimation from "../common/LoadingAnimation";
 import { useAuth } from "../../contexts/AuthContext";
 
 const PublicOnlyRoute = () => {

@@ -22,10 +22,34 @@ async function main() {
   await prisma.teacher.deleteMany();
   await prisma.user.deleteMany();
   await prisma.departmentInfo.deleteMany();
+  await prisma.institute.deleteMany();
   console.log("Database cleared!");
 
   const salt = await bcrypt.genSalt(10);
   const hashedPassword = await bcrypt.hash("password123", salt);
+
+  // ──────────────────────────────────────────────────────────
+  // 1b. CREATE THE SEED INSTITUTE (the tenant everything below belongs to)
+  // ──────────────────────────────────────────────────────────
+  const institute = await prisma.institute.create({
+    data: {
+      name: "Hogwarts College of Technology",
+      code: "HOGWARTS",
+      address: "1 Castle Grounds, Scotland",
+    },
+  });
+  console.log(`✅ Institute created: ${institute.name} (code: ${institute.code})`);
+
+  // A platform-level SUPER_ADMIN — not tied to any institute, can see across all of them.
+  await prisma.user.create({
+    data: {
+      name: "Platform Owner",
+      email: "superadmin@platform.dev",
+      password: hashedPassword,
+      role: "SUPER_ADMIN",
+    },
+  });
+  console.log("✅ Super admin created");
 
   // ──────────────────────────────────────────────────────────
   // 2. CREATE DEPARTMENTS
@@ -68,7 +92,11 @@ async function main() {
     },
   ];
   for (const d of departmentData) {
-    departments.push(await prisma.departmentInfo.create({ data: d }));
+    departments.push(
+      await prisma.departmentInfo.create({
+        data: { ...d, instituteId: institute.id },
+      }),
+    );
   }
   console.log(`✅ ${departments.length} departments created`);
 
@@ -81,6 +109,7 @@ async function main() {
       email: "admin@college.edu",
       password: hashedPassword,
       role: "ADMIN",
+      instituteId: institute.id,
     },
   });
 
@@ -154,8 +183,10 @@ async function main() {
         email: t.email,
         password: hashedPassword,
         role: "TEACHER",
+        instituteId: institute.id,
         teacher: {
           create: {
+            instituteId: institute.id,
             employeeId: t.empId,
             designation: t.desig,
             department: t.dept,
@@ -293,7 +324,9 @@ async function main() {
 
   const courses = [];
   for (const c of courseData) {
-    courses.push(await prisma.course.create({ data: c }));
+    courses.push(
+      await prisma.course.create({ data: { ...c, instituteId: institute.id } }),
+    );
   }
   console.log(`✅ ${courses.length} courses created`);
 
@@ -418,8 +451,10 @@ async function main() {
         email: s.email,
         password: hashedPassword,
         role: "STUDENT",
+        instituteId: institute.id,
         student: {
           create: {
+            instituteId: institute.id,
             rollNumber: s.roll,
             department: s.dept,
             semester: s.sem,
@@ -457,6 +492,7 @@ async function main() {
     allocations.push(
       await prisma.courseAllocation.create({
         data: {
+          instituteId: institute.id,
           teacherId: teachers[a.teacherIdx].id,
           courseId: course.id,
           department: a.dept,
@@ -633,11 +669,11 @@ async function main() {
   // ──────────────────────────────────────────────────────────
   // Get some user IDs for contributors (teachers + admin + a student)
   const allTeacherUsers = await prisma.user.findMany({
-    where: { role: "TEACHER" },
+    where: { role: "TEACHER", instituteId: institute.id },
     select: { id: true },
   });
   const allStudentUsers = await prisma.user.findMany({
-    where: { role: "STUDENT" },
+    where: { role: "STUDENT", instituteId: institute.id },
     select: { id: true },
   });
 
@@ -768,7 +804,9 @@ async function main() {
   ];
 
   for (const lr of libraryData) {
-    await prisma.libraryResource.create({ data: lr });
+    await prisma.libraryResource.create({
+      data: { ...lr, instituteId: institute.id },
+    });
   }
   console.log(`✅ ${libraryData.length} library resources created`);
 

@@ -33,7 +33,9 @@ const normalizePeriods = (periods) =>
 
 const buildTeacherRoutineEntry = (entry) => {
   const periods = normalizePeriods(entry.classTimetable?.periods);
-  const period = periods.find((item) => item.periodNumber === entry.periodNumber);
+  const period = periods.find(
+    (item) => item.periodNumber === entry.periodNumber,
+  );
 
   return {
     id: entry.id,
@@ -53,9 +55,10 @@ const buildTeacherRoutineEntry = (entry) => {
 
 const getTeacherDashboard = asyncHandler(async (req, res) => {
   const { teacherId } = req.params;
+  const instituteId = req.user.instituteId;
 
-  const teacher = await prisma.teacher.findUnique({
-    where: { employeeId: teacherId },
+  const teacher = await prisma.teacher.findFirst({
+    where: { instituteId, employeeId: teacherId },
     select: {
       id: true,
       employeeId: true,
@@ -102,6 +105,7 @@ const getTeacherDashboard = asyncHandler(async (req, res) => {
   const routineEntriesRaw = await prisma.classScheduleEntry.findMany({
     where: {
       courseAllocation: {
+        instituteId,
         teacher: { employeeId: teacherId },
       },
     },
@@ -210,8 +214,11 @@ const getTeacherDashboard = asyncHandler(async (req, res) => {
 const getAttendanceSession = asyncHandler(async (req, res) => {
   const { sessionId } = req.params;
 
-  const session = await prisma.attendanceSession.findUnique({
-    where: { id: parseInt(sessionId) },
+  const session = await prisma.attendanceSession.findFirst({
+    where: {
+      id: parseInt(sessionId),
+      courseAllocation: { instituteId: req.user.instituteId },
+    },
     select: {
       id: true,
       date: true,
@@ -268,6 +275,7 @@ const getCourseAttendance = asyncHandler(async (req, res) => {
   const allocation = await prisma.courseAllocation.findFirst({
     where: {
       id: Number(allocationId),
+      instituteId: req.user.instituteId,
       teacher: { employeeId: teacherId },
     },
     select: {
@@ -336,9 +344,10 @@ const getCourseAttendance = asyncHandler(async (req, res) => {
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+*/
 const getLiveAttendance = asyncHandler(async (req, res) => {
   const { allocationId } = req.params;
+  const instituteId = req.user.instituteId;
 
-  const alloc = await prisma.courseAllocation.findUnique({
-    where: { id: parseInt(allocationId) },
+  const alloc = await prisma.courseAllocation.findFirst({
+    where: { id: parseInt(allocationId), instituteId },
     select: {
       id: true,
       department: true,
@@ -353,6 +362,7 @@ const getLiveAttendance = asyncHandler(async (req, res) => {
   // Find all students in this demographic
   const students = await prisma.student.findMany({
     where: {
+      instituteId,
       department: alloc.department,
       semester: alloc.semester,
       section: alloc.section,
@@ -379,8 +389,11 @@ const submitAttendance = asyncHandler(async (req, res) => {
   const { courseAllocationId, date, records } = req.body;
   const normalizedCourseAllocationId = parseInt(courseAllocationId);
 
-  const allocation = await prisma.courseAllocation.findUnique({
-    where: { id: normalizedCourseAllocationId },
+  const allocation = await prisma.courseAllocation.findFirst({
+    where: {
+      id: normalizedCourseAllocationId,
+      instituteId: req.user.instituteId,
+    },
     select: {
       id: true,
       courseId: true,
