@@ -24,7 +24,7 @@ const EditProfileForm = ({
   saving,
 }) => {
   return (
-    <div className="w-full rounded-xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900 sm:p-8">
+    <div className="w-full rounded-xl border border-slate-200 bg-white p-3 shadow-sm dark:border-slate-800 dark:bg-slate-900 sm:p-8">
       <form
         onSubmit={handleSubmit}
         className="grid grid-cols-1 gap-5 md:grid-cols-2"
@@ -71,15 +71,12 @@ const EditProfileForm = ({
         ) : null}
 
         {role === "TEACHER" ? (
-          <TeacherProfileFields
-            formData={formData}
-            updateField={updateField}
-          />
+          <TeacherProfileFields formData={formData} updateField={updateField} />
         ) : null}
 
         <div className="md:col-span-2 flex flex-col gap-4 border-t border-slate-100 pt-6 dark:border-slate-800 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-3 text-sm text-slate-500 dark:text-slate-400">
-            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-indigo-50 text-indigo-600 dark:bg-indigo-500/10 dark:text-indigo-400">
+            <div className="flex h-9 w-9 items-center justify-center rounded-lg sm:bg-indigo-50 text-indigo-600 sm:dark:bg-indigo-500/10 dark:text-indigo-400">
               <PencilLine size={18} />
             </div>
             <p className="text-xs sm:text-sm">

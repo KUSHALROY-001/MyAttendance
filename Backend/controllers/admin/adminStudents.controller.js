@@ -3,6 +3,11 @@ const bcrypt = require("bcryptjs");
 const ApiError = require("../../utils/ApiError");
 const asyncHandler = require("../../utils/asyncHandler");
 const { getWhereClause } = require("./adminHelpers");
+const {
+  stampOnCreate,
+  stampOnUpdate,
+  auditActorSelect,
+} = require("../../utils/auditStamp");
 
 const formatStudent = (student) => ({
   id: student.id,
@@ -10,6 +15,7 @@ const formatStudent = (student) => ({
   name: student.user?.name || "",
   email: student.user?.email || "",
   rollNumber: student.rollNumber,
+  enrollmentNumber: student.enrollmentNumber,
   department: student.department,
   semester: student.semester,
   section: student.section,
@@ -39,6 +45,7 @@ const createStudent = asyncHandler(async (req, res) => {
     name,
     email,
     rollNumber,
+    enrollmentNumber,
     department,
     semester,
     section,
@@ -46,7 +53,15 @@ const createStudent = asyncHandler(async (req, res) => {
     contactNumber,
   } = req.body;
 
-  if (!name || !email || !rollNumber || !department || !semester || !batch) {
+  if (
+    !name ||
+    !email ||
+    !rollNumber ||
+    !enrollmentNumber ||
+    !department ||
+    !semester ||
+    !batch
+  ) {
     throw new ApiError(400, "All required fields must be provided.");
   }
 
@@ -61,6 +76,16 @@ const createStudent = asyncHandler(async (req, res) => {
   });
   if (existingRoll) {
     throw new ApiError(409, "A student with this roll number already exists.");
+  }
+
+  const existingEnrollment = await prisma.student.findFirst({
+    where: { instituteId: req.user.instituteId, enrollmentNumber },
+  });
+  if (existingEnrollment) {
+    throw new ApiError(
+      409,
+      "A student with this enrollment number already exists.",
+    );
   }
 
   // Hash a default password
@@ -83,6 +108,7 @@ const createStudent = asyncHandler(async (req, res) => {
         password: hashedPassword,
         role: "STUDENT",
         instituteId: req.user.instituteId,
+        ...stampOnCreate(req.user.userId),
       },
     });
 
@@ -91,11 +117,13 @@ const createStudent = asyncHandler(async (req, res) => {
         userId: user.id,
         instituteId: req.user.instituteId,
         rollNumber,
+        enrollmentNumber,
         department,
         semester: Number(semester),
         section: section || "A",
         batch,
         contactNumber: contactNumber || null,
+        ...stampOnCreate(req.user.userId),
         enrolledCourses: {
           create: courses.map((course) => ({
             courseId: course.id,
@@ -126,6 +154,7 @@ const updateStudent = asyncHandler(async (req, res) => {
     name,
     email,
     rollNumber,
+    enrollmentNumber,
     department,
     semester,
     section,
@@ -165,6 +194,19 @@ const updateStudent = asyncHandler(async (req, res) => {
     }
   }
 
+  // Same for enrollmentNumber
+  if (enrollmentNumber && enrollmentNumber !== student.enrollmentNumber) {
+    const enrollmentTaken = await prisma.student.findFirst({
+      where: { instituteId: req.user.instituteId, enrollmentNumber },
+    });
+    if (enrollmentTaken) {
+      throw new ApiError(
+        409,
+        "A student with this enrollment number already exists.",
+      );
+    }
+  }
+
   // Update User + Student in a single transaction
   const updatedStudent = await prisma.$transaction(async (tx) => {
     await tx.user.update({
@@ -172,6 +214,7 @@ const updateStudent = asyncHandler(async (req, res) => {
       data: {
         ...(name && { name }),
         ...(email && { email }),
+        ...stampOnUpdate(req.user.userId),
       },
     });
 
@@ -179,6 +222,7 @@ const updateStudent = asyncHandler(async (req, res) => {
       where: { id: Number(id) },
       data: {
         ...(rollNumber && { rollNumber }),
+        ...(enrollmentNumber && { enrollmentNumber }),
         ...(department && { department }),
         ...(semester && { semester: Number(semester) }),
         ...(section && { section }),
@@ -186,6 +230,7 @@ const updateStudent = asyncHandler(async (req, res) => {
         ...(contactNumber !== undefined && {
           contactNumber: contactNumber || null,
         }),
+        ...stampOnUpdate(req.user.userId),
       },
       include: {
         user: { select: { name: true, email: true } },
@@ -217,10 +262,73 @@ const deleteStudent = asyncHandler(async (req, res) => {
   res.status(200).json({ message: "Student deleted successfully." });
 });
 
+const getStudentDetail = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+
+  const student = await prisma.student.findFirst({
+    where: { id: Number(id), instituteId: req.user.instituteId },
+    include: {
+      user: {
+        select: { name: true, email: true, status: true, createdAt: true },
+      },
+      createdBy: auditActorSelect,
+      updatedBy: auditActorSelect,
+      attendanceStats: {
+        include: { course: { select: { name: true, code: true } } },
+      },
+      enrolledCourses: {
+        include: { course: { select: { id: true, name: true, code: true } } },
+      },
+    },
+  });
+
+  if (!student) {
+    throw new ApiError(404, "Student not found.");
+  }
+
+  const totals = student.attendanceStats.reduce(
+    (acc, s) => ({
+      sessions: acc.sessions + s.totalSessions,
+      attended: acc.attended + s.totalAttended,
+    }),
+    { sessions: 0, attended: 0 },
+  );
+  const overallAttendancePercentage =
+    totals.sessions === 0
+      ? null
+      : Math.round((totals.attended / totals.sessions) * 1000) / 10;
+
+  // Same convention as getUserDetailFull's isFounder/isPendingApproval —
+  // computed server-side so the frontend doesn't need to re-derive this
+  // logic itself for every detail endpoint that can hit a null createdBy.
+  const isPendingApproval =
+    student.user.status === "PENDING" && !student.createdBy;
+
+  res.status(200).json({
+    ...formatStudent(student),
+    accountStatus: student.user.status,
+    accountCreatedAt: student.user.createdAt,
+    recordCreatedAt: student.createdAt,
+    recordUpdatedAt: student.updatedAt,
+    createdBy: student.createdBy,
+    updatedBy: student.updatedBy,
+    isPendingApproval,
+    overallAttendancePercentage,
+    perCourseAttendance: student.attendanceStats.map((s) => ({
+      course: s.course.name,
+      code: s.course.code,
+      totalSessions: s.totalSessions,
+      totalAttended: s.totalAttended,
+    })),
+    enrolledCourses: student.enrolledCourses.map((ec) => ec.course),
+  });
+});
+
 module.exports = {
   readStudent,
   createStudent,
   updateStudent,
   deleteStudent,
+  getStudentDetail,
   formatStudent,
 };

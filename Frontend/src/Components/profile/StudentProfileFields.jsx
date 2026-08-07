@@ -34,6 +34,20 @@ const StudentProfileFields = ({
       </div>
 
       <div className="space-y-1.5">
+        <label htmlFor="enrollmentNumber" className={labelClass}>
+          Enrollment Number
+          <Required />
+        </label>
+        <input
+          id="enrollmentNumber"
+          value={formData.enrollmentNumber}
+          onChange={updateField("enrollmentNumber")}
+          required
+          className={inputClass}
+        />
+      </div>
+
+      <div className="space-y-1.5">
         <label htmlFor="department" className={labelClass}>
           Department
           <Required />

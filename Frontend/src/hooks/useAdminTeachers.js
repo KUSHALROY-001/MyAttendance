@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import api from "../api/axios";
+import useRecordDetail from "./useRecordDetail";
 
 const initial_form = {
   name: "",
@@ -11,6 +12,9 @@ const initial_form = {
 };
 
 export const useAdminTeachers = () => {
+  const detailState = useRecordDetail(
+    (row) => `/api/admin/teachers/${row.id}/detail`,
+  );
   const [data, setData] = useState([]);
   const [search, setSearch] = useState("");
   const [dept, setDept] = useState("BCA");
@@ -131,6 +135,7 @@ export const useAdminTeachers = () => {
     handleOpenModal,
     handleSave,
     handleDelete,
+    ...detailState,
   };
 };
 

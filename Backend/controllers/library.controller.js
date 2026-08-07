@@ -165,7 +165,11 @@ const deleteLibraryResource = asyncHandler(async (req, res) => {
     throw new ApiError(404, "User not found.");
   }
 
-  if (resource.contributorId !== user.id && user.role !== "ADMIN") {
+  if (
+    resource.contributorId !== user.id &&
+    user.role !== "ADMIN" &&
+    user.role !== "SUPER_ADMIN"
+  ) {
     throw new ApiError(403, "You are not authorized to delete this resource.");
   }
 

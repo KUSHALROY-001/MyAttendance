@@ -103,6 +103,7 @@ const buildSafeAuthUser = (user) => {
         type: "student",
         studentId: user.student.id,
         rollNumber: user.student.rollNumber,
+        enrollmentNumber: user.student.enrollmentNumber,
         department: user.student.department,
         semester: user.student.semester,
         section: user.student.section,
@@ -127,6 +128,13 @@ const buildSafeAuthUser = (user) => {
     name: user.name,
     email: user.email,
     role: user.role,
+    institute: user.institute
+      ? {
+          id: user.institute.id,
+          name: user.institute.name,
+          code: user.institute.code,
+        }
+      : null,
     profile,
   };
 };

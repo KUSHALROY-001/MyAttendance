@@ -18,8 +18,24 @@ const getUserForSession = async (userId) => {
     include: {
       student: true,
       teacher: true,
+      institute: { select: { id: true, name: true, code: true } },
     },
   });
+};
+
+const ensureActiveStatus = (user) => {
+  if (user.status === "PENDING") {
+    throw new ApiError(
+      403,
+      "Your account is awaiting approval from your institute admin.",
+    );
+  }
+  if (user.status === "REJECTED") {
+    throw new ApiError(
+      403,
+      "Your signup request was not approved. Please contact your institute admin.",
+    );
+  }
 };
 
 const issueAuthResponse = async (res, user) => {
@@ -53,7 +69,7 @@ const login = asyncHandler(async (req, res) => {
     throw new ApiError(400, "Email and password are required.");
   }
 
-  const user = await prisma.user.findUnique({
+  const user = await prisma.user.findFirst({
     where: { email },
     select: {
       id: true,
@@ -61,8 +77,10 @@ const login = asyncHandler(async (req, res) => {
       email: true,
       password: true,
       role: true,
+      status: true,
       student: true,
       teacher: true,
+      institute: { select: { id: true, name: true, code: true } },
     },
   });
 
@@ -74,6 +92,8 @@ const login = asyncHandler(async (req, res) => {
   if (!passwordMatches) {
     throw new ApiError(401, "Invalid email or password.");
   }
+
+  ensureActiveStatus(user);
 
   return issueAuthResponse(res, user);
 });
@@ -98,6 +118,8 @@ const refreshSession = asyncHandler(async (req, res) => {
     throw new ApiError(401, "User session is no longer valid.");
   }
 
+  ensureActiveStatus(user);
+
   return issueAuthResponse(res, user);
 });
 
@@ -121,6 +143,8 @@ const getCurrentUser = asyncHandler(async (req, res) => {
   if (!user) {
     throw new ApiError(404, "User not found.");
   }
+
+  ensureActiveStatus(user);
 
   return res.status(200).json({
     user: buildSafeAuthUser(user),

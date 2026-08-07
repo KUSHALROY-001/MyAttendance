@@ -1,10 +1,13 @@
 import React from "react";
 
 const inputClass =
-  "w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm focus:ring-2 focus:ring-indigo-500 outline-none text-slate-900 dark:text-white";
+  "w-full px-3 py-2 rounded-lg border border-slate-300 bg-[#ffffff] dark:bg-[#000000] text-sm focus:ring-2 focus:ring-indigo-500 outline-none text-slate-900 dark:text-white appearance-none";
+
+const selectClass =
+  "w-full px-3 py-2 rounded-lg border border-slate-300 bg-[#ffffff] dark:bg-[#000000] text-sm focus:ring-2 focus:ring-indigo-500 outline-none text-slate-900 dark:text-white appearance-none cursor-pointer";
 
 const Label = ({ children }) => (
-  <label className="text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase">
+  <label className="text-xs font-semibold text-white dark:text-slate-300/70 uppercase">
     {children}
   </label>
 );
@@ -57,19 +60,29 @@ const AdminForm = ({
         {type === "select" ? (
           <select
             required={required}
-            className={`${inputClass} ${extraClass || ""}`}
+            className={`${selectClass} ${extraClass || ""}`}
             value={formData[name] || ""}
             onChange={update(name)}
           >
-            <option value="">-- Select --</option>
-            {(options || []).map((opt) => {
-              const isObj = typeof opt === "object";
+            <option
+              value=""
+              className="text-slate-900 bg-[#ffffff] dark:bg-[#000000] dark:text-[#ffffff]"
+            >
+              -- Select --
+            </option>
+            {(options || []).map((opt, idx) => {
+              const isObj = typeof opt === "object" && opt !== null;
+              const optValue = isObj ? (opt.value ?? opt.name ?? opt) : opt;
+              const optLabel = isObj
+                ? (opt.label ?? opt.name ?? opt.value ?? opt)
+                : opt;
               return (
                 <option
-                  key={isObj ? opt.value : opt}
-                  value={isObj ? opt.value : opt}
+                  key={`${name}-${idx}-${optValue}`}
+                  value={optValue}
+                  className="text-slate-900 bg-[#ffffff] dark:bg-[#000000] dark:text-[#ffffff]"
                 >
-                  {isObj ? opt.label : opt}
+                  {optLabel}
                 </option>
               );
             })}

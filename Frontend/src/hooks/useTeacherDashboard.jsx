@@ -181,7 +181,7 @@ export const useTeacherDashboard = () => {
           className="flex w-full items-center justify-between gap-4 px-4 py-3 text-left transition hover:bg-slate-50 dark:hover:bg-slate-800/50"
         >
           <div>
-            <p className="font-medium text-slate-900 dark:text-white">
+            <p className="font-medium text-white">
               {new Date(session.date).toLocaleDateString("en-US", {
                 weekday: "short",
                 month: "short",
@@ -189,7 +189,7 @@ export const useTeacherDashboard = () => {
                 year: "numeric",
               })}
             </p>
-            <p className="text-xs text-slate-500">
+            <p className="text-xs text-white/70">
               {session.department} • Sem {session.semester} • Sec{" "}
               {session.section}
             </p>

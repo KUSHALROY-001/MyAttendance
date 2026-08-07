@@ -1,4 +1,3 @@
-import React from "react";
 import TeacherHeader from "../components/teacher/TeacherHeader";
 import TeacherStats from "../components/teacher/TeacherStats";
 import TodaysClasses from "../components/teacher/TodaysClasses";
@@ -7,7 +6,7 @@ import AttendanceSessions from "../components/teacher/AttendanceSessions";
 import TeacherCourses from "../components/teacher/TeacherCourses";
 import StartAttendanceModal from "../components/teacher/StartAttendanceModal";
 import AttendanceSessionModal from "../components/common/AttendanceSessionModal";
-import useTeacherDashboard from "../hooks/useTeacherDashboard";
+import useTeacherDashboard from "../hooks/useTeacherDashboard.jsx";
 
 const TeacherDashboard = () => {
   const {

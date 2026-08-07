@@ -6,6 +6,7 @@ const AdminTable = ({
   data,
   actions,
   emptyMessage = "No records found.",
+  onRowClick,
 }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const rowsPerPage = 10;
@@ -47,7 +48,8 @@ const AdminTable = ({
               currentData.map((row, rowIndex) => (
                 <tr
                   key={rowIndex}
-                  className="border-b border-slate-100 dark:border-slate-800 hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors"
+                  onClick={onRowClick ? () => onRowClick(row) : undefined}
+                  className={`border-b border-slate-100 dark:border-slate-800 hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors ${onRowClick ? "cursor-pointer" : ""}`}
                 >
                   {columns.map((col, colIndex) => (
                     <td
@@ -58,7 +60,10 @@ const AdminTable = ({
                     </td>
                   ))}
                   {actions && (
-                    <td className="px-6 py-4 whitespace-nowrap text-right">
+                    <td
+                      className="px-6 py-4 whitespace-nowrap text-right"
+                      onClick={(e) => e.stopPropagation()}
+                    >
                       <div className="flex items-center justify-end gap-2">
                         {actions(row)}
                       </div>

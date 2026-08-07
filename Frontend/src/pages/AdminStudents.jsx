@@ -4,8 +4,10 @@ import AdminModal from "../components/admin/AdminModal";
 import ConfirmDialog from "../components/admin/ConfirmDialog";
 import AdminToolbar from "../components/admin/AdminToolbar";
 import AdminForm from "../components/admin/AdminForm";
+import RecordDetailPanel from "../components/admin/RecordDetailPanel";
 import { Plus, Pencil, Trash2 } from "lucide-react";
 import useAdminStudents from "../hooks/useAdminStudents";
+import { formatDateMedium } from "../utils/formatters";
 
 const columns = [
   {
@@ -18,13 +20,20 @@ const columns = [
     ),
   },
   {
+    header: "Enrollment Number",
+    accessor: "enrollmentNumber",
+    render: (r) => (
+      <span className="font-mono text-xs text-slate-500 dark:text-slate-400">
+        {r.enrollmentNumber}
+      </span>
+    ),
+  },
+  {
     header: "Name",
     accessor: "name",
     render: (r) => (
       <div>
-        <p className="font-semibold text-slate-900 dark:text-white">
-          {r.name}
-        </p>
+        <p className="font-semibold text-slate-900 dark:text-white">{r.name}</p>
         <p className="text-xs text-slate-500">{r.email}</p>
       </div>
     ),
@@ -36,6 +45,61 @@ const columns = [
   },
   { header: "Section", accessor: "section" },
   { header: "Batch", accessor: "batch" },
+];
+
+const studentDetailSections = [
+  {
+    title: "Student Profile",
+    fields: [
+      { label: "Name", accessor: "name" },
+      { label: "Email", accessor: "email" },
+      { label: "Roll Number", accessor: "rollNumber" },
+      { label: "Enrollment Number", accessor: "enrollmentNumber" },
+      { label: "Department", accessor: "department" },
+      { label: "Semester", render: (d) => `Semester ${d.semester}` },
+      { label: "Section", accessor: "section" },
+      { label: "Batch", accessor: "batch" },
+      { label: "Contact", accessor: "contactNumber" },
+      { label: "Account Status", accessor: "accountStatus" },
+    ],
+  },
+  {
+    title: "Attendance",
+    fields: [
+      {
+        label: "Overall Attendance",
+        render: (d) =>
+          d.overallAttendancePercentage === null
+            ? "No sessions yet"
+            : `${d.overallAttendancePercentage}%`,
+      },
+      {
+        label: "Enrolled Courses",
+        fullWidth: true,
+        render: (d) =>
+          d.enrolledCourses?.length
+            ? d.enrolledCourses.map((c) => `${c.code} - ${c.name}`).join(", ")
+            : "No enrolled courses",
+      },
+      {
+        label: "Course Attendance",
+        fullWidth: true,
+        render: (d) =>
+          d.perCourseAttendance?.length
+            ? d.perCourseAttendance
+                .map(
+                  (c) =>
+                    `${c.code}: ${c.totalAttended}/${c.totalSessions} attended`,
+                )
+                .join(", ")
+            : "No attendance records",
+      },
+      {
+        label: "Account Created",
+        render: (d) => formatDateMedium(d.accountCreatedAt),
+      },
+    ],
+  },
 ];
 
 const AdminStudents = () => {
@@ -65,6 +129,11 @@ const AdminStudents = () => {
     handleOpenModal,
     handleSave,
     handleDelete,
+    detail,
+    isDetailOpen,
+    isDetailLoading,
+    openDetail,
+    closeDetail,
   } = useAdminStudents();
 
   return (
@@ -120,6 +189,7 @@ const AdminStudents = () => {
       <AdminTable
         columns={columns}
         data={filteredData}
+        onRowClick={openDetail}
         actions={(row) => (
           <>
             <button
@@ -139,6 +209,15 @@ const AdminStudents = () => {
             </button>
           </>
         )}
+      />
+
+      <RecordDetailPanel
+        isOpen={isDetailOpen}
+        onClose={closeDetail}
+        title={detail ? `Student: ${detail.name}` : "Student Details"}
+        detail={detail}
+        isLoading={isDetailLoading}
+        sections={studentDetailSections}
       />
 
       <AdminModal

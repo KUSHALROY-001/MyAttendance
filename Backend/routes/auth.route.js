@@ -18,7 +18,7 @@ const {
   optionalAuthenticate,
 } = require("../middlewares/auth.middleware");
 
-router.get("/academic-options", getAcademicOptions);
+router.get("/academic-options", optionalAuthenticate, getAcademicOptions);
 router.get("/institute/verify", verifyInstituteCode);
 router.post("/institute/register", registerInstitute);
 router.post("/signup", signupStudent);

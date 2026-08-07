@@ -22,7 +22,9 @@ export const resolveAvailableSemesters = (currentDeptObj) => {
 
 export const resolveAvailableSections = (currentSemObj) => {
   if (!currentSemObj || !currentSemObj.sections) return [];
-  return currentSemObj.sections;
+  return currentSemObj.sections.map((sec) =>
+    typeof sec === "object" && sec !== null ? sec.name || sec.value || String(sec) : String(sec),
+  );
 };
 
 export const buildSignUpPayload = (formData, selectedDept, selectedSem, selectedSec) => {

@@ -4,7 +4,9 @@ import ReportsHeader from "../components/admin/ReportsHeader";
 import ReportsTabs from "../components/admin/ReportsTabs";
 import SessionsReportTable from "../components/admin/SessionsReportTable";
 import DefaultersReportTable from "../components/admin/DefaultersReportTable";
-import AttendanceSessionModal from "../components/common/AttendanceSessionModal";
+import AttendanceSessionModal, {
+  AttendanceStatusBadge,
+} from "../components/common/AttendanceSessionModal";
 import useAdminReports from "../hooks/useAdminReports";
 
 const AdminReports = () => {

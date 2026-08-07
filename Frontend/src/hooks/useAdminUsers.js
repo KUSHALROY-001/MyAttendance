@@ -1,7 +1,11 @@
 import { useState, useEffect, useMemo } from "react";
 import api from "../api/axios";
+import useRecordDetail from "./useRecordDetail";
 
 export const useAdminUsers = () => {
+  const detailState = useRecordDetail(
+    (row) => `/api/admin/users/${row.id}/detail`,
+  );
   const [data, setData] = useState([]);
   const [search, setSearch] = useState("");
   const [filterRole, setFilterRole] = useState("");
@@ -43,7 +47,10 @@ export const useAdminUsers = () => {
     [data, search, filterRole],
   );
 
-  const handleRoleChange = async (id, newRole) => {
+  const [isPromoteDialogOpen, setIsPromoteDialogOpen] = useState(false);
+  const [userToPromote, setUserToPromote] = useState(null);
+
+  const executeRoleChange = async (id, newRole) => {
     const previousData = data;
 
     setUpdatingUserId(id);
@@ -65,6 +72,23 @@ export const useAdminUsers = () => {
       setData(previousData);
     } finally {
       setUpdatingUserId(null);
+    }
+  };
+
+  const requestRoleChange = (user, newRole) => {
+    if (newRole === "SUPER_ADMIN" && user.role !== "SUPER_ADMIN") {
+      setUserToPromote({ id: user.id, name: user.name, email: user.email, newRole });
+      setIsPromoteDialogOpen(true);
+      return;
+    }
+    executeRoleChange(user.id, newRole);
+  };
+
+  const confirmPromotion = async () => {
+    if (userToPromote) {
+      await executeRoleChange(userToPromote.id, userToPromote.newRole);
+      setUserToPromote(null);
+      setIsPromoteDialogOpen(false);
     }
   };
 
@@ -94,9 +118,15 @@ export const useAdminUsers = () => {
     setIsDeleteDialogOpen,
     recordToDelete,
     setRecordToDelete,
+    isPromoteDialogOpen,
+    setIsPromoteDialogOpen,
+    userToPromote,
+    setUserToPromote,
     filteredData,
-    handleRoleChange,
+    handleRoleChange: requestRoleChange,
+    confirmPromotion,
     handleDelete,
+    ...detailState,
   };
 };
 

@@ -46,7 +46,7 @@ export function useEditProfile() {
 
   const role = profile?.role || user?.role || "STUDENT";
   const dashboardPath = useMemo(() => {
-    if (role === "ADMIN") return "/admin";
+    if (role === "ADMIN" || role === "SUPER_ADMIN") return "/admin";
     return getDefaultRouteForRole(role);
   }, [getDefaultRouteForRole, role]);
 
@@ -74,7 +74,8 @@ export function useEditProfile() {
     const deptObj = academicOptions.find((d) => d.code === nextDeptCode);
     const sems = deptObj?.semesterDetails || [];
     const nextSem = sems.length > 0 ? String(sems[0].semester) : "";
-    const secs = sems.length > 0 ? sems[0].sections || [] : [];
+    const rawSecs = sems.length > 0 ? sems[0].sections || [] : [];
+    const secs = rawSecs.map((s) => (typeof s === "object" && s !== null ? s.name || s.value || String(s) : String(s)));
     const nextSec = secs.length > 0 ? secs[0] : "";
 
     setFormData((current) => ({
@@ -90,7 +91,8 @@ export function useEditProfile() {
     const semObj = currentDeptObj?.semesterDetails?.find(
       (d) => String(d.semester) === String(nextSemStr),
     );
-    const secs = semObj?.sections || [];
+    const rawSecs = semObj?.sections || [];
+    const secs = rawSecs.map((s) => (typeof s === "object" && s !== null ? s.name || s.value || String(s) : String(s)));
     const nextSec = secs.length > 0 ? secs[0] : "";
 
     setFormData((current) => ({

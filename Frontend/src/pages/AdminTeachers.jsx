@@ -4,8 +4,10 @@ import AdminModal from "../components/admin/AdminModal";
 import ConfirmDialog from "../components/admin/ConfirmDialog";
 import AdminToolbar from "../components/admin/AdminToolbar";
 import AdminForm from "../components/admin/AdminForm";
+import RecordDetailPanel from "../components/admin/RecordDetailPanel";
 import { Pencil, Plus, Trash2 } from "lucide-react";
 import useAdminTeachers from "../hooks/useAdminTeachers";
+import { formatDateMedium } from "../utils/formatters";
 
 const columns = [
   {
@@ -34,6 +36,43 @@ const columns = [
   { header: "Designation", accessor: "designation" },
 ];
 
+const teacherDetailSections = [
+  {
+    title: "Teacher Profile",
+    fields: [
+      { label: "Name", accessor: "name" },
+      { label: "Email", accessor: "email" },
+      { label: "Employee ID", accessor: "employeeId" },
+      { label: "Department", accessor: "department" },
+      { label: "Designation", accessor: "designation" },
+      { label: "Contact", accessor: "contactNumber" },
+      {
+        label: "Account Created",
+        render: (d) => formatDateMedium(d.accountCreatedAt),
+      },
+    ],
+  },
+  {
+    title: "Allocations",
+    fields: [
+      { label: "Allocation Count", accessor: "allocationCount" },
+      {
+        label: "Assigned Courses",
+        fullWidth: true,
+        render: (d) =>
+          d.allocations?.length
+            ? d.allocations
+                .map(
+                  (a) =>
+                    `${a.courseCode} - ${a.courseName} (${a.department} Sem ${a.semester}, Sec ${a.section})`,
+                )
+                .join(", ")
+            : "No allocations",
+      },
+    ],
+  },
+];
+
 const AdminTeachers = () => {
   const {
     departments,
@@ -55,6 +94,11 @@ const AdminTeachers = () => {
     handleOpenModal,
     handleSave,
     handleDelete,
+    detail,
+    isDetailOpen,
+    isDetailLoading,
+    openDetail,
+    closeDetail,
   } = useAdminTeachers();
 
   return (
@@ -96,6 +140,7 @@ const AdminTeachers = () => {
       <AdminTable
         columns={columns}
         data={filteredData}
+        onRowClick={openDetail}
         actions={(row) => (
           <>
             <button
@@ -115,6 +160,15 @@ const AdminTeachers = () => {
             </button>
           </>
         )}
+      />
+
+      <RecordDetailPanel
+        isOpen={isDetailOpen}
+        onClose={closeDetail}
+        title={detail ? `Teacher: ${detail.name}` : "Teacher Details"}
+        detail={detail}
+        isLoading={isDetailLoading}
+        sections={teacherDetailSections}
       />
 
       <AdminModal

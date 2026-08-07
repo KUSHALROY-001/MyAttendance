@@ -21,6 +21,7 @@ const ScheduleGrid = ({
   handleInlineTimeEdit,
   getEntry,
   openAssignModal,
+  openEntryDetail,
   setRecordToDelete,
   setIsDeleteDialogOpen,
 }) => {
@@ -213,7 +214,8 @@ const ScheduleGrid = ({
                       >
                         {entry ? (
                           <div
-                            className={`h-full w-full rounded p-2 border-l-2 text-left shadow-sm ${entry.classType === "lab" ? "bg-amber-50 dark:bg-amber-500/10 border-amber-500" : "bg-indigo-50 dark:bg-indigo-500/10 border-indigo-500"}`}
+                            onClick={() => openEntryDetail(entry)}
+                            className={`h-full w-full rounded p-2 border-l-2 text-left shadow-sm cursor-pointer ${entry.classType === "lab" ? "bg-amber-50 dark:bg-amber-500/10 border-amber-500" : "bg-indigo-50 dark:bg-indigo-500/10 border-indigo-500"}`}
                           >
                             <p className="font-bold text-[11px] leading-tight text-slate-900 dark:text-white line-clamp-1">
                               {entry.courseName}
@@ -224,8 +226,14 @@ const ScheduleGrid = ({
                             <p className="text-[9px] text-slate-500 mt-0.5 font-mono">
                               {entry.room || "No Room"}
                             </p>
+                            {entry.updatedBy && (
+                              <p className="text-[10px] text-slate-400 mt-1 leading-tight">
+                                Updated by {entry.updatedBy.name}
+                              </p>
+                            )}
                             <button
-                              onClick={() => {
+                              onClick={(e) => {
+                                e.stopPropagation();
                                 setRecordToDelete(entry);
                                 setIsDeleteDialogOpen(true);
                               }}

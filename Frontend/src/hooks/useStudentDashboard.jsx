@@ -85,9 +85,9 @@ export const useStudentDashboard = () => {
   const courseModalDetail = useMemo(() => {
     if (!courseDetail) return null;
 
-    const records = (courseDetail.attendance || []).slice().sort(
-      (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
-    );
+    const records = (courseDetail.attendance || [])
+      .slice()
+      .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
     const lateCount = records.filter(
       (record) => record.status?.toUpperCase() === "LATE",
     ).length;
@@ -126,7 +126,7 @@ export const useStudentDashboard = () => {
       renderRow: (record) => (
         <div className="flex items-center justify-between gap-4 px-4 py-3">
           <div>
-            <p className="font-medium text-slate-900 dark:text-white">
+            <p className="font-medium text-white">
               {new Date(record.date).toLocaleDateString("en-US", {
                 weekday: "short",
                 month: "short",
@@ -134,7 +134,7 @@ export const useStudentDashboard = () => {
                 year: "numeric",
               })}
             </p>
-            <p className="text-xs text-slate-500">
+            <p className="text-xs text-white/70">
               {record.teacher?.name || "Instructor"}
             </p>
           </div>

@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
 import api from "../api/axios";
+import useRecordDetail from "./useRecordDetail";
 
 export const days = [
   "Monday",
@@ -11,6 +12,9 @@ export const days = [
 ];
 
 export const useAdminSchedules = () => {
+  const detailState = useRecordDetail(
+    (entry) => `/api/admin/schedule-entries/${entry.id}/detail`,
+  );
   const [selectedDept, setSelectedDept] = useState("BCA");
   const [selectedSem, setSelectedSem] = useState("1");
   const [selectedSec, setSelectedSec] = useState("A");
@@ -57,7 +61,8 @@ export const useAdminSchedules = () => {
     const sem = currentDept.semesterDetails.find(
       (s) => s.semester.toString() === selectedSem,
     );
-    return sem?.sections || ["A"];
+    const rawSecs = sem?.sections || ["A"];
+    return rawSecs.map((s) => (typeof s === "object" && s !== null ? s.name || s.value || String(s) : String(s)));
   }, [currentDept, selectedSem]);
 
   const filteredAllocations = useMemo(() => {
@@ -250,6 +255,7 @@ export const useAdminSchedules = () => {
     openAssignModal,
     getEntry,
     handleInlineTimeEdit,
+    ...detailState,
   };
 };
 

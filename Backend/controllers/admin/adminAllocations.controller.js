@@ -2,6 +2,11 @@ const { prisma } = require("../../utils/prisma.js");
 const ApiError = require("../../utils/ApiError");
 const asyncHandler = require("../../utils/asyncHandler");
 const { getWhereClause, syncStudentsForCourseAllocation } = require("./adminHelpers");
+const {
+  stampOnCreate,
+  stampOnUpdate,
+  auditActorSelect,
+} = require("../../utils/auditStamp");
 
 const getcourseAllocations = async (whereClause) => {
   const courseAllocations = await prisma.courseAllocation.findMany({
@@ -95,6 +100,7 @@ const createCourseAllocation = asyncHandler(async (req, res) => {
           section,
           academicYear: academicYear || "2023-2024",
           instituteId,
+          ...stampOnCreate(req.user.userId),
         },
         select: {
           id: true,
@@ -177,6 +183,7 @@ const updateCourseAllocation = asyncHandler(async (req, res) => {
           ...(semester && { semester: Number(semester) }),
           ...(section && { section }),
           ...(academicYear && { academicYear }),
+          ...stampOnUpdate(req.user.userId),
         },
         select: {
           id: true,
@@ -234,6 +241,40 @@ const deleteCourseAllocation = asyncHandler(async (req, res) => {
   });
 });
 
+const getAllocationDetail = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+
+  const allocation = await prisma.courseAllocation.findFirst({
+    where: { id: Number(id), instituteId: req.user.instituteId },
+    include: {
+      course: { select: { name: true, code: true } },
+      teacher: {
+        select: {
+          id: true,
+          employeeId: true,
+          user: { select: { name: true, email: true } },
+        },
+      },
+      createdBy: auditActorSelect,
+      updatedBy: auditActorSelect,
+      attendanceSessions: { select: { id: true } },
+    },
+  });
+
+  if (!allocation) {
+    throw new ApiError(404, "Course allocation not found.");
+  }
+
+  res.status(200).json({
+    ...formatCourseAllocation(allocation),
+    recordCreatedAt: allocation.createdAt,
+    recordUpdatedAt: allocation.updatedAt,
+    createdBy: allocation.createdBy,
+    updatedBy: allocation.updatedBy,
+    sessionsTaken: allocation.attendanceSessions.length,
+  });
+});
+
 module.exports = {
   readCourseAllocation,
   createCourseAllocation,
@@ -241,4 +282,5 @@ module.exports = {
   deleteCourseAllocation,
   getcourseAllocations,
   formatCourseAllocation,
+  getAllocationDetail,
 };

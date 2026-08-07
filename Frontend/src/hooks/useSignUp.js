@@ -7,26 +7,51 @@ import {
   resolveAvailableSections,
   buildSignUpPayload,
 } from "../utils/signupHelpers";
+import { useInstituteCode } from "./useInstituteCode";
 
 export function useSignUp() {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  const {
+    instituteCode,
+    handleInstituteCodeChange,
+    instituteCodeStatus,
+    verifiedInstitute,
+  } = useInstituteCode();
+
   const [academicOptions, setAcademicOptions] = useState([]);
   const [selectedDept, setSelectedDept] = useState("");
   const [selectedSem, setSelectedSem] = useState("");
   const [selectedSec, setSelectedSec] = useState("");
-  const [loadingOptions, setLoadingOptions] = useState(true);
+  const [loadingOptions, setLoadingOptions] = useState(false);
 
+  // Academic options depend entirely on which institute the student is
+  // joining, so this only fires once the institute code has been verified —
+  // there's nothing sensible to show before that.
   useEffect(() => {
+    if (instituteCodeStatus !== "valid" || !verifiedInstitute?.code) {
+      setAcademicOptions([]);
+      setSelectedDept("");
+      setSelectedSem("");
+      setSelectedSec("");
+      return undefined;
+    }
+
+    let cancelled = false;
+
     const fetchAcademicOptions = async () => {
       try {
         setLoadingOptions(true);
         const res = await api.get("/api/auth/academic-options", {
+          params: { instituteCode: verifiedInstitute.code },
           hideAuthRedirect: true,
           skipAuthRefresh: true,
         });
+
+        if (cancelled) return;
+
         const depts = res.data?.departments || [];
         setAcademicOptions(depts);
         if (depts.length > 0) {
@@ -35,21 +60,27 @@ export function useSignUp() {
           const sems = firstDept.semesterDetails || [];
           if (sems.length > 0) {
             setSelectedSem(String(sems[0].semester));
-            const secs = sems[0].sections || [];
+            const secs = (sems[0].sections || []).map((s) =>
+              typeof s === "object" && s !== null ? s.name || s.value || String(s) : String(s),
+            );
             if (secs.length > 0) {
               setSelectedSec(secs[0]);
             }
           }
         }
       } catch (_err) {
-        toast.error("Failed to load department options.");
+        if (!cancelled) toast.error("Failed to load department options.");
       } finally {
-        setLoadingOptions(false);
+        if (!cancelled) setLoadingOptions(false);
       }
     };
 
     fetchAcademicOptions();
-  }, []);
+
+    return () => {
+      cancelled = true;
+    };
+  }, [instituteCodeStatus, verifiedInstitute]);
 
   const currentDeptObj = useMemo(() => {
     return academicOptions.find((d) => d.code === selectedDept);
@@ -79,7 +110,9 @@ export function useSignUp() {
     if (sems.length > 0) {
       const nextSem = String(sems[0].semester);
       setSelectedSem(nextSem);
-      const secs = sems[0].sections || [];
+      const secs = (sems[0].sections || []).map((s) =>
+        typeof s === "object" && s !== null ? s.name || s.value || String(s) : String(s),
+      );
       if (secs.length > 0) {
         setSelectedSec(secs[0]);
       } else {
@@ -98,7 +131,9 @@ export function useSignUp() {
     const semObj = currentDeptObj?.semesterDetails?.find(
       (d) => String(d.semester) === String(nextSemStr),
     );
-    const secs = semObj?.sections || [];
+    const secs = (semObj?.sections || []).map((s) =>
+      typeof s === "object" && s !== null ? s.name || s.value || String(s) : String(s),
+    );
     if (secs.length > 0) {
       setSelectedSec(secs[0]);
     } else {
@@ -112,16 +147,22 @@ export function useSignUp() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const formData = Object.fromEntries(new FormData(e.currentTarget).entries());
+
+    if (instituteCodeStatus !== "valid" || !verifiedInstitute?.code) {
+      toast.error("Please enter a valid institute code first.");
+      return;
+    }
+
+    const formData = Object.fromEntries(
+      new FormData(e.currentTarget).entries(),
+    );
 
     try {
       setIsSubmitting(true);
-      const payload = buildSignUpPayload(
-        formData,
-        selectedDept,
-        selectedSem,
-        selectedSec,
-      );
+      const payload = {
+        ...buildSignUpPayload(formData, selectedDept, selectedSem, selectedSec),
+        instituteCode: verifiedInstitute.code,
+      };
 
       await api.post("/api/auth/signup", payload, {
         hideAuthRedirect: true,
@@ -129,8 +170,8 @@ export function useSignUp() {
       });
 
       toast.success(
-        `${formData.name || "Your"} account has been created successfully. Please log in.`,
-        { duration: 4000 },
+        "Your signup request has been submitted. Your institute admin needs to approve your account before you can log in.",
+        { duration: 6000 },
       );
       navigate("/login");
     } finally {
@@ -139,6 +180,10 @@ export function useSignUp() {
   };
 
   return {
+    instituteCode,
+    handleInstituteCodeChange,
+    instituteCodeStatus,
+    verifiedInstitute,
     academicOptions,
     selectedDept,
     selectedSem,

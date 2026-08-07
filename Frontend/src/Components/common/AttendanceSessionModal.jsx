@@ -91,7 +91,7 @@ const AttendanceSessionModal = ({
 
           {detail.listTitle ? (
             <div className="border-b border-slate-200 px-1 pb-2 dark:border-[#222228]">
-              <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-200">
+              <h3 className="text-sm font-semibold text-white">
                 {detail.listTitle}
               </h3>
             </div>

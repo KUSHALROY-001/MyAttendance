@@ -58,14 +58,15 @@ const AdminToolbar = ({ searchProps, filters = [], actions }) => {
                 <option value="" className="text-slate-500">
                   {filter.label}
                 </option>
-                {filter.options.map((opt) => {
+                {filter.options.map((opt, index) => {
                   const isPrimitive =
                     typeof opt === "string" || typeof opt === "number";
+                  const optionValue = isPrimitive ? opt : opt.value;
                   return (
                     <option
                       className="text-slate-900 dark:text-slate-900"
-                      key={isPrimitive ? opt : opt.value}
-                      value={isPrimitive ? opt : opt.value}
+                      key={`${filter.label}-${optionValue}-${index}`}
+                      value={optionValue}
                     >
                       {isPrimitive ? opt : opt.label}
                     </option>

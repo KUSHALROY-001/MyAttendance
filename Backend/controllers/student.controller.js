@@ -118,6 +118,7 @@ const getStudentDashboard = asyncHandler(async (req, res) => {
     select: {
       id: true,
       rollNumber: true,
+      enrollmentNumber: true,
       department: true,
       semester: true,
       section: true,
@@ -234,6 +235,7 @@ const getStudentDashboard = asyncHandler(async (req, res) => {
   // Construct final payload
   const payload = {
     rollNumber: studentData.rollNumber,
+    enrollmentNumber: studentData.enrollmentNumber,
     department: studentData.department,
     semester: studentData.semester,
     section: studentData.section,

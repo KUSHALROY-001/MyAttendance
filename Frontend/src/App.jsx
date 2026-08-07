@@ -3,17 +3,18 @@ import { Toaster } from "react-hot-toast";
 import ErrorBoundary from "./components/common/ErrorBoundary";
 import PremiumErrorState from "./components/common/PremiumErrorState";
 
-import Navbar from "./Components/Layout/Navbar.jsx";
-import Footer from "./Components/Layout/Footer.jsx";
+import Navbar from "./components/layout/Navbar.jsx";
+import Footer from "./components/layout/Footer.jsx";
 import Home from "./pages/Home.jsx";
 import Features from "./pages/Features.jsx";
 import About from "./pages/About.jsx";
 import SignUp from "./pages/SignUp.jsx";
+import RegisterInstitute from "./pages/RegisterInstitute.jsx";
 import Login from "./pages/Login.jsx";
 import EditProfile from "./pages/EditProfile.jsx";
 import { Routes, Route, Outlet } from "react-router-dom";
-import ProtectedRoute from "./Components/Auth/ProtectedRoute.jsx";
-import PublicOnlyRoute from "./Components/Auth/PublicOnlyRoute.jsx";
+import ProtectedRoute from "./components/auth/ProtectedRoute.jsx";
+import PublicOnlyRoute from "./components/auth/PublicOnlyRoute.jsx";
 import StudentDashboard from "./pages/StudentDashboard.jsx";
 import TeacherDashboard from "./pages/TeacherDashboard.jsx";
 import TakeAttendance from "./pages/TakeAttendance.jsx";
@@ -30,6 +31,9 @@ import AdminAllocations from "./pages/AdminAllocations.jsx";
 import AdminSchedules from "./pages/AdminSchedules.jsx";
 import AdminReports from "./pages/AdminReports.jsx";
 import AdminUsers from "./pages/AdminUsers.jsx";
+import AdminInstituteSettings from "./pages/AdminInstituteSettings.jsx";
+import AdminPendingApprovals from "./pages/AdminPendingApprovals.jsx";
+import AdminAcademicOptions from "./pages/AdminAcademicOptions.jsx";
 
 const MainLayout = () => (
   <>
@@ -55,6 +59,10 @@ function App() {
             <Route element={<PublicOnlyRoute />}>
               <Route path="/login" element={<Login />} />
               <Route path="/signup" element={<SignUp />} />
+              <Route
+                path="/register-institute"
+                element={<RegisterInstitute />}
+              />
             </Route>
 
             <Route element={<ProtectedRoute allowedRoles={["STUDENT"]} />}>
@@ -71,7 +79,9 @@ function App() {
 
             <Route
               element={
-                <ProtectedRoute allowedRoles={["STUDENT", "TEACHER", "ADMIN"]} />
+                <ProtectedRoute
+                  allowedRoles={["STUDENT", "TEACHER", "ADMIN", "SUPER_ADMIN"]}
+                />
               }
             >
               <Route path="/profile/edit" element={<EditProfile />} />
@@ -91,7 +101,9 @@ function App() {
           </Route>
 
           {/* Admin Routes */}
-          <Route element={<ProtectedRoute allowedRoles={["ADMIN"]} />}>
+          <Route
+            element={<ProtectedRoute allowedRoles={["ADMIN", "SUPER_ADMIN"]} />}
+          >
             <Route path="/admin" element={<AdminLayout />}>
               <Route index element={<AdminDashboard />} />
               <Route path="students" element={<AdminStudents />} />
@@ -101,6 +113,15 @@ function App() {
               <Route path="schedules" element={<AdminSchedules />} />
               <Route path="reports" element={<AdminReports />} />
               <Route path="users" element={<AdminUsers />} />
+              <Route
+                path="academic-options"
+                element={<AdminAcademicOptions />}
+              />
+              <Route path="institute" element={<AdminInstituteSettings />} />
+              <Route
+                path="pending-approvals"
+                element={<AdminPendingApprovals />}
+              />
               <Route path="profile/edit" element={<EditProfile />} />
             </Route>
           </Route>

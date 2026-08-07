@@ -2,6 +2,7 @@ export const getInitialForm = (profile) => ({
   name: profile?.name || "",
   email: profile?.email || "",
   rollNumber: profile?.student?.rollNumber || "",
+  enrollmentNumber: profile?.student?.enrollmentNumber || "",
   department:
     profile?.student?.department || profile?.teacher?.department || "",
   semester: profile?.student?.semester?.toString() || "",
@@ -20,7 +21,9 @@ export const resolveAvailableSemesters = (currentDeptObj) => {
 
 export const resolveAvailableSections = (currentSemObj) => {
   if (!currentSemObj || !currentSemObj.sections) return [];
-  return currentSemObj.sections;
+  return currentSemObj.sections.map((sec) =>
+    typeof sec === "object" && sec !== null ? sec.name || sec.value || String(sec) : String(sec),
+  );
 };
 
 export const formatProfileUpdatePayload = (formData, role) => {

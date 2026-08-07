@@ -4,6 +4,7 @@ import AdminModal from "../components/admin/AdminModal";
 import ConfirmDialog from "../components/admin/ConfirmDialog";
 import AdminToolbar from "../components/admin/AdminToolbar";
 import AdminForm from "../components/admin/AdminForm";
+import RecordDetailPanel from "../components/admin/RecordDetailPanel";
 import { Plus, Pencil, Trash2 } from "lucide-react";
 import useAdminCourses from "../hooks/useAdminCourses";
 
@@ -43,6 +44,35 @@ const columns = [
   },
 ];
 
+const courseDetailSections = [
+  {
+    title: "Course",
+    fields: [
+      { label: "Code", accessor: "code" },
+      { label: "Name", accessor: "name" },
+      { label: "Department", accessor: "department" },
+      { label: "Semester", render: (d) => `Semester ${d.semester}` },
+      { label: "Credits", render: (d) => `${d.credits} credits` },
+      { label: "Enrolled Students", accessor: "enrolledStudentCount" },
+    ],
+  },
+  {
+    title: "Teaching Assignments",
+    fields: [
+      {
+        label: "Allocations",
+        fullWidth: true,
+        render: (d) =>
+          d.allocations?.length
+            ? d.allocations
+                .map((a) => `${a.teacherName || "Unassigned"} - Sec ${a.section}`)
+                .join(", ")
+            : "No allocations",
+      },
+    ],
+  },
+];
+
 const AdminCourses = () => {
   const {
     departments,
@@ -67,6 +97,11 @@ const AdminCourses = () => {
     handleOpenModal,
     handleSave,
     handleDelete,
+    detail,
+    isDetailOpen,
+    isDetailLoading,
+    openDetail,
+    closeDetail,
   } = useAdminCourses();
 
   return (
@@ -115,6 +150,7 @@ const AdminCourses = () => {
       <AdminTable
         columns={columns}
         data={filteredData}
+        onRowClick={openDetail}
         actions={(row) => (
           <>
             <button
@@ -134,6 +170,15 @@ const AdminCourses = () => {
             </button>
           </>
         )}
+      />
+
+      <RecordDetailPanel
+        isOpen={isDetailOpen}
+        onClose={closeDetail}
+        title={detail ? `Course: ${detail.code}` : "Course Details"}
+        detail={detail}
+        isLoading={isDetailLoading}
+        sections={courseDetailSections}
       />
 
       <AdminModal

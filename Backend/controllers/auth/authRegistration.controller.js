@@ -3,6 +3,24 @@ const ApiError = require("../../utils/ApiError");
 const asyncHandler = require("../../utils/asyncHandler");
 const { prisma } = require("../../utils/prisma");
 
+const isEmailDomainAllowed = (email, allowedEmailDomains) => {
+  if (!allowedEmailDomains || !allowedEmailDomains.trim()) {
+    return true; // no restriction configured for this institute
+  }
+
+  const emailDomain = email.split("@")[1]?.toLowerCase();
+  if (!emailDomain) {
+    return false;
+  }
+
+  const allowedList = allowedEmailDomains
+    .split(",")
+    .map((d) => d.trim().toLowerCase())
+    .filter(Boolean);
+
+  return allowedList.includes(emailDomain);
+};
+
 const signupStudent = asyncHandler(async (req, res) => {
   const {
     name,
@@ -10,6 +28,7 @@ const signupStudent = asyncHandler(async (req, res) => {
     password,
     instituteCode,
     rollNumber,
+    enrollmentNumber,
     department,
     semester,
     section,
@@ -23,6 +42,7 @@ const signupStudent = asyncHandler(async (req, res) => {
     !password ||
     !instituteCode ||
     !rollNumber ||
+    !enrollmentNumber ||
     !department ||
     !semester ||
     !section ||
@@ -40,6 +60,7 @@ const signupStudent = asyncHandler(async (req, res) => {
   const normalizedInstituteCode = String(instituteCode).trim().toUpperCase();
   const normalizedDepartment = String(department).trim().toUpperCase();
   const normalizedRollNumber = String(rollNumber).trim();
+  const normalizedEnrollmentNumber = String(enrollmentNumber).trim();
   const normalizedSection = String(section).trim().toUpperCase();
   const normalizedBatch = String(batch).trim();
   const normalizedContactNumber = String(contactNumber).trim();
@@ -51,7 +72,7 @@ const signupStudent = asyncHandler(async (req, res) => {
 
   const institute = await prisma.institute.findUnique({
     where: { code: normalizedInstituteCode },
-    select: { id: true, isActive: true },
+    select: { id: true, isActive: true, allowedEmailDomains: true },
   });
 
   if (!institute || !institute.isActive) {
@@ -61,16 +82,32 @@ const signupStudent = asyncHandler(async (req, res) => {
     );
   }
 
-  const [existingUser, existingStudent] = await Promise.all([
-    prisma.user.findUnique({
-      where: { email: normalizedEmail },
-      select: { id: true },
-    }),
-    prisma.student.findFirst({
-      where: { instituteId: institute.id, rollNumber: normalizedRollNumber },
-      select: { id: true },
-    }),
-  ]);
+  if (!isEmailDomainAllowed(normalizedEmail, institute.allowedEmailDomains)) {
+    throw new ApiError(
+      403,
+      `This institute only accepts signups from these email domains: ${institute.allowedEmailDomains}`,
+    );
+  }
+
+  const [existingUser, existingStudent, existingEnrollment] = await Promise.all(
+    [
+      prisma.user.findUnique({
+        where: { email: normalizedEmail },
+        select: { id: true },
+      }),
+      prisma.student.findFirst({
+        where: { instituteId: institute.id, rollNumber: normalizedRollNumber },
+        select: { id: true },
+      }),
+      prisma.student.findFirst({
+        where: {
+          instituteId: institute.id,
+          enrollmentNumber: normalizedEnrollmentNumber,
+        },
+        select: { id: true },
+      }),
+    ],
+  );
 
   if (existingUser) {
     throw new ApiError(409, "A user with this email already exists.");
@@ -78,6 +115,13 @@ const signupStudent = asyncHandler(async (req, res) => {
 
   if (existingStudent) {
     throw new ApiError(409, "A student with this roll number already exists.");
+  }
+
+  if (existingEnrollment) {
+    throw new ApiError(
+      409,
+      "A student with this enrollment number already exists.",
+    );
   }
 
   const hashedPassword = await bcrypt.hash(password, 10);
@@ -99,6 +143,11 @@ const signupStudent = asyncHandler(async (req, res) => {
         password: hashedPassword,
         role: "STUDENT",
         instituteId: institute.id,
+        // Every self-signup starts pending — an admin has to approve it
+        // before this account can actually log in. Admin-created accounts
+        // (via the admin panel) skip this, since a human already vouched
+        // for them at creation time.
+        status: "PENDING",
       },
     });
 
@@ -107,6 +156,7 @@ const signupStudent = asyncHandler(async (req, res) => {
         userId: user.id,
         instituteId: institute.id,
         rollNumber: normalizedRollNumber,
+        enrollmentNumber: normalizedEnrollmentNumber,
         department: normalizedDepartment,
         semester: parsedSemester,
         section: normalizedSection,
@@ -127,13 +177,20 @@ const signupStudent = asyncHandler(async (req, res) => {
   });
 
   return res.status(201).json({
-    message: "Student account created successfully. Please log in.",
+    message:
+      "Your signup request has been submitted. Your institute admin needs to approve your account before you can log in.",
   });
 });
 
 const registerInstitute = asyncHandler(async (req, res) => {
-  const { instituteName, instituteCode, adminName, adminEmail, adminPassword } =
-    req.body;
+  const {
+    instituteName,
+    instituteCode,
+    adminName,
+    adminEmail,
+    adminPassword,
+    allowedEmailDomains,
+  } = req.body;
 
   if (
     !instituteName ||
@@ -160,6 +217,14 @@ const registerInstitute = asyncHandler(async (req, res) => {
       "Institute code must be 3-20 characters: letters, numbers, or hyphens only.",
     );
   }
+
+  const normalizedAllowedDomains = allowedEmailDomains
+    ? String(allowedEmailDomains)
+        .split(",")
+        .map((d) => d.trim().toLowerCase())
+        .filter(Boolean)
+        .join(",")
+    : null;
 
   const [existingInstitute, existingUser] = await Promise.all([
     prisma.institute.findUnique({
@@ -190,6 +255,7 @@ const registerInstitute = asyncHandler(async (req, res) => {
       data: {
         name: normalizedInstituteName,
         code: normalizedInstituteCode,
+        allowedEmailDomains: normalizedAllowedDomains,
       },
     });
 
@@ -198,7 +264,7 @@ const registerInstitute = asyncHandler(async (req, res) => {
         name: normalizedAdminName,
         email: normalizedAdminEmail,
         password: hashedPassword,
-        role: "ADMIN",
+        role: "SUPER_ADMIN",
         instituteId: institute.id,
       },
     });
@@ -206,7 +272,7 @@ const registerInstitute = asyncHandler(async (req, res) => {
 
   return res.status(201).json({
     message:
-      "Institute registered successfully. Please log in as the institute admin.",
+      "Institute registered successfully. Please log in as the institute's super admin.",
   });
 });
 

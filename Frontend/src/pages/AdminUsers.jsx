@@ -2,6 +2,7 @@ import React from "react";
 import AdminTable from "../components/admin/AdminTable";
 import ConfirmDialog from "../components/admin/ConfirmDialog";
 import AdminToolbar from "../components/admin/AdminToolbar";
+import RecordDetailPanel from "../components/admin/RecordDetailPanel";
 import { Trash2 } from "lucide-react";
 import useAdminUsers from "../hooks/useAdminUsers";
 import { formatDateMedium } from "../utils/formatters";
@@ -13,6 +14,8 @@ const roleStyles = {
     "bg-indigo-100 text-indigo-800 dark:bg-indigo-900/30 dark:text-indigo-400 border-indigo-200 dark:border-indigo-800",
   ADMIN:
     "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400 border-red-200 dark:border-red-800",
+  SUPER_ADMIN:
+    "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400 border-purple-200 dark:border-purple-800",
 };
 
 const profileStyles = {
@@ -71,6 +74,45 @@ const columns = [
   },
 ];
 
+const userDetailSections = [
+  {
+    title: "Account",
+    fields: [
+      { label: "Name", accessor: "name" },
+      { label: "Email", accessor: "email" },
+      { label: "Role", accessor: "role" },
+      { label: "Status", accessor: "status" },
+      { label: "Profile Type", accessor: "profileType" },
+    ],
+  },
+  {
+    title: "Linked Profile",
+    fields: [
+      {
+        label: "Student Profile",
+        fullWidth: true,
+        render: (d) =>
+          d.studentProfile
+            ? `${d.studentProfile.rollNumber} / ${d.studentProfile.enrollmentNumber} - ${d.studentProfile.department} Sem ${d.studentProfile.semester}, Sec ${d.studentProfile.section}`
+            : "No linked student profile",
+      },
+      {
+        label: "Teacher Profile",
+        fullWidth: true,
+        render: (d) =>
+          d.teacherProfile
+            ? `${d.teacherProfile.employeeId} - ${d.teacherProfile.department}, ${d.teacherProfile.designation}`
+            : "No linked teacher profile",
+      },
+      {
+        label: "Allowed Roles",
+        fullWidth: true,
+        render: (d) => d.allowedRoles?.join(", ") || "No role changes allowed",
+      },
+    ],
+  },
+];
+
 const AdminUsers = () => {
   const {
     data,
@@ -84,9 +126,18 @@ const AdminUsers = () => {
     setIsDeleteDialogOpen,
     recordToDelete,
     setRecordToDelete,
+    isPromoteDialogOpen,
+    setIsPromoteDialogOpen,
+    userToPromote,
     filteredData,
     handleRoleChange,
+    confirmPromotion,
     handleDelete,
+    detail,
+    isDetailOpen,
+    isDetailLoading,
+    openDetail,
+    closeDetail,
   } = useAdminUsers();
 
   return (
@@ -120,12 +171,13 @@ const AdminUsers = () => {
         columns={columns}
         data={loading ? [] : filteredData}
         emptyMessage={loading ? "Loading users..." : "No users found."}
+        onRowClick={openDetail}
         actions={(row) => (
           <div className="flex items-center gap-3">
             <select
               value={row.role}
               disabled={updatingUserId === row.id}
-              onChange={(e) => handleRoleChange(row.id, e.target.value)}
+              onChange={(e) => handleRoleChange(row, e.target.value)}
               className="px-2 py-1 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded text-xs font-medium text-slate-700 dark:text-slate-300 outline-none focus:ring-2 focus:ring-indigo-500 cursor-pointer disabled:opacity-60"
             >
               {row.allowedRoles.map((role) => (
@@ -148,12 +200,31 @@ const AdminUsers = () => {
         )}
       />
 
+      <RecordDetailPanel
+        isOpen={isDetailOpen}
+        onClose={closeDetail}
+        title={detail ? `User: ${detail.name}` : "User Details"}
+        detail={detail}
+        isLoading={isDetailLoading}
+        sections={userDetailSections}
+      />
+
       <ConfirmDialog
         isOpen={isDeleteDialogOpen}
         onClose={() => setIsDeleteDialogOpen(false)}
         onConfirm={handleDelete}
         title="Delete User"
         message={`Warning: You are about to permanently delete the account for ${recordToDelete?.name}. This will prevent them from logging in and may remove linked profile data.`}
+      />
+
+      <ConfirmDialog
+        isOpen={isPromoteDialogOpen}
+        onClose={() => setIsPromoteDialogOpen(false)}
+        onConfirm={confirmPromotion}
+        title="Confirm Super Admin Promotion"
+        message={`Are you sure you want to promote ${userToPromote?.name} (${userToPromote?.email}) to SUPER_ADMIN? This will grant them unrestricted administrative privileges across the institute.`}
+        confirmText="Promote to Super Admin"
+        confirmVariant="warning"
       />
     </div>
   );

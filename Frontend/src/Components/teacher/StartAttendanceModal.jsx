@@ -75,7 +75,7 @@ const StartAttendanceModal = ({ isOpen, onClose, allocations = [] }) => {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 animate-fadeIn">
-      <div className="relative w-full max-w-md animate-slideUp rounded-2xl bg-white p-6 shadow-xl dark:bg-slate-900">
+      <div className="relative w-full max-w-md animate-slideUp rounded-2xl bg-white px-2 py-4 md:p-6 shadow-xl dark:bg-slate-900">
         <button
           onClick={onClose}
           className="absolute right-4 top-4 text-slate-400 transition hover:text-slate-600 dark:hover:text-slate-200"
@@ -186,7 +186,8 @@ const StartAttendanceModal = ({ isOpen, onClose, allocations = [] }) => {
                   </option>
                   {availableCourses.map((alloc) => (
                     <option key={alloc.id} value={alloc.id}>
-                      {alloc.course?.name || "Unknown"} ({alloc.course?.code || "N/A"})
+                      {alloc.course?.name || "Unknown"} (
+                      {alloc.course?.code || "N/A"})
                     </option>
                   ))}
                 </select>
@@ -233,7 +234,7 @@ const StartAttendanceModal = ({ isOpen, onClose, allocations = [] }) => {
                 : "cursor-not-allowed bg-slate-200 text-slate-400 dark:bg-slate-800 dark:text-slate-500"
             }`}
           >
-            <PlayCircle className="h-4 w-4" />
+            <PlayCircle className="h-4 w-4 hidden sm:block" />
             Start Session
           </button>
         </div>

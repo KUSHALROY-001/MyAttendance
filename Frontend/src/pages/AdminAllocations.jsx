@@ -4,6 +4,7 @@ import AdminModal from "../components/admin/AdminModal";
 import ConfirmDialog from "../components/admin/ConfirmDialog";
 import AdminToolbar from "../components/admin/AdminToolbar";
 import AdminForm from "../components/admin/AdminForm";
+import RecordDetailPanel from "../components/admin/RecordDetailPanel";
 import { Plus, Trash2, Pencil } from "lucide-react";
 import useAdminAllocations from "../hooks/useAdminAllocations";
 
@@ -46,6 +47,23 @@ const columns = [
   { header: "Academic Yr", accessor: "academicYear" },
 ];
 
+const allocationDetailSections = [
+  {
+    title: "Allocation",
+    fields: [
+      { label: "Teacher", accessor: "teacherName" },
+      { label: "Employee ID", accessor: "teacherEmployeeId" },
+      { label: "Course", accessor: "courseName" },
+      { label: "Course Code", accessor: "courseCode" },
+      { label: "Department", accessor: "department" },
+      { label: "Semester", render: (d) => `Semester ${d.semester}` },
+      { label: "Section", accessor: "section" },
+      { label: "Academic Year", accessor: "academicYear" },
+      { label: "Sessions Taken", accessor: "sessionsTaken" },
+    ],
+  },
+];
+
 const AdminAllocations = () => {
   const {
     departments,
@@ -73,6 +91,11 @@ const AdminAllocations = () => {
     handleOpenModal,
     handleSave,
     handleDelete,
+    detail,
+    isDetailOpen,
+    isDetailLoading,
+    openDetail,
+    closeDetail,
   } = useAdminAllocations();
 
   return (
@@ -128,6 +151,7 @@ const AdminAllocations = () => {
       <AdminTable
         columns={columns}
         data={filteredData}
+        onRowClick={openDetail}
         actions={(row) => (
           <>
             <button
@@ -147,6 +171,15 @@ const AdminAllocations = () => {
             </button>
           </>
         )}
+      />
+
+      <RecordDetailPanel
+        isOpen={isDetailOpen}
+        onClose={closeDetail}
+        title={detail ? `Allocation: ${detail.courseCode}` : "Allocation Details"}
+        detail={detail}
+        isLoading={isDetailLoading}
+        sections={allocationDetailSections}
       />
 
       <AdminModal

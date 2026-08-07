@@ -2,6 +2,11 @@ const { prisma } = require("../../utils/prisma.js");
 const bcrypt = require("bcryptjs");
 const ApiError = require("../../utils/ApiError");
 const asyncHandler = require("../../utils/asyncHandler");
+const {
+  stampOnCreate,
+  stampOnUpdate,
+  auditActorSelect,
+} = require("../../utils/auditStamp");
 
 const formatTeacher = (teacher) => ({
   id: teacher.id,
@@ -81,6 +86,7 @@ const createTeacher = asyncHandler(async (req, res) => {
         password: hashedPassword,
         role: "TEACHER",
         instituteId: req.user.instituteId,
+        ...stampOnCreate(req.user.userId),
       },
     });
     const teacher = await tx.teacher.create({
@@ -91,6 +97,7 @@ const createTeacher = asyncHandler(async (req, res) => {
         department,
         contactNumber: contactNumber || null,
         designation,
+        ...stampOnCreate(req.user.userId),
       },
       include: {
         user: { select: { name: true, email: true } },
@@ -136,6 +143,7 @@ const updateTeacher = asyncHandler(async (req, res) => {
       data: {
         ...(name && { name }),
         ...(email && { email }),
+        ...stampOnUpdate(req.user.userId),
       },
     });
     const updated = await tx.teacher.update({
@@ -147,6 +155,7 @@ const updateTeacher = asyncHandler(async (req, res) => {
           contactNumber: contactNumber || null,
         }),
         ...(designation && { designation }),
+        ...stampOnUpdate(req.user.userId),
       },
       include: {
         user: { select: { name: true, email: true } },
@@ -174,10 +183,55 @@ const deleteTeacher = asyncHandler(async (req, res) => {
   });
 });
 
+const getTeacherDetail = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+
+  const teacher = await prisma.teacher.findFirst({
+    where: { id: Number(id), instituteId: req.user.instituteId },
+    include: {
+      user: { select: { name: true, email: true, createdAt: true } },
+      createdBy: auditActorSelect,
+      updatedBy: auditActorSelect,
+      courseAllocations: {
+        select: {
+          id: true,
+          department: true,
+          semester: true,
+          section: true,
+          course: { select: { name: true, code: true } },
+        },
+      },
+    },
+  });
+
+  if (!teacher) {
+    throw new ApiError(404, "Teacher not found.");
+  }
+
+  res.status(200).json({
+    ...formatTeacher(teacher),
+    accountCreatedAt: teacher.user.createdAt,
+    recordCreatedAt: teacher.createdAt,
+    recordUpdatedAt: teacher.updatedAt,
+    createdBy: teacher.createdBy,
+    updatedBy: teacher.updatedBy,
+    allocationCount: teacher.courseAllocations.length,
+    allocations: teacher.courseAllocations.map((a) => ({
+      id: a.id,
+      department: a.department,
+      semester: a.semester,
+      section: a.section,
+      courseName: a.course?.name,
+      courseCode: a.course?.code,
+    })),
+  });
+});
+
 module.exports = {
   readTeacher,
   createTeacher,
   updateTeacher,
   deleteTeacher,
+  getTeacherDetail,
   formatTeacher,
 };

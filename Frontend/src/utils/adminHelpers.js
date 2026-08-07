@@ -14,7 +14,10 @@ export const getSemesterSections = (departments, selectedDeptCode, selectedSem) 
   const semDetail = currentDept?.semesterDetails?.find(
     (s) => String(s.semester) === String(selectedSem),
   );
-  return semDetail?.sections || [];
+  const rawSections = semDetail?.sections || [];
+  return rawSections.map((sec) =>
+    typeof sec === "object" && sec !== null ? sec.name || sec.value || String(sec) : String(sec),
+  );
 };
 
 export const filterSessionsBySearch = (

@@ -1,6 +1,10 @@
 const { prisma } = require("../../utils/prisma.js");
 const ApiError = require("../../utils/ApiError");
 const asyncHandler = require("../../utils/asyncHandler");
+const {
+  stampOnCreate,
+  auditActorSelect,
+} = require("../../utils/auditStamp");
 
 const formatClassScheduleEntry = (entry) => ({
   id: entry.id,
@@ -20,6 +24,11 @@ const formatClassScheduleEntry = (entry) => ({
   teacherId: entry.courseAllocation?.teacher?.id,
   teacherName: entry.courseAllocation?.teacher?.user?.name || "",
   teacherEmployeeId: entry.courseAllocation?.teacher?.employeeId || "",
+  // Ambient audit caption shown directly on the schedule grid cell — full
+  // name only (kept light since this renders on every filled cell, not
+  // behind a click). Null-safe: entries created before this feature shipped
+  // will have no updatedBy.
+  updatedBy: entry.updatedBy ? { name: entry.updatedBy.name } : null,
 });
 
 const readClassTimetable = asyncHandler(async (req, res) => {
@@ -67,6 +76,10 @@ const readClassTimetable = asyncHandler(async (req, res) => {
           },
         },
       },
+      // Enrichment for the always-visible "Updated by" caption on the
+      // schedule grid — must come from this same load, since the caption
+      // can't wait for a click-through fetch.
+      updatedBy: { select: { name: true } },
     },
   });
 
@@ -254,6 +267,7 @@ const createClassScheduleEntry = asyncHandler(async (req, res) => {
       courseAllocationId: Number(courseAllocationId),
       room: room || null,
       classType: classType || "class",
+      ...stampOnCreate(req.user.userId),
     },
   });
 
@@ -276,6 +290,48 @@ const deleteClassScheduleEntry = asyncHandler(async (req, res) => {
   res.status(200).json({ message: "Schedule entry deleted." });
 });
 
+const getScheduleEntryDetail = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+
+  // ClassScheduleEntry has no instituteId column of its own — it's scoped
+  // through its courseAllocation. Filtering on a direct `instituteId` field
+  // here would throw a Prisma "unknown field" error, not just be imprecise.
+  const entry = await prisma.classScheduleEntry.findFirst({
+    where: {
+      id: Number(id),
+      courseAllocation: { instituteId: req.user.instituteId },
+    },
+    include: {
+      courseAllocation: {
+        include: {
+          course: { select: { id: true, name: true, code: true } },
+          teacher: {
+            select: {
+              id: true,
+              employeeId: true,
+              user: { select: { name: true, email: true } },
+            },
+          },
+        },
+      },
+      createdBy: auditActorSelect,
+      updatedBy: auditActorSelect,
+    },
+  });
+
+  if (!entry) {
+    throw new ApiError(404, "Schedule entry not found.");
+  }
+
+  res.status(200).json({
+    ...formatClassScheduleEntry(entry),
+    recordCreatedAt: entry.createdAt,
+    recordUpdatedAt: entry.updatedAt,
+    createdBy: entry.createdBy,
+    updatedBy: entry.updatedBy,
+  });
+});
+
 module.exports = {
   readClassTimetable,
   addClassPeriod,
@@ -284,4 +340,5 @@ module.exports = {
   createClassScheduleEntry,
   deleteClassScheduleEntry,
   formatClassScheduleEntry,
+  getScheduleEntryDetail,
 };

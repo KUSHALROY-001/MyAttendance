@@ -4,8 +4,34 @@ import ConfirmDialog from "../components/admin/ConfirmDialog";
 import ScheduleHeader from "../components/admin/ScheduleHeader";
 import ScheduleGrid from "../components/admin/ScheduleGrid";
 import AssignSlotModal from "../components/admin/AssignSlotModal";
+import RecordDetailPanel from "../components/admin/RecordDetailPanel";
 import { Plus } from "lucide-react";
 import useAdminSchedules from "../hooks/useAdminSchedules";
+
+const scheduleDetailSections = [
+  {
+    title: "Schedule Slot",
+    fields: [
+      { label: "Day", accessor: "day" },
+      { label: "Period", accessor: "periodNumber" },
+      { label: "Class Type", accessor: "classType" },
+      { label: "Room", accessor: "room" },
+      { label: "Department", accessor: "department" },
+      { label: "Semester", render: (d) => `Semester ${d.semester}` },
+      { label: "Section", accessor: "section" },
+      { label: "Academic Year", accessor: "academicYear" },
+    ],
+  },
+  {
+    title: "Allocation",
+    fields: [
+      { label: "Course", accessor: "courseName" },
+      { label: "Course Code", accessor: "courseCode" },
+      { label: "Teacher", accessor: "teacherName" },
+      { label: "Employee ID", accessor: "teacherEmployeeId" },
+    ],
+  },
+];
 
 const AdminSchedules = () => {
   const {
@@ -55,6 +81,11 @@ const AdminSchedules = () => {
     openAssignModal,
     getEntry,
     handleInlineTimeEdit,
+    detail,
+    isDetailOpen,
+    isDetailLoading,
+    openDetail,
+    closeDetail,
   } = useAdminSchedules();
 
   return (
@@ -119,8 +150,18 @@ const AdminSchedules = () => {
         handleInlineTimeEdit={handleInlineTimeEdit}
         getEntry={getEntry}
         openAssignModal={openAssignModal}
+        openEntryDetail={openDetail}
         setRecordToDelete={setRecordToDelete}
         setIsDeleteDialogOpen={setIsDeleteDialogOpen}
+      />
+
+      <RecordDetailPanel
+        isOpen={isDetailOpen}
+        onClose={closeDetail}
+        title={detail ? `Schedule: ${detail.day} Period ${detail.periodNumber}` : "Schedule Details"}
+        detail={detail}
+        isLoading={isDetailLoading}
+        sections={scheduleDetailSections}
       />
 
       <AssignSlotModal

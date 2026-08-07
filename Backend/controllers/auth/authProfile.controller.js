@@ -17,9 +17,11 @@ const getProfile = asyncHandler(async (req, res) => {
       name: true,
       email: true,
       role: true,
+      institute: { select: { id: true, name: true, code: true } },
       student: {
         select: {
           rollNumber: true,
+          enrollmentNumber: true,
           department: true,
           semester: true,
           section: true,
@@ -139,6 +141,7 @@ const updateProfile = asyncHandler(async (req, res) => {
 
     if (currentUser.role === "STUDENT") {
       const rollNumber = String(req.body.rollNumber || "").trim();
+      const enrollmentNumber = String(req.body.enrollmentNumber || "").trim();
       const department = String(req.body.department || "")
         .trim()
         .toUpperCase();
@@ -151,6 +154,7 @@ const updateProfile = asyncHandler(async (req, res) => {
 
       if (
         !rollNumber ||
+        !enrollmentNumber ||
         !department ||
         !Number.isInteger(semester) ||
         semester < 1 ||
@@ -177,10 +181,27 @@ const updateProfile = asyncHandler(async (req, res) => {
         );
       }
 
+      const duplicateEnrollmentNumber = await tx.student.findFirst({
+        where: {
+          instituteId: currentUser.instituteId,
+          enrollmentNumber,
+          NOT: { id: currentUser.student?.id || 0 },
+        },
+        select: { id: true },
+      });
+
+      if (duplicateEnrollmentNumber) {
+        throw new ApiError(
+          409,
+          "A student with this enrollment number already exists.",
+        );
+      }
+
       await tx.student.update({
         where: { userId: currentUser.id },
         data: {
           rollNumber,
+          enrollmentNumber,
           department,
           semester,
           section,

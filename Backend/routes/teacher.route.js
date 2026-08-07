@@ -15,9 +15,13 @@ const {
   submitAttendance,
 } = require("../controllers/teacher.controller");
 
-router.use(authenticate, authorizeRoles("TEACHER", "ADMIN"));
+router.use(authenticate, authorizeRoles("TEACHER", "ADMIN", "SUPER_ADMIN"));
 
-router.get("/dashboard/:teacherId", authorizeTeacherSelf(), getTeacherDashboard);
+router.get(
+  "/dashboard/:teacherId",
+  authorizeTeacherSelf(),
+  getTeacherDashboard,
+);
 router.get(
   "/attendance/:sessionId",
   authorizeTeacherSessionAccess(),

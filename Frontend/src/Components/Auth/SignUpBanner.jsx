@@ -4,7 +4,7 @@ import { accessCards } from "../../utils/signupHelpers";
 
 const SignUpBanner = () => {
   return (
-    <section className="overflow-hidden rounded-[32px] border border-slate-200 bg-white/85 p-3 shadow-[0_24px_70px_-32px_rgba(15,23,42,0.35)] backdrop-blur-md dark:border-slate-700 dark:bg-slate-900/70 md:p-8 lg:w-[42%] lg:p-10">
+    <section className="overflow-hidden rounded-[32px] border border-slate-200 bg-white p-6 shadow-xl transition-all duration-300 dark:border-[#222228] dark:bg-[#151518] md:p-8 lg:w-[42%] lg:p-10">
       <div className="max-w-xl">
         <p className="text-xs font-black uppercase tracking-[0.28em] text-indigo-500">
           Institution Access
@@ -25,7 +25,7 @@ const SignUpBanner = () => {
           return (
             <div
               key={card.title}
-              className="rounded-2xl border border-slate-200 bg-slate-50/80 p-2 dark:border-slate-700 dark:bg-slate-950/50 md:p-4"
+              className="rounded-2xl border border-slate-200 bg-slate-50 p-4 transition-all duration-300 dark:border-[#222228] dark:bg-[#19191D]"
             >
               <div className="flex flex-col items-center gap-3 sm:flex-row sm:items-start">
                 <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-indigo-100 text-indigo-600 dark:bg-indigo-500/15 dark:text-indigo-300">

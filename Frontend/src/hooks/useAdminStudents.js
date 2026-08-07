@@ -1,10 +1,15 @@
 import { useState, useEffect } from "react";
 import api from "../api/axios";
-import { getDepartmentSemesters, getSemesterSections } from "../utils/adminHelpers";
+import useRecordDetail from "./useRecordDetail";
+import {
+  getDepartmentSemesters,
+  getSemesterSections,
+} from "../utils/adminHelpers";
 
 const initial_form = {
   name: "",
   rollNumber: "",
+  enrollmentNumber: "",
   email: "",
   department: "BCA",
   semester: "1",
@@ -14,6 +19,9 @@ const initial_form = {
 };
 
 export const useAdminStudents = () => {
+  const detailState = useRecordDetail(
+    (row) => `/api/admin/students/${row.id}/detail`,
+  );
   const [data, setData] = useState([]);
   const [search, setSearch] = useState("");
   const [dept, setDept] = useState("BCA");
@@ -55,6 +63,7 @@ export const useAdminStudents = () => {
         ? {
             name: record.name || "",
             rollNumber: record.rollNumber || "",
+            enrollmentNumber: record.enrollmentNumber || "",
             email: record.email || "",
             department: record.department || "BCA",
             semester: record.semester?.toString() || "1",
@@ -96,14 +105,27 @@ export const useAdminStudents = () => {
   const semOptions = getDepartmentSemesters(departments, dept);
   const secOptions = getSemesterSections(departments, dept, sem);
 
-  const formSemOptions = getDepartmentSemesters(departments, formData.department);
-  const formSecOptions = getSemesterSections(departments, formData.department, formData.semester);
+  const formSemOptions = getDepartmentSemesters(
+    departments,
+    formData.department,
+  );
+  const formSecOptions = getSemesterSections(
+    departments,
+    formData.department,
+    formData.semester,
+  );
 
   const student_fields = [
     { name: "name", label: "Full Name", colSpan: 6 },
     {
       name: "rollNumber",
       label: "Roll Number",
+      className: "font-mono",
+      colSpan: 6,
+    },
+    {
+      name: "enrollmentNumber",
+      label: "Enrollment Number",
       className: "font-mono",
       colSpan: 6,
     },
@@ -165,6 +187,7 @@ export const useAdminStudents = () => {
     handleOpenModal,
     handleSave,
     handleDelete,
+    ...detailState,
   };
 };
 
