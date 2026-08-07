@@ -22,13 +22,45 @@ async function main() {
   await prisma.teacher.deleteMany();
   await prisma.user.deleteMany();
   await prisma.departmentInfo.deleteMany();
+  await prisma.institute.deleteMany();
   console.log("Database cleared!");
 
   const salt = await bcrypt.genSalt(10);
   const hashedPassword = await bcrypt.hash("password123", salt);
 
   // ──────────────────────────────────────────────────────────
-  // 2. CREATE DEPARTMENTS
+  // 1b. CREATE THE SEED INSTITUTE (the tenant everything below belongs to)
+  // ──────────────────────────────────────────────────────────
+  const institute = await prisma.institute.create({
+    data: {
+      name: "Hogwarts College of Technology",
+      code: "HOGWARTS",
+      address: "1 Castle Grounds, Scotland",
+    },
+  });
+  console.log(
+    `✅ Institute created: ${institute.name} (code: ${institute.code})`,
+  );
+
+  // ──────────────────────────────────────────────────────────
+  // 2. CREATE ADMIN (moved ahead of departments — departments now need
+  //    adminUser.id to stamp createdById/updatedById)
+  // ──────────────────────────────────────────────────────────
+  const adminUser = await prisma.user.create({
+    data: {
+      name: "Admin User",
+      email: "admin@college.edu",
+      password: hashedPassword,
+      role: "SUPER_ADMIN",
+      instituteId: institute.id,
+      // No createdById/updatedById — this is the institute founder, nobody
+      // in the system "created" this account. Renders as
+      // "System / Self-registered" in the UI.
+    },
+  });
+
+  // ──────────────────────────────────────────────────────────
+  // 3. CREATE DEPARTMENTS
   // ──────────────────────────────────────────────────────────
   const departments = [];
   const departmentData = [
@@ -68,21 +100,32 @@ async function main() {
     },
   ];
   for (const d of departmentData) {
-    departments.push(await prisma.departmentInfo.create({ data: d }));
+    departments.push(
+      await prisma.departmentInfo.create({
+        data: {
+          ...d,
+          instituteId: institute.id,
+          createdById: adminUser.id,
+          updatedById: adminUser.id,
+          // Also stamp the granular per-semester/per-section audit inside
+          // the JSON blob itself, so getDepartmentDetail has something real
+          // to resolve instead of every seeded semester/section showing
+          // "Unknown (pre-audit record)".
+          semesterDetails: d.semesterDetails.map((sem) => ({
+            ...sem,
+            updatedById: adminUser.id,
+            updatedAt: new Date().toISOString(),
+            sections: sem.sections.map((sectionName) => ({
+              name: sectionName,
+              updatedById: adminUser.id,
+              updatedAt: new Date().toISOString(),
+            })),
+          })),
+        },
+      }),
+    );
   }
   console.log(`✅ ${departments.length} departments created`);
-
-  // ──────────────────────────────────────────────────────────
-  // 3. CREATE ADMIN
-  // ──────────────────────────────────────────────────────────
-  const adminUser = await prisma.user.create({
-    data: {
-      name: "Admin User",
-      email: "admin@college.edu",
-      password: hashedPassword,
-      role: "ADMIN",
-    },
-  });
 
   // ──────────────────────────────────────────────────────────
   // 4. CREATE TEACHERS
@@ -154,12 +197,18 @@ async function main() {
         email: t.email,
         password: hashedPassword,
         role: "TEACHER",
+        instituteId: institute.id,
+        createdById: adminUser.id,
+        updatedById: adminUser.id,
         teacher: {
           create: {
+            instituteId: institute.id,
             employeeId: t.empId,
             designation: t.desig,
             department: t.dept,
-            contactNumber : t.contact
+            contactNumber: t.contact,
+            createdById: adminUser.id,
+            updatedById: adminUser.id,
           },
         },
       },
@@ -293,7 +342,16 @@ async function main() {
 
   const courses = [];
   for (const c of courseData) {
-    courses.push(await prisma.course.create({ data: c }));
+    courses.push(
+      await prisma.course.create({
+        data: {
+          ...c,
+          instituteId: institute.id,
+          createdById: adminUser.id,
+          updatedById: adminUser.id,
+        },
+      }),
+    );
   }
   console.log(`✅ ${courses.length} courses created`);
 
@@ -418,14 +476,24 @@ async function main() {
         email: s.email,
         password: hashedPassword,
         role: "STUDENT",
+        instituteId: institute.id,
+        // Seeded students are treated as admin-created (not self-signup),
+        // so both fields are stamped immediately — same as approvePendingStudent
+        // would do for a real self-signup once approved.
+        createdById: adminUser.id,
+        updatedById: adminUser.id,
         student: {
           create: {
+            instituteId: institute.id,
             rollNumber: s.roll,
+            enrollmentNumber: `ENR-2024-${s.roll}`,
             department: s.dept,
             semester: s.sem,
             section: s.sec,
             batch: s.batch,
             contactNumber: s.contact,
+            createdById: adminUser.id,
+            updatedById: adminUser.id,
             enrolledCourses: {
               create: enrollCourses.map((course) => ({
                 courseId: course.id,
@@ -457,11 +525,14 @@ async function main() {
     allocations.push(
       await prisma.courseAllocation.create({
         data: {
+          instituteId: institute.id,
           teacherId: teachers[a.teacherIdx].id,
           courseId: course.id,
           department: a.dept,
           semester: a.sem,
           section: a.sec,
+          createdById: adminUser.id,
+          updatedById: adminUser.id,
         },
       }),
     );
@@ -550,6 +621,58 @@ async function main() {
   console.log("✅ Teacher schedules created");
 
   // ──────────────────────────────────────────────────────────
+  // 8b. CREATE CLASS TIMETABLE + SCHEDULE ENTRIES
+  //     (the model the Schedule grid page + audit caption actually read
+  //     from — distinct from the older TeacherSchedule seeded above)
+  // ──────────────────────────────────────────────────────────
+  const bcaSem1TimetablePeriods = [
+    { period: 1, startTime: "09:00", endTime: "10:00", type: "class" },
+    { period: 2, startTime: "10:00", endTime: "11:00", type: "class" },
+    { period: 3, startTime: "11:15", endTime: "12:15", type: "class" },
+    { period: 4, startTime: "12:15", endTime: "13:15", type: "class" },
+    { period: 5, startTime: "14:00", endTime: "15:00", type: "lab" },
+  ];
+
+  const bcaSem1Timetable = await prisma.classTimetable.create({
+    data: {
+      instituteId: institute.id,
+      department: "BCA",
+      semester: 1,
+      section: "A",
+      periods: bcaSem1TimetablePeriods,
+    },
+  });
+
+  const scheduleEntryData = [
+    { day: "Monday", periodNumber: 1, allocIdx: 0, room: "Room 101", classType: "class" },
+    { day: "Monday", periodNumber: 2, allocIdx: 1, room: "Room 102", classType: "class" },
+    { day: "Tuesday", periodNumber: 1, allocIdx: 2, room: "Room 103", classType: "class" },
+    { day: "Tuesday", periodNumber: 3, allocIdx: 3, room: "Room 104", classType: "class" },
+    { day: "Wednesday", periodNumber: 1, allocIdx: 0, room: "Room 101", classType: "class" },
+    { day: "Wednesday", periodNumber: 5, allocIdx: 4, room: "Lab 1", classType: "lab" },
+    { day: "Thursday", periodNumber: 2, allocIdx: 1, room: "Room 102", classType: "class" },
+    { day: "Thursday", periodNumber: 4, allocIdx: 2, room: "Room 103", classType: "class" },
+    { day: "Friday", periodNumber: 1, allocIdx: 3, room: "Room 104", classType: "class" },
+    { day: "Friday", periodNumber: 3, allocIdx: 4, room: "Lab 1", classType: "lab" },
+  ];
+
+  for (const entry of scheduleEntryData) {
+    await prisma.classScheduleEntry.create({
+      data: {
+        classTimetableId: bcaSem1Timetable.id,
+        periodNumber: entry.periodNumber,
+        day: entry.day,
+        courseAllocationId: allocations[entry.allocIdx].id,
+        room: entry.room,
+        classType: entry.classType,
+        createdById: adminUser.id,
+        updatedById: adminUser.id,
+      },
+    });
+  }
+  console.log(`✅ ${scheduleEntryData.length} class schedule entries created`);
+
+  // ──────────────────────────────────────────────────────────
   // 9. GENERATE ATTENDANCE DATA (Past 20 days)
   // ──────────────────────────────────────────────────────────
   console.log("Generating 20 days of attendance records...");
@@ -633,11 +756,11 @@ async function main() {
   // ──────────────────────────────────────────────────────────
   // Get some user IDs for contributors (teachers + admin + a student)
   const allTeacherUsers = await prisma.user.findMany({
-    where: { role: "TEACHER" },
+    where: { role: "TEACHER", instituteId: institute.id },
     select: { id: true },
   });
   const allStudentUsers = await prisma.user.findMany({
-    where: { role: "STUDENT" },
+    where: { role: "STUDENT", instituteId: institute.id },
     select: { id: true },
   });
 
@@ -768,7 +891,9 @@ async function main() {
   ];
 
   for (const lr of libraryData) {
-    await prisma.libraryResource.create({ data: lr });
+    await prisma.libraryResource.create({
+      data: { ...lr, instituteId: institute.id },
+    });
   }
   console.log(`✅ ${libraryData.length} library resources created`);
 

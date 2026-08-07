@@ -3,10 +3,11 @@ const ApiError = require("../utils/ApiError");
 const asyncHandler = require("../utils/asyncHandler");
 
 const getLibraryResources = asyncHandler(async (req, res) => {
+  const instituteId = req.user.instituteId;
   const { department, semester, subjectName } = req.query;
   const parsedSemester = semester ? parseInt(semester, 10) : undefined;
 
-  const where = {};
+  const where = { instituteId };
   if (department) where.department = department;
   if (parsedSemester) where.semester = parsedSemester;
   if (subjectName) where.subjectName = subjectName;
@@ -30,11 +31,12 @@ const getLibraryResources = asyncHandler(async (req, res) => {
       },
     }),
     prisma.departmentInfo.findMany({
+      where: { instituteId },
       select: { code: true },
     }),
     department
       ? prisma.departmentInfo.findFirst({
-          where: { code: department },
+          where: { instituteId, code: department },
           select: { semesterDetails: true },
         })
       : Promise.resolve(null),
@@ -47,7 +49,7 @@ const getLibraryResources = asyncHandler(async (req, res) => {
         .sort((a, b) => a - b)
     : (
         await prisma.course.findMany({
-          where: department ? { department } : undefined,
+          where: { instituteId, ...(department && { department }) },
           select: { semester: true },
           distinct: ["semester"],
         })
@@ -57,6 +59,7 @@ const getLibraryResources = asyncHandler(async (req, res) => {
 
   const subjectRows = await prisma.course.findMany({
     where: {
+      instituteId,
       ...(department && { department }),
       ...(parsedSemester && { semester: parsedSemester }),
     },
@@ -79,15 +82,17 @@ const getLibraryResources = asyncHandler(async (req, res) => {
 });
 
 const createLibraryResource = asyncHandler(async (req, res) => {
-  const {
-    title,
-    subjectName,
-    department,
-    semester,
-    driveLink,
-    description,
-  } = req.body;
+  let { title, subjectName, department, semester, driveLink, description } =
+    req.body;
   const contributorId = req.user?.userId;
+  const instituteId = req.user?.instituteId;
+
+  if (driveLink) {
+    driveLink = driveLink.trim();
+    if (!/^https?:\/\//i.test(driveLink)) {
+      driveLink = `https://${driveLink}`;
+    }
+  }
 
   if (
     !title ||
@@ -103,8 +108,12 @@ const createLibraryResource = asyncHandler(async (req, res) => {
     );
   }
 
-  if (!driveLink.includes("drive.google.com")) {
-    throw new ApiError(400, "Please provide a valid Google Drive link.");
+  const isGoogleLink = /(google\.com|forms\.gle|goo\.gl)/i.test(driveLink);
+  if (!isGoogleLink) {
+    throw new ApiError(
+      400,
+      "Please provide a valid Google Drive or Google Docs link.",
+    );
   }
 
   const user = await prisma.user.findUnique({
@@ -117,6 +126,7 @@ const createLibraryResource = asyncHandler(async (req, res) => {
 
   const resource = await prisma.libraryResource.create({
     data: {
+      instituteId,
       title,
       subjectName,
       department,
@@ -135,9 +145,12 @@ const createLibraryResource = asyncHandler(async (req, res) => {
 const deleteLibraryResource = asyncHandler(async (req, res) => {
   const { id } = req.params;
   const userId = req.user?.userId;
+  const instituteId = req.user?.instituteId;
 
-  const resource = await prisma.libraryResource.findUnique({
-    where: { id: parseInt(id, 10) },
+  // Scoped by institute — an admin (or anyone) from a different institute
+  // gets a 404 here rather than being able to even see the resource exists.
+  const resource = await prisma.libraryResource.findFirst({
+    where: { id: parseInt(id, 10), instituteId },
   });
 
   if (!resource) {
@@ -152,7 +165,11 @@ const deleteLibraryResource = asyncHandler(async (req, res) => {
     throw new ApiError(404, "User not found.");
   }
 
-  if (resource.contributorId !== user.id && user.role !== "ADMIN") {
+  if (
+    resource.contributorId !== user.id &&
+    user.role !== "ADMIN" &&
+    user.role !== "SUPER_ADMIN"
+  ) {
     throw new ApiError(403, "You are not authorized to delete this resource.");
   }
 

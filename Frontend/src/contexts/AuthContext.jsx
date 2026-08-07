@@ -17,6 +17,7 @@ const AuthContext = createContext(null);
 const getDefaultRouteForRole = (role) => {
   switch (role) {
     case "ADMIN":
+    case "SUPER_ADMIN":
       return "/admin";
     case "TEACHER":
       return "/teacher";

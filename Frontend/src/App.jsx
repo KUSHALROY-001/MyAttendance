@@ -1,34 +1,39 @@
 import "./App.css";
 import { Toaster } from "react-hot-toast";
-import ErrorBoundary from "./Components/UI/ErrorBoundary";
-import PremiumErrorState from "./Components/UI/PremiumErrorState";
+import ErrorBoundary from "./components/common/ErrorBoundary";
+import PremiumErrorState from "./components/common/PremiumErrorState";
 
-import Navbar from "./Components/Layout/Navbar.jsx";
-import Footer from "./Components/Layout/Footer.jsx";
-import Home from "./Components/Pages/Home.jsx";
-import Features from "./Components/Pages/Features.jsx";
-import About from "./Components/Pages/About.jsx";
-import SignUp from "./Components/Pages/SignUp.jsx";
-import Login from "./Components/Pages/Login.jsx";
+import Navbar from "./components/layout/Navbar.jsx";
+import Footer from "./components/layout/Footer.jsx";
+import Home from "./pages/Home.jsx";
+import Features from "./pages/Features.jsx";
+import About from "./pages/About.jsx";
+import SignUp from "./pages/SignUp.jsx";
+import RegisterInstitute from "./pages/RegisterInstitute.jsx";
+import Login from "./pages/Login.jsx";
+import EditProfile from "./pages/EditProfile.jsx";
 import { Routes, Route, Outlet } from "react-router-dom";
-import ProtectedRoute from "./Components/Auth/ProtectedRoute.jsx";
-import PublicOnlyRoute from "./Components/Auth/PublicOnlyRoute.jsx";
-import StudentDashboard from "./Components/Pages/Student/StudentDash.jsx";
-import TeacherDashboard from "./Components/Pages/Teacher/TeacherDashboard.jsx";
-import TakeAttendance from "./Components/Pages/Teacher/TakeAttendance.jsx";
-import Library from "./Components/Pages/Library/Library.jsx";
+import ProtectedRoute from "./components/auth/ProtectedRoute.jsx";
+import PublicOnlyRoute from "./components/auth/PublicOnlyRoute.jsx";
+import StudentDashboard from "./pages/StudentDashboard.jsx";
+import TeacherDashboard from "./pages/TeacherDashboard.jsx";
+import TakeAttendance from "./pages/TakeAttendance.jsx";
+import Library from "./pages/Library.jsx";
 
 // Admin Imports
 import { ThemeProvider } from "./contexts/ThemeContext.jsx";
-import AdminLayout from "./Components/Pages/Admin/AdminLayout.jsx";
-import AdminDashboard from "./Components/Pages/Admin/AdminDashboard.jsx";
-import AdminStudents from "./Components/Pages/Admin/AdminStudents.jsx";
-import AdminTeachers from "./Components/Pages/Admin/AdminTeachers.jsx";
-import AdminCourses from "./Components/Pages/Admin/AdminCourses.jsx";
-import AdminAllocations from "./Components/Pages/Admin/AdminAllocations.jsx";
-import AdminSchedules from "./Components/Pages/Admin/AdminSchedules.jsx";
-import AdminReports from "./Components/Pages/Admin/AdminReports.jsx";
-import AdminUsers from "./Components/Pages/Admin/AdminUsers.jsx";
+import AdminLayout from "./pages/AdminLayout.jsx";
+import AdminDashboard from "./pages/AdminDashboard.jsx";
+import AdminStudents from "./pages/AdminStudents.jsx";
+import AdminTeachers from "./pages/AdminTeachers.jsx";
+import AdminCourses from "./pages/AdminCourses.jsx";
+import AdminAllocations from "./pages/AdminAllocations.jsx";
+import AdminSchedules from "./pages/AdminSchedules.jsx";
+import AdminReports from "./pages/AdminReports.jsx";
+import AdminUsers from "./pages/AdminUsers.jsx";
+import AdminInstituteSettings from "./pages/AdminInstituteSettings.jsx";
+import AdminPendingApprovals from "./pages/AdminPendingApprovals.jsx";
+import AdminAcademicOptions from "./pages/AdminAcademicOptions.jsx";
 
 const MainLayout = () => (
   <>
@@ -54,6 +59,10 @@ function App() {
             <Route element={<PublicOnlyRoute />}>
               <Route path="/login" element={<Login />} />
               <Route path="/signup" element={<SignUp />} />
+              <Route
+                path="/register-institute"
+                element={<RegisterInstitute />}
+              />
             </Route>
 
             <Route element={<ProtectedRoute allowedRoles={["STUDENT"]} />}>
@@ -66,6 +75,16 @@ function App() {
                 path="/teacher/attendance/live/:allocationId"
                 element={<TakeAttendance />}
               />
+            </Route>
+
+            <Route
+              element={
+                <ProtectedRoute
+                  allowedRoles={["STUDENT", "TEACHER", "ADMIN", "SUPER_ADMIN"]}
+                />
+              }
+            >
+              <Route path="/profile/edit" element={<EditProfile />} />
             </Route>
 
             {/* Fallback for unmatched routes inside Main */}
@@ -82,7 +101,9 @@ function App() {
           </Route>
 
           {/* Admin Routes */}
-          <Route element={<ProtectedRoute allowedRoles={["ADMIN"]} />}>
+          <Route
+            element={<ProtectedRoute allowedRoles={["ADMIN", "SUPER_ADMIN"]} />}
+          >
             <Route path="/admin" element={<AdminLayout />}>
               <Route index element={<AdminDashboard />} />
               <Route path="students" element={<AdminStudents />} />
@@ -92,6 +113,16 @@ function App() {
               <Route path="schedules" element={<AdminSchedules />} />
               <Route path="reports" element={<AdminReports />} />
               <Route path="users" element={<AdminUsers />} />
+              <Route
+                path="academic-options"
+                element={<AdminAcademicOptions />}
+              />
+              <Route path="institute" element={<AdminInstituteSettings />} />
+              <Route
+                path="pending-approvals"
+                element={<AdminPendingApprovals />}
+              />
+              <Route path="profile/edit" element={<EditProfile />} />
             </Route>
           </Route>
         </Routes>

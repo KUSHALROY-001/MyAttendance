@@ -103,10 +103,12 @@ const buildSafeAuthUser = (user) => {
         type: "student",
         studentId: user.student.id,
         rollNumber: user.student.rollNumber,
+        enrollmentNumber: user.student.enrollmentNumber,
         department: user.student.department,
         semester: user.student.semester,
         section: user.student.section,
         batch: user.student.batch,
+        contactNumber: user.student.contactNumber,
       }
     : user.teacher
       ? {
@@ -115,6 +117,7 @@ const buildSafeAuthUser = (user) => {
           employeeId: user.teacher.employeeId,
           department: user.teacher.department,
           designation: user.teacher.designation,
+          contactNumber: user.teacher.contactNumber,
         }
       : {
           type: "admin",
@@ -125,6 +128,13 @@ const buildSafeAuthUser = (user) => {
     name: user.name,
     email: user.email,
     role: user.role,
+    institute: user.institute
+      ? {
+          id: user.institute.id,
+          name: user.institute.name,
+          code: user.institute.code,
+        }
+      : null,
     profile,
   };
 };

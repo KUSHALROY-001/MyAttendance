@@ -1,5 +1,4 @@
-const { PrismaClient } = require("@prisma/client");
-const prisma = new PrismaClient();
+const { prisma } = require("../utils/prisma");
 const ApiError = require("../utils/ApiError");
 const asyncHandler = require("../utils/asyncHandler");
 
@@ -102,7 +101,8 @@ const buildCourseSummaries = ({
         courseName: course.name,
         totalClasses,
         attendedClasses,
-        percentage: totalClasses > 0 ? (attendedClasses / totalClasses) * 100 : 0,
+        percentage:
+          totalClasses > 0 ? (attendedClasses / totalClasses) * 100 : 0,
       };
     })
     .sort((a, b) => a.courseName.localeCompare(b.courseName));
@@ -110,13 +110,15 @@ const buildCourseSummaries = ({
 
 const getStudentDashboard = asyncHandler(async (req, res) => {
   const roll = req.params.roll || req.authProfile?.rollNumber;
+  const instituteId = req.user.instituteId;
 
   // OPTIMIZATION 1 & 2: A single, highly-filtered query
-  const studentData = await prisma.student.findUnique({
-    where: { rollNumber: roll },
+  const studentData = await prisma.student.findFirst({
+    where: { instituteId, rollNumber: roll },
     select: {
       id: true,
       rollNumber: true,
+      enrollmentNumber: true,
       department: true,
       semester: true,
       section: true,
@@ -164,13 +166,12 @@ const getStudentDashboard = asyncHandler(async (req, res) => {
     throw new ApiError(404, "Student not found");
   }
 
-  const classTimetable = await prisma.classTimetable.findUnique({
+  const classTimetable = await prisma.classTimetable.findFirst({
     where: {
-      department_semester_section: {
-        department: studentData.department,
-        semester: studentData.semester,
-        section: studentData.section,
-      },
+      instituteId,
+      department: studentData.department,
+      semester: studentData.semester,
+      section: studentData.section,
     },
     select: {
       periods: true,
@@ -194,6 +195,7 @@ const getStudentDashboard = asyncHandler(async (req, res) => {
 
   const allocatedCourses = await prisma.courseAllocation.findMany({
     where: {
+      instituteId,
       department: studentData.department,
       semester: studentData.semester,
       section: studentData.section,
@@ -233,6 +235,7 @@ const getStudentDashboard = asyncHandler(async (req, res) => {
   // Construct final payload
   const payload = {
     rollNumber: studentData.rollNumber,
+    enrollmentNumber: studentData.enrollmentNumber,
     department: studentData.department,
     semester: studentData.semester,
     section: studentData.section,
@@ -260,13 +263,14 @@ const getStudentDashboard = asyncHandler(async (req, res) => {
 const getCourseDetails = asyncHandler(async (req, res) => {
   const courseCode = req.params.code;
   const rollNumber = req.authProfile?.rollNumber || req.query.rollNumber;
+  const instituteId = req.user.instituteId;
 
   if (!rollNumber) {
     throw new ApiError(400, "Roll number is required");
   }
 
-  const studentData = await prisma.student.findUnique({
-    where: { rollNumber },
+  const studentData = await prisma.student.findFirst({
+    where: { instituteId, rollNumber },
     select: {
       id: true,
       department: true,
@@ -317,6 +321,7 @@ const getCourseDetails = asyncHandler(async (req, res) => {
 
   const allocatedCourse = await prisma.courseAllocation.findFirst({
     where: {
+      instituteId,
       department: studentData.department,
       semester: studentData.semester,
       section: studentData.section,
@@ -333,15 +338,16 @@ const getCourseDetails = asyncHandler(async (req, res) => {
   });
 
   const filteredAttendanceRecords = studentData.attendanceRecords.filter(
-    (record) =>
-      record.session.courseAllocation?.course?.code === courseCode,
+    (record) => record.session.courseAllocation?.course?.code === courseCode,
   );
 
   const enrolled = studentData.enrolledCourses[0];
   const courseInfo = allocatedCourse?.course || enrolled?.course;
 
   if (!courseInfo) {
-    return res.status(404).json({ message: "Course not found or not enrolled" });
+    return res
+      .status(404)
+      .json({ message: "Course not found or not enrolled" });
   }
 
   const stat = studentData.attendanceStats[0];
@@ -349,7 +355,10 @@ const getCourseDetails = asyncHandler(async (req, res) => {
     (record) => record.status === "PRESENT" || record.status === "LATE",
   ).length;
   const totalClassesFromRecords = filteredAttendanceRecords.length;
-  const totalClasses = Math.max(stat?.totalSessions ?? 0, totalClassesFromRecords);
+  const totalClasses = Math.max(
+    stat?.totalSessions ?? 0,
+    totalClassesFromRecords,
+  );
   const attendedClasses = Math.max(
     stat?.totalAttended ?? 0,
     attendedClassesFromRecords,
@@ -359,10 +368,7 @@ const getCourseDetails = asyncHandler(async (req, res) => {
     courseName: courseInfo.name,
     totalClasses,
     attendedClasses,
-    percentage:
-      totalClasses > 0
-        ? (attendedClasses / totalClasses) * 100
-        : 0,
+    percentage: totalClasses > 0 ? (attendedClasses / totalClasses) * 100 : 0,
   };
 
   const attendanceFormatted = filteredAttendanceRecords.map((record) => {

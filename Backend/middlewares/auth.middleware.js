@@ -30,6 +30,7 @@ const attachAuthContext = async (req, token) => {
     role: user.role,
     email: user.email,
     name: user.name,
+    instituteId: user.instituteId || null,
   };
 
   req.authProfile = {

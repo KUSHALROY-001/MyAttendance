@@ -10,7 +10,7 @@ const {
   getCourseDetails,
 } = require("../controllers/student.controller");
 
-router.use(authenticate, authorizeRoles("STUDENT", "ADMIN"));
+router.use(authenticate, authorizeRoles("STUDENT", "ADMIN", "SUPER_ADMIN"));
 
 router.get("/dashboard/:roll", authorizeStudentSelf(), getStudentDashboard);
 router.get("/course/:code", getCourseDetails);
