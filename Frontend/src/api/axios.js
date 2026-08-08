@@ -8,7 +8,10 @@ let accessToken =
   typeof window !== "undefined" ? localStorage.getItem(ACCESS_TOKEN_KEY) : null;
 let refreshPromise = null;
 
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "";
+
 const api = axios.create({
+  baseURL: API_BASE_URL,
   withCredentials: true,
 });
 
@@ -94,7 +97,7 @@ api.interceptors.response.use(
       try {
         if (!refreshPromise) {
           refreshPromise = axios.post(
-            "/api/auth/refresh",
+            `${API_BASE_URL}/api/auth/refresh`,
             {},
             { withCredentials: true, skipAuthRefresh: true },
           );
