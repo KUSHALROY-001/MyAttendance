@@ -43,6 +43,7 @@ const issueAuthResponse = async (res, user) => {
   const payload = {
     userId: user.id,
     role: user.role,
+    tokenVersion: user.tokenVersion ?? 0,
   };
 
   const accessToken = generateAccessToken(payload);
@@ -78,6 +79,7 @@ const login = asyncHandler(async (req, res) => {
       password: true,
       role: true,
       status: true,
+      tokenVersion: true,
       student: true,
       teacher: true,
       institute: { select: { id: true, name: true, code: true } },
@@ -95,7 +97,23 @@ const login = asyncHandler(async (req, res) => {
 
   ensureActiveStatus(user);
 
-  return issueAuthResponse(res, user);
+  const updatedUser = await prisma.user.update({
+    where: { id: user.id },
+    data: { tokenVersion: { increment: 1 } },
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      role: true,
+      status: true,
+      tokenVersion: true,
+      student: true,
+      teacher: true,
+      institute: { select: { id: true, name: true, code: true } },
+    },
+  });
+
+  return issueAuthResponse(res, updatedUser);
 });
 
 const refreshSession = asyncHandler(async (req, res) => {
@@ -119,6 +137,16 @@ const refreshSession = asyncHandler(async (req, res) => {
   }
 
   ensureActiveStatus(user);
+
+  if (
+    payload.tokenVersion !== undefined &&
+    user.tokenVersion !== payload.tokenVersion
+  ) {
+    throw new ApiError(
+      401,
+      "Session expired. You were logged out because a new login occurred on another device.",
+    );
+  }
 
   return issueAuthResponse(res, user);
 });

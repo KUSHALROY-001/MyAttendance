@@ -54,6 +54,7 @@ model User {
   // (admin-created students/teachers, institute founders) is ACTIVE from
   // creation, since a human admin already vouched for them by creating them.
   status      UserStatus @default(ACTIVE)
+  tokenVersion Int        @default(0)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 

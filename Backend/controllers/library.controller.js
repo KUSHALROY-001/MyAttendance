@@ -142,6 +142,72 @@ const createLibraryResource = asyncHandler(async (req, res) => {
     .json({ message: "Resource shared successfully!", resource });
 });
 
+const updateLibraryResource = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  let { title, subjectName, department, semester, driveLink, description } =
+    req.body;
+  const userId = req.user?.userId;
+  const instituteId = req.user?.instituteId;
+
+  const resource = await prisma.libraryResource.findFirst({
+    where: { id: parseInt(id, 10), instituteId },
+  });
+
+  if (!resource) {
+    throw new ApiError(404, "Resource not found.");
+  }
+
+  const user = await prisma.user.findUnique({
+    where: { id: parseInt(userId, 10) },
+  });
+
+  if (!user) {
+    throw new ApiError(404, "User not found.");
+  }
+
+  if (
+    resource.contributorId !== user.id &&
+    user.role !== "ADMIN" &&
+    user.role !== "SUPER_ADMIN"
+  ) {
+    throw new ApiError(403, "You are not authorized to update this resource.");
+  }
+
+  if (driveLink) {
+    driveLink = driveLink.trim();
+    if (!/^https?:\/\//i.test(driveLink)) {
+      driveLink = `https://${driveLink}`;
+    }
+
+    const isGoogleLink = /(google\.com|forms\.gle|goo\.gl)/i.test(driveLink);
+    if (!isGoogleLink) {
+      throw new ApiError(
+        400,
+        "Please provide a valid Google Drive or Google Docs link.",
+      );
+    }
+  }
+
+  const updatedResource = await prisma.libraryResource.update({
+    where: { id: parseInt(id, 10) },
+    data: {
+      ...(title && { title: title.trim() }),
+      ...(subjectName && { subjectName: subjectName.trim() }),
+      ...(department && { department: department.trim() }),
+      ...(semester && { semester: parseInt(semester, 10) }),
+      ...(driveLink && { driveLink }),
+      ...(description !== undefined && {
+        description: description ? description.trim() : null,
+      }),
+    },
+  });
+
+  return res.status(200).json({
+    message: "Resource updated successfully!",
+    resource: updatedResource,
+  });
+});
+
 const deleteLibraryResource = asyncHandler(async (req, res) => {
   const { id } = req.params;
   const userId = req.user?.userId;
@@ -181,5 +247,6 @@ const deleteLibraryResource = asyncHandler(async (req, res) => {
 module.exports = {
   getLibraryResources,
   createLibraryResource,
+  updateLibraryResource,
   deleteLibraryResource,
 };

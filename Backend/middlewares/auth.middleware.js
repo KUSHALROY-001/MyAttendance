@@ -25,6 +25,16 @@ const attachAuthContext = async (req, token) => {
     throw new ApiError(401, "Authenticated user no longer exists.");
   }
 
+  if (
+    payload.tokenVersion !== undefined &&
+    user.tokenVersion !== payload.tokenVersion
+  ) {
+    throw new ApiError(
+      401,
+      "Session expired. You were logged out because a new login occurred on another device.",
+    );
+  }
+
   req.user = {
     userId: user.id,
     role: user.role,
