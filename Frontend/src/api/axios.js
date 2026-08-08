@@ -117,7 +117,10 @@ api.interceptors.response.use(
       } catch (refreshError) {
         clearStoredAuth();
         if (!originalRequest.hideAuthRedirect) {
-          toast.error("Session expired. Please log in again.");
+          const message =
+            refreshError.response?.data?.message ||
+            "Session expired. Please log in again.";
+          toast.error(message);
           window.location.href = "/login";
         }
         return Promise.reject(refreshError);

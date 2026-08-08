@@ -82,6 +82,25 @@ export const useLibrary = () => {
     setFilters({ department: "", semester: "", subjectName: "" });
   };
 
+  const [editingResource, setEditingResource] = useState(null);
+  const [resourceToDelete, setRecordToDelete] = useState(null);
+  const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
+
+  const handleOpenCreateModal = () => {
+    setEditingResource(null);
+    setIsModalOpen(true);
+  };
+
+  const handleOpenEditModal = (resource) => {
+    setEditingResource(resource);
+    setIsModalOpen(true);
+  };
+
+  const handleOpenDeleteModal = (resource) => {
+    setRecordToDelete(resource);
+    setIsDeleteConfirmOpen(true);
+  };
+
   const handleCreateSubmit = async (e) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
@@ -101,6 +120,48 @@ export const useLibrary = () => {
       fetchLibrary();
     } catch (error) {
       console.error("Error creating resource", error);
+      toast.error(error.response?.data?.message || "Failed to share resource");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleUpdateSubmit = async (e) => {
+    e.preventDefault();
+    if (!editingResource) return;
+
+    const formData = new FormData(e.currentTarget);
+    const data = Object.fromEntries(formData.entries());
+    data.driveLink = formatDriveLink(data.driveLink);
+
+    try {
+      setIsSubmitting(true);
+      await api.put(`/api/library/${editingResource.id}`, data);
+      toast.success("Resource updated successfully!");
+      setIsModalOpen(false);
+      setEditingResource(null);
+      fetchLibrary();
+    } catch (error) {
+      console.error("Error updating resource", error);
+      toast.error(error.response?.data?.message || "Failed to update resource");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!resourceToDelete) return;
+
+    try {
+      setIsSubmitting(true);
+      await api.delete(`/api/library/${resourceToDelete.id}`);
+      toast.success("Resource deleted successfully!");
+      setIsDeleteConfirmOpen(false);
+      setRecordToDelete(null);
+      fetchLibrary();
+    } catch (error) {
+      console.error("Error deleting resource", error);
+      toast.error(error.response?.data?.message || "Failed to delete resource");
     } finally {
       setIsSubmitting(false);
     }
@@ -122,9 +183,18 @@ export const useLibrary = () => {
     setIsModalOpen,
     isSubmitting,
     filters,
+    editingResource,
+    resourceToDelete,
+    isDeleteConfirmOpen,
+    setIsDeleteConfirmOpen,
     handleFilterChange,
     clearFilters,
+    handleOpenCreateModal,
+    handleOpenEditModal,
+    handleOpenDeleteModal,
     handleCreateSubmit,
+    handleUpdateSubmit,
+    handleConfirmDelete,
     onRequestLogin,
   };
 };

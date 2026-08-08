@@ -58,8 +58,7 @@ function ScreenSlider({ startAt = 0 }) {
       <div
         style={{
           opacity: visible ? 1 : 0,
-          transform: visible ? "translateY(0px)" : "translateY(10px)",
-          transition: "opacity 0.28s ease, transform 0.28s ease",
+          transition: "opacity 0.28s ease",
         }}
       >
         <PublicVisuals visual={slide.visual} tone={slide.tone} />

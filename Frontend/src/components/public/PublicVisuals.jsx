@@ -46,7 +46,7 @@ const PublicVisuals = ({ visual = "student", tone = "indigo" }) => {
         className={`absolute inset-x-10 top-8 h-56 rounded-full bg-gradient-to-br blur-3xl ${styles.glow}`}
       />
       <div
-        className={`relative overflow-hidden rounded-[2rem] border pt-9 p-2 md:pt-9 md:p-6 shadow-[0_20px_80px_-40px_rgba(15,23,42,0.45)] backdrop-blur ${styles.shell}`}
+        className={`relative overflow-hidden rounded-[2rem] border pt-9 p-4 md:pt-9 md:p-6 shadow-[0_20px_80px_-40px_rgba(15,23,42,0.45)] backdrop-blur min-h-[500px] h-[500px] flex flex-col justify-between ${styles.shell}`}
       >
         <div className="absolute right-4 top-4 md:pr-3 flex gap-2">
           <span className={`h-2.5 w-2.5 rounded-full ${styles.accent}`} />
@@ -58,13 +58,7 @@ const PublicVisuals = ({ visual = "student", tone = "indigo" }) => {
           <div className="space-y-5">
             <div className="grid grid-cols-3 gap-1 md:gap-3">
               {studentBars.map((value, index) => (
-                <div
-                  key={value}
-                  className={`rounded-2xl p-3 ${styles.soft} transition-transform duration-500`}
-                  style={{
-                    transform: `translateY(${index % 2 === 0 ? "0px" : "10px"})`,
-                  }}
-                >
+                <div key={value} className={`rounded-2xl p-3 ${styles.soft}`}>
                   <p className="text-[11px] font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
                     Subject {index + 1}
                   </p>

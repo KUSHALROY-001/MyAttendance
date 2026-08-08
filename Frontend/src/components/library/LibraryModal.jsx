@@ -5,6 +5,8 @@ export default function LibraryModal({
   isModalOpen,
   setIsModalOpen,
   handleCreateSubmit,
+  handleUpdateSubmit,
+  editingResource,
   isSubmitting,
   departments,
   semesters,
@@ -13,12 +15,14 @@ export default function LibraryModal({
 }) {
   if (!isModalOpen) return null;
 
+  const isEdit = Boolean(editingResource);
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-0 backdrop-blur-sm md:p-4">
       <div className="flex h-full w-full max-w-lg flex-col rounded-none border border-slate-200 bg-white shadow-2xl dark:border-[#222228] dark:bg-[#151518] md:h-auto md:max-h-[90vh] md:rounded-2xl max-h-[100dvh]">
         <div className="flex shrink-0 items-center justify-between border-b border-slate-200 p-6 dark:border-[#222228] dark:bg-[#161619] md:rounded-t-2xl">
           <h2 className="text-xl font-semibold text-slate-900 dark:text-slate-50">
-            Share a Resource
+            {isEdit ? "Edit Resource" : "Share a Resource"}
           </h2>
           <button
             onClick={() => setIsModalOpen(false)}
@@ -29,7 +33,8 @@ export default function LibraryModal({
         </div>
 
         <form
-          onSubmit={handleCreateSubmit}
+          key={editingResource ? `edit-${editingResource.id}` : "create"}
+          onSubmit={isEdit ? handleUpdateSubmit : handleCreateSubmit}
           className="flex-1 space-y-4 overflow-y-auto p-4 text-slate-900 dark:text-slate-50 md:p-6"
         >
           <div className="grid grid-cols-2 gap-4">
@@ -38,6 +43,7 @@ export default function LibraryModal({
               <input
                 name="title"
                 required
+                defaultValue={editingResource?.title || ""}
                 className={inputClass}
                 placeholder="e.g., Unit 1-3 Handwritten Notes"
               />
@@ -48,6 +54,7 @@ export default function LibraryModal({
               <input
                 name="subjectName"
                 required
+                defaultValue={editingResource?.subjectName || ""}
                 className={inputClass}
                 placeholder="e.g., Operating Systems"
               />
@@ -55,7 +62,12 @@ export default function LibraryModal({
 
             <div className="col-span-2 space-y-1.5 md:col-span-1">
               <label className={labelClass}>Department</label>
-              <select name="department" required className={inputClass}>
+              <select
+                name="department"
+                required
+                defaultValue={editingResource?.department || ""}
+                className={inputClass}
+              >
                 <option value="">Select Dept</option>
                 {departments.map((d) => (
                   <option key={d} value={d}>
@@ -67,7 +79,12 @@ export default function LibraryModal({
 
             <div className="col-span-2 space-y-1.5 md:col-span-1">
               <label className={labelClass}>Semester</label>
-              <select name="semester" required className={inputClass}>
+              <select
+                name="semester"
+                required
+                defaultValue={editingResource?.semester || ""}
+                className={inputClass}
+              >
                 <option value="">Select Sem</option>
                 {semesters.map((s) => (
                   <option key={s} value={s}>
@@ -83,6 +100,7 @@ export default function LibraryModal({
                 name="driveLink"
                 type="text"
                 required
+                defaultValue={editingResource?.driveLink || ""}
                 className={inputClass}
                 placeholder="https://drive.google.com/... or https://docs.google.com/..."
               />
@@ -93,6 +111,7 @@ export default function LibraryModal({
               <textarea
                 name="description"
                 rows="3"
+                defaultValue={editingResource?.description || ""}
                 className={inputClass}
                 placeholder="Any extra context about these notes..."
               ></textarea>
@@ -114,6 +133,8 @@ export default function LibraryModal({
             >
               {isSubmitting ? (
                 <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/20 border-t-white"></span>
+              ) : isEdit ? (
+                "Update Resource"
               ) : (
                 "Share Resource"
               )}
