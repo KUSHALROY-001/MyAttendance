@@ -1,12 +1,17 @@
 const jwt = require("jsonwebtoken");
 
-const DEFAULT_ACCESS_SECRET = "dev-access-secret-change-me";
-const DEFAULT_REFRESH_SECRET = "dev-refresh-secret-change-me";
+if (
+  process.env.NODE_ENV === "production" &&
+  (!process.env.ACCESS_TOKEN_SECRET || !process.env.REFRESH_TOKEN_SECRET)
+) {
+  console.error(
+    "FATAL ERROR: JWT secret environment variables are missing in production!",
+  );
+  process.exit(1);
+}
 
-const ACCESS_TOKEN_SECRET =
-  process.env.ACCESS_TOKEN_SECRET || DEFAULT_ACCESS_SECRET;
-const REFRESH_TOKEN_SECRET =
-  process.env.REFRESH_TOKEN_SECRET || DEFAULT_REFRESH_SECRET;
+const ACCESS_TOKEN_SECRET = process.env.ACCESS_TOKEN_SECRET;
+const REFRESH_TOKEN_SECRET = process.env.REFRESH_TOKEN_SECRET;
 const ACCESS_TOKEN_EXPIRES_IN = process.env.ACCESS_TOKEN_EXPIRES_IN || "15m";
 const REFRESH_TOKEN_EXPIRES_IN = process.env.REFRESH_TOKEN_EXPIRES_IN || "7d";
 
@@ -90,7 +95,7 @@ const createCookie = (name, value, options = {}) => {
 const getRefreshCookieOptions = () => ({
   httpOnly: true,
   path: "/api/auth",
-  sameSite: process.env.NODE_ENV === "production" ? "Strict" : "Lax",
+  sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",
   secure: process.env.NODE_ENV === "production",
   maxAge: parseDurationToSeconds(REFRESH_TOKEN_EXPIRES_IN),
 });
