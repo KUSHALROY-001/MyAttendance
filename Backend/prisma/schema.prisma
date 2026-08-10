@@ -55,6 +55,13 @@ model User {
   // creation, since a human admin already vouched for them by creating them.
   status      UserStatus @default(ACTIVE)
   tokenVersion Int        @default(0)
+  // True for accounts created with a shared, admin-known default password
+  // (createStudentRecord's "password123", createTeacher's "teacher123") —
+  // forces a password change before the account can use any other route.
+  // Self-signup students and institute founders set their own password at
+  // creation, so this stays false for them. See requirePasswordChange
+  // middleware for enforcement.
+  mustChangePassword Boolean @default(false)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 

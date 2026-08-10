@@ -54,8 +54,8 @@ const changePassword = asyncHandler(async (req, res) => {
     throw new ApiError(401, "Authentication required.");
   }
 
-  if (!currentPassword || !newPassword) {
-    throw new ApiError(400, "Current password and new password are required.");
+  if (!newPassword) {
+    throw new ApiError(400, "New password is required.");
   }
 
   if (String(newPassword).length < 6) {
@@ -67,6 +67,7 @@ const changePassword = asyncHandler(async (req, res) => {
     select: {
       id: true,
       password: true,
+      mustChangePassword: true,
     },
   });
 
@@ -74,9 +75,29 @@ const changePassword = asyncHandler(async (req, res) => {
     throw new ApiError(404, "User not found.");
   }
 
-  const passwordMatches = await bcrypt.compare(currentPassword, user.password);
-  if (!passwordMatches) {
-    throw new ApiError(401, "Current password is incorrect.");
+  // The forced first-change flow (mustChangePassword: true) reaches this
+  // endpoint only after the user has already authenticated with the real
+  // current (default) password via /login — that login IS the proof, so
+  // re-asking for it here just invites the classic browser-autofill trap:
+  // several stacked password fields make Chrome/Edge/1Password treat the
+  // "current password" field as part of a signup form and silently
+  // overwrite it with a generated suggestion, which then fails the
+  // bcrypt.compare below every time. Anywhere else changePassword is
+  // called (a normal settings-page change, once one exists) still requires
+  // and verifies currentPassword as before — this branch is decided by the
+  // server-side flag, not anything the client sends, so it can't be used
+  // to skip verification outside the intended first-login flow.
+  if (!user.mustChangePassword) {
+    if (!currentPassword) {
+      throw new ApiError(400, "Current password is required.");
+    }
+    const passwordMatches = await bcrypt.compare(
+      currentPassword,
+      user.password,
+    );
+    if (!passwordMatches) {
+      throw new ApiError(401, "Current password is incorrect.");
+    }
   }
 
   const hashedPassword = await bcrypt.hash(newPassword, 10);
@@ -84,6 +105,10 @@ const changePassword = asyncHandler(async (req, res) => {
     where: { id: user.id },
     data: {
       password: hashedPassword,
+      // Clears the forced-change gate (see requirePasswordChange middleware)
+      // for accounts created with a shared default password. A no-op write
+      // for accounts that were never flagged.
+      mustChangePassword: false,
     },
   });
 

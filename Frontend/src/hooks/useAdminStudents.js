@@ -187,6 +187,7 @@ export const useAdminStudents = () => {
     handleOpenModal,
     handleSave,
     handleDelete,
+    refetch: fetchStudents,
     ...detailState,
   };
 };

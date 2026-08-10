@@ -1,11 +1,12 @@
-import React from "react";
+import React, { useState } from "react";
 import AdminTable from "../components/admin/AdminTable";
 import AdminModal from "../components/admin/AdminModal";
 import ConfirmDialog from "../components/admin/ConfirmDialog";
 import AdminToolbar from "../components/admin/AdminToolbar";
 import AdminForm from "../components/admin/AdminForm";
 import RecordDetailPanel from "../components/admin/RecordDetailPanel";
-import { Plus, Pencil, Trash2 } from "lucide-react";
+import StudentImportModal from "../components/admin/StudentImportModal";
+import { Plus, Pencil, Trash2, Upload } from "lucide-react";
 import useAdminStudents from "../hooks/useAdminStudents";
 import { formatDateMedium } from "../utils/formatters";
 
@@ -134,7 +135,10 @@ const AdminStudents = () => {
     isDetailLoading,
     openDetail,
     closeDetail,
+    refetch,
   } = useAdminStudents();
+
+  const [isImportModalOpen, setIsImportModalOpen] = useState(false);
 
   return (
     <div className="space-y-6 animate-in fade-in duration-300">
@@ -147,13 +151,22 @@ const AdminStudents = () => {
             Manage overall student records and enrollment profiles.
           </p>
         </div>
-        <button
-          onClick={() => handleOpenModal()}
-          className="inline-flex items-center justify-center rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-700 transition"
-        >
-          <Plus className="w-5 h-5 mr-1" />
-          Add Student
-        </button>
+        <div className="flex items-center gap-3">
+          <button
+            onClick={() => setIsImportModalOpen(true)}
+            className="inline-flex items-center justify-center rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-4 py-2 text-sm font-semibold text-slate-700 dark:text-slate-200 shadow-sm hover:bg-slate-50 dark:hover:bg-slate-700 transition"
+          >
+            <Upload className="w-4 h-4 mr-1.5" />
+            Bulk Import
+          </button>
+          <button
+            onClick={() => handleOpenModal()}
+            className="inline-flex items-center justify-center rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-700 transition"
+          >
+            <Plus className="w-5 h-5 mr-1" />
+            Add Student
+          </button>
+        </div>
       </div>
 
       <AdminToolbar
@@ -241,6 +254,12 @@ const AdminStudents = () => {
         onConfirm={handleDelete}
         title="Delete Student"
         message={`Are you sure you want to delete ${recordToDelete?.name || recordToDelete?.rollNumber}? This action cannot be undone and will remove all their attendance records.`}
+      />
+
+      <StudentImportModal
+        isOpen={isImportModalOpen}
+        onClose={() => setIsImportModalOpen(false)}
+        onImported={refetch}
       />
     </div>
   );

@@ -38,10 +38,6 @@ html.dark .bg-white {
   background-color: #03080a !important;
 }
 
-html.dark .card-hover:hover {
-  background-color: #1c1c22 !important;
-}
-
 html.dark .bg-slate-50 {
   background-color: #101010 !important;
 }

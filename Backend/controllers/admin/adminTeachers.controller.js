@@ -86,6 +86,9 @@ const createTeacher = asyncHandler(async (req, res) => {
         password: hashedPassword,
         role: "TEACHER",
         instituteId: req.user.instituteId,
+        // Account starts on a known default password ("teacher123") —
+        // force a change before it can be used elsewhere.
+        mustChangePassword: true,
         ...stampOnCreate(req.user.userId),
       },
     });
