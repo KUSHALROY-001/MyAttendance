@@ -133,6 +133,7 @@ const buildSafeAuthUser = (user) => {
     name: user.name,
     email: user.email,
     role: user.role,
+    mustChangePassword: Boolean(user.mustChangePassword),
     institute: user.institute
       ? {
           id: user.institute.id,

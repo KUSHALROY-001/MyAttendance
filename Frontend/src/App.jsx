@@ -15,10 +15,12 @@ import EditProfile from "./pages/EditProfile.jsx";
 import { Routes, Route, Outlet } from "react-router-dom";
 import ProtectedRoute from "./components/auth/ProtectedRoute.jsx";
 import PublicOnlyRoute from "./components/auth/PublicOnlyRoute.jsx";
+import RequirePasswordChange from "./components/auth/RequirePasswordChange.jsx";
 import StudentDashboard from "./pages/StudentDashboard.jsx";
 import TeacherDashboard from "./pages/TeacherDashboard.jsx";
 import TakeAttendance from "./pages/TakeAttendance.jsx";
 import Library from "./pages/Library.jsx";
+import ChangePasswordRequired from "./pages/ChangePasswordRequired.jsx";
 
 // Admin Imports
 import { ThemeProvider } from "./contexts/ThemeContext.jsx";
@@ -66,15 +68,19 @@ function App() {
             </Route>
 
             <Route element={<ProtectedRoute allowedRoles={["STUDENT"]} />}>
-              <Route path="/student" element={<StudentDashboard />} />
+              <Route element={<RequirePasswordChange />}>
+                <Route path="/student" element={<StudentDashboard />} />
+              </Route>
             </Route>
 
             <Route element={<ProtectedRoute allowedRoles={["TEACHER"]} />}>
-              <Route path="/teacher" element={<TeacherDashboard />} />
-              <Route
-                path="/teacher/attendance/live/:allocationId"
-                element={<TakeAttendance />}
-              />
+              <Route element={<RequirePasswordChange />}>
+                <Route path="/teacher" element={<TeacherDashboard />} />
+                <Route
+                  path="/teacher/attendance/live/:allocationId"
+                  element={<TakeAttendance />}
+                />
+              </Route>
             </Route>
 
             <Route
@@ -84,7 +90,17 @@ function App() {
                 />
               }
             >
-              <Route path="/profile/edit" element={<EditProfile />} />
+              {/* Not wrapped in RequirePasswordChange — this is the escape
+                  hatch a locked-out user is redirected to, so it can't also
+                  redirect away from itself. */}
+              <Route
+                path="/change-password"
+                element={<ChangePasswordRequired />}
+              />
+
+              <Route element={<RequirePasswordChange />}>
+                <Route path="/profile/edit" element={<EditProfile />} />
+              </Route>
             </Route>
 
             {/* Fallback for unmatched routes inside Main */}
@@ -104,25 +120,27 @@ function App() {
           <Route
             element={<ProtectedRoute allowedRoles={["ADMIN", "SUPER_ADMIN"]} />}
           >
-            <Route path="/admin" element={<AdminLayout />}>
-              <Route index element={<AdminDashboard />} />
-              <Route path="students" element={<AdminStudents />} />
-              <Route path="teachers" element={<AdminTeachers />} />
-              <Route path="courses" element={<AdminCourses />} />
-              <Route path="allocations" element={<AdminAllocations />} />
-              <Route path="schedules" element={<AdminSchedules />} />
-              <Route path="reports" element={<AdminReports />} />
-              <Route path="users" element={<AdminUsers />} />
-              <Route
-                path="academic-options"
-                element={<AdminAcademicOptions />}
-              />
-              <Route path="institute" element={<AdminInstituteSettings />} />
-              <Route
-                path="pending-approvals"
-                element={<AdminPendingApprovals />}
-              />
-              <Route path="profile/edit" element={<EditProfile />} />
+            <Route element={<RequirePasswordChange />}>
+              <Route path="/admin" element={<AdminLayout />}>
+                <Route index element={<AdminDashboard />} />
+                <Route path="students" element={<AdminStudents />} />
+                <Route path="teachers" element={<AdminTeachers />} />
+                <Route path="courses" element={<AdminCourses />} />
+                <Route path="allocations" element={<AdminAllocations />} />
+                <Route path="schedules" element={<AdminSchedules />} />
+                <Route path="reports" element={<AdminReports />} />
+                <Route path="users" element={<AdminUsers />} />
+                <Route
+                  path="academic-options"
+                  element={<AdminAcademicOptions />}
+                />
+                <Route path="institute" element={<AdminInstituteSettings />} />
+                <Route
+                  path="pending-approvals"
+                  element={<AdminPendingApprovals />}
+                />
+                <Route path="profile/edit" element={<EditProfile />} />
+              </Route>
             </Route>
           </Route>
         </Routes>

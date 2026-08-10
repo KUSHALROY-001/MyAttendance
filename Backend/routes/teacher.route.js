@@ -2,6 +2,9 @@ const express = require("express");
 const router = express.Router();
 const { authenticate } = require("../middlewares/auth.middleware");
 const {
+  requirePasswordChange,
+} = require("../middlewares/requirePasswordChange.middleware");
+const {
   authorizeRoles,
   authorizeTeacherSelf,
   authorizeTeacherAllocationAccess,
@@ -15,7 +18,11 @@ const {
   submitAttendance,
 } = require("../controllers/teacher.controller");
 
-router.use(authenticate, authorizeRoles("TEACHER", "ADMIN", "SUPER_ADMIN"));
+router.use(
+  authenticate,
+  requirePasswordChange,
+  authorizeRoles("TEACHER", "ADMIN", "SUPER_ADMIN"),
+);
 
 router.get(
   "/dashboard/:teacherId",

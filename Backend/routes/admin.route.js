@@ -2,6 +2,9 @@ const express = require("express");
 const router = express.Router();
 const multer = require("multer");
 const { authenticate } = require("../middlewares/auth.middleware");
+const {
+  requirePasswordChange,
+} = require("../middlewares/requirePasswordChange.middleware");
 const { authorizeRoles } = require("../middlewares/authorize.middleware");
 const {
   getAdminDashboard,
@@ -56,7 +59,11 @@ const {
   getDepartmentDetail,
 } = require("../controllers/admin.controller");
 
-router.use(authenticate, authorizeRoles("ADMIN", "SUPER_ADMIN"));
+router.use(
+  authenticate,
+  requirePasswordChange,
+  authorizeRoles("ADMIN", "SUPER_ADMIN"),
+);
 
 const importUpload = multer({
   storage: multer.memoryStorage(),
@@ -91,7 +98,11 @@ router.get("/students/:id/detail", getStudentDetail);
 
 // Student bulk import (Excel/CSV)
 router.get("/students/import/template", downloadImportTemplate);
-router.post("/students/import/preview", importUpload.single("file"), previewStudentImport);
+router.post(
+  "/students/import/preview",
+  importUpload.single("file"),
+  previewStudentImport,
+);
 router.post("/students/import/confirm", confirmStudentImport);
 
 // Teacher CRUD

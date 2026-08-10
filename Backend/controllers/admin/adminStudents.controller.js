@@ -52,7 +52,20 @@ const readStudent = asyncHandler(async (req, res) => {
 // down) — so there's exactly one place that hashes the password, checks
 // duplicates, auto-enrolls in matching courses, and stamps audit fields,
 // rather than two copies that could quietly drift apart.
-const createStudentRecord = async (fields, instituteId, actorUserId) => {
+//
+// `coursesByKey` is an optional Map<"DEPT::SEMESTER", Course[]> the caller
+// can pass in to skip the course lookup below. confirmStudentImport passes
+// one it built once for the whole batch (see there) instead of every row
+// re-querying the same department+semester combo — with 10+ rows that was
+// adding real, avoidable round trips on top of everything else in this
+// function, which is part of what was pushing rows into the interactive
+// transaction timeout below.
+const createStudentRecord = async (
+  fields,
+  instituteId,
+  actorUserId,
+  coursesByKey = null,
+) => {
   const {
     name,
     email,
@@ -89,58 +102,69 @@ const createStudentRecord = async (fields, instituteId, actorUserId) => {
 
   const hashedPassword = await bcrypt.hash("password123", 10);
 
-  const courses = await prisma.course.findMany({
-    where: {
-      instituteId,
-      department,
-      semester: Number(semester),
+  const courses = coursesByKey
+    ? coursesByKey.get(`${department}::${Number(semester)}`) || []
+    : await prisma.course.findMany({
+        where: { instituteId, department, semester: Number(semester) },
+      });
+
+  return prisma.$transaction(
+    async (tx) => {
+      const user = await tx.user.create({
+        data: {
+          name,
+          email,
+          password: hashedPassword,
+          role: "STUDENT",
+          instituteId,
+          // Shared by single-add and bulk import (both call this function) —
+          // the account starts on a known default password, so force a
+          // change before it can be used elsewhere.
+          mustChangePassword: true,
+          ...stampOnCreate(actorUserId),
+        },
+      });
+
+      const student = await tx.student.create({
+        data: {
+          userId: user.id,
+          instituteId,
+          rollNumber,
+          enrollmentNumber,
+          department,
+          semester: Number(semester),
+          section: section || "A",
+          batch,
+          contactNumber: contactNumber || null,
+          ...stampOnCreate(actorUserId),
+          enrolledCourses: {
+            create: courses.map((course) => ({
+              courseId: course.id,
+            })),
+          },
+          attendanceStats: {
+            create: courses.map((course) => ({
+              courseId: course.id,
+            })),
+          },
+        },
+        include: {
+          user: { select: { name: true, email: true } },
+          enrolledCourses: true,
+          attendanceStats: true,
+        },
+      });
+
+      return student;
     },
-  });
-
-  return prisma.$transaction(async (tx) => {
-    const user = await tx.user.create({
-      data: {
-        name,
-        email,
-        password: hashedPassword,
-        role: "STUDENT",
-        instituteId,
-        ...stampOnCreate(actorUserId),
-      },
-    });
-
-    const student = await tx.student.create({
-      data: {
-        userId: user.id,
-        instituteId,
-        rollNumber,
-        enrollmentNumber,
-        department,
-        semester: Number(semester),
-        section: section || "A",
-        batch,
-        contactNumber: contactNumber || null,
-        ...stampOnCreate(actorUserId),
-        enrolledCourses: {
-          create: courses.map((course) => ({
-            courseId: course.id,
-          })),
-        },
-        attendanceStats: {
-          create: courses.map((course) => ({
-            courseId: course.id,
-          })),
-        },
-      },
-      include: {
-        user: { select: { name: true, email: true } },
-        enrolledCourses: true,
-        attendanceStats: true,
-      },
-    });
-
-    return student;
-  });
+    // Defaults are maxWait: 2000ms, timeout: 5000ms — fine for a single
+    // create, but bulk import calls this in a loop and a slower connection
+    // (cloud DB, VPN, a loaded dev machine) can burn most of that just
+    // acquiring a pool connection. Widened here rather than globally in
+    // utils/prisma.js so a single admin action can't hang a request for 15s
+    // by accident elsewhere in the app.
+    { maxWait: 10000, timeout: 15000 },
+  );
 };
 
 const createStudent = asyncHandler(async (req, res) => {
@@ -513,6 +537,18 @@ const previewStudentImport = asyncHandler(async (req, res) => {
   });
 });
 
+// Prisma error codes worth a single retry rather than an immediate failure:
+// P1017 is a dropped server connection (row 5's "Server has closed the
+// connection"), P2028/P2034 are transaction-layer errors (closed/expired
+// transaction, write conflict). All three are transient — the row's own
+// data isn't the problem, so silently failing it on the first hiccup would
+// under-report what's actually importable. Interactive transactions roll
+// back atomically on error, so retrying createStudentRecord is safe: if the
+// row somehow *did* land, the retry's own duplicate-email/roll/enrollment
+// check catches it and reports a clean 409 instead of a second row.
+const isTransientDbError = (err) =>
+  err?.code === "P1017" || err?.code === "P2028" || err?.code === "P2034";
+
 const confirmStudentImport = asyncHandler(async (req, res) => {
   const { previewToken } = req.body;
   if (!previewToken) {
@@ -531,44 +567,86 @@ const confirmStudentImport = asyncHandler(async (req, res) => {
   }
 
   const validRows = cached.results.filter((r) => r.isValid);
+
+  // Batch the course lookup once per unique department+semester combo in
+  // this import, instead of createStudentRecord re-querying it on every
+  // single row — a 10-row import for one class was issuing the same query
+  // up to 10 times.
+  const deptSemKeys = [
+    ...new Set(
+      validRows.map(
+        ({ row }) =>
+          `${String(row.department).trim().toUpperCase()}::${Number(row.semester)}`,
+      ),
+    ),
+  ];
+  const courseListsByKey = await Promise.all(
+    deptSemKeys.map((key) => {
+      const [department, semesterStr] = key.split("::");
+      return prisma.course.findMany({
+        where: {
+          instituteId: req.user.instituteId,
+          department,
+          semester: Number(semesterStr),
+        },
+      });
+    }),
+  );
+  const coursesByKey = new Map(
+    deptSemKeys.map((key, i) => [key, courseListsByKey[i]]),
+  );
+
   const outcomes = [];
 
   for (const { row, rowNumber } of validRows) {
-    try {
-      await createStudentRecord(
-        {
-          name: String(row.name).trim(),
-          email: String(row.email).trim().toLowerCase(),
-          rollNumber: String(row.rollNumber).trim(),
-          enrollmentNumber: String(row.enrollmentNumber).trim(),
-          department: String(row.department).trim().toUpperCase(),
-          semester: Number(row.semester),
-          section: row.section
-            ? String(row.section).trim().toUpperCase()
-            : undefined,
-          batch: String(row.batch).trim(),
-          contactNumber: row.contactNumber
-            ? String(row.contactNumber).trim()
-            : undefined,
-        },
-        req.user.instituteId,
-        req.user.userId,
-      );
-      outcomes.push({
-        rowNumber,
-        success: true,
-        name: row.name,
-        email: row.email,
-      });
-    } catch (err) {
-      outcomes.push({
-        rowNumber,
-        success: false,
-        name: row.name,
-        email: row.email,
-        error: err.message || "Failed to create this student.",
-      });
+    const payload = {
+      name: String(row.name).trim(),
+      email: String(row.email).trim().toLowerCase(),
+      rollNumber: String(row.rollNumber).trim(),
+      enrollmentNumber: String(row.enrollmentNumber).trim(),
+      department: String(row.department).trim().toUpperCase(),
+      semester: Number(row.semester),
+      section: row.section
+        ? String(row.section).trim().toUpperCase()
+        : undefined,
+      batch: String(row.batch).trim(),
+      contactNumber: row.contactNumber
+        ? String(row.contactNumber).trim()
+        : undefined,
+    };
+
+    let lastError;
+    let succeeded = false;
+
+    for (let attempt = 1; attempt <= 2 && !succeeded; attempt++) {
+      try {
+        await createStudentRecord(
+          payload,
+          req.user.instituteId,
+          req.user.userId,
+          coursesByKey,
+        );
+        succeeded = true;
+      } catch (err) {
+        lastError = err;
+        if (attempt === 1 && isTransientDbError(err)) {
+          continue; // one retry for a transient connection/transaction blip
+        }
+        break;
+      }
     }
+
+    outcomes.push(
+      succeeded
+        ? { rowNumber, success: true, name: row.name, email: row.email }
+        : {
+            rowNumber,
+            success: false,
+            name: row.name,
+            email: row.email,
+            error: lastError?.message || "Failed to create this student.",
+          },
+    );
   }
 
   previewCache.remove(previewToken);
