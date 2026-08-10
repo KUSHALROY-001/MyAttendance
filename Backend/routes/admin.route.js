@@ -1,5 +1,6 @@
 const express = require("express");
 const router = express.Router();
+const multer = require("multer");
 const { authenticate } = require("../middlewares/auth.middleware");
 const { authorizeRoles } = require("../middlewares/authorize.middleware");
 const {
@@ -9,6 +10,9 @@ const {
   createStudent,
   updateStudent,
   deleteStudent,
+  downloadImportTemplate,
+  previewStudentImport,
+  confirmStudentImport,
   readTeacher,
   createTeacher,
   updateTeacher,
@@ -54,6 +58,11 @@ const {
 
 router.use(authenticate, authorizeRoles("ADMIN", "SUPER_ADMIN"));
 
+const importUpload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB — well above what 500 rows of plain data needs
+});
+
 router.get("/dashboard", getAdminDashboard);
 router.get("/departments", getDepartment);
 
@@ -79,6 +88,11 @@ router.post("/students", createStudent);
 router.put("/students/:id", updateStudent);
 router.delete("/students/:id", deleteStudent);
 router.get("/students/:id/detail", getStudentDetail);
+
+// Student bulk import (Excel/CSV)
+router.get("/students/import/template", downloadImportTemplate);
+router.post("/students/import/preview", importUpload.single("file"), previewStudentImport);
+router.post("/students/import/confirm", confirmStudentImport);
 
 // Teacher CRUD
 router.get("/teachers", readTeacher);
