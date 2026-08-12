@@ -36,6 +36,7 @@ import AdminUsers from "./pages/AdminUsers.jsx";
 import AdminInstituteSettings from "./pages/AdminInstituteSettings.jsx";
 import AdminPendingApprovals from "./pages/AdminPendingApprovals.jsx";
 import AdminAcademicOptions from "./pages/AdminAcademicOptions.jsx";
+import AdminPromotions from "./pages/AdminPromotions.jsx";
 
 const MainLayout = () => (
   <>
@@ -134,6 +135,7 @@ function App() {
                   path="academic-options"
                   element={<AdminAcademicOptions />}
                 />
+                <Route path="promotions" element={<AdminPromotions />} />
                 <Route path="institute" element={<AdminInstituteSettings />} />
                 <Route
                   path="pending-approvals"

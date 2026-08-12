@@ -36,6 +36,8 @@ model Institute {
   courseAllocations CourseAllocation[]
   classTimetables  ClassTimetable[]
   libraryResources LibraryResource[]
+  promotionBatches  PromotionBatch[]
+  semesterSummaries StudentSemesterSummary[]
 }
 
 // ─────────────────────────────────────────────
@@ -90,6 +92,9 @@ model User {
   updatedScheduleEntries ClassScheduleEntry[] @relation("ScheduleEntryUpdatedBy")
   createdDepartments     DepartmentInfo[]     @relation("DepartmentCreatedBy")
   updatedDepartments     DepartmentInfo[]     @relation("DepartmentUpdatedBy")
+
+  // Semester promotion — which SUPER_ADMIN triggered a given batch run.
+  triggeredPromotionBatches PromotionBatch[] @relation("PromotionTriggeredBy")
 
   // Relations
   institute        Institute?        @relation(fields: [instituteId], references: [id], onDelete: Cascade, onUpdate: NoAction)
@@ -180,6 +185,7 @@ model Student {
   enrolledCourses   StudentCourse[] // Many-to-many with Course
   attendanceRecords AttendanceRecord[] // All attendance records for this student
   attendanceStats   StudentAttendanceStat[] // Cached attendance per course
+  semesterSummaries StudentSemesterSummary[] // Frozen per-semester report cards from promotion runs
 
   @@unique([instituteId, rollNumber]) // roll numbers only need to be unique within an institute
   @@unique([instituteId, enrollmentNumber]) // same for enrollment numbers
@@ -316,6 +322,10 @@ model Course {
   enrolledStudents StudentCourse[]
   allocations      CourseAllocation[]
   attendanceStats  StudentAttendanceStat[]
+  // Nullable on the child side (StudentSemesterCourseSummary.courseId) —
+  // a course can be deleted later and the archived summary row still
+  // renders from its own snapshotted courseCode/courseName.
+  semesterCourseSummaries StudentSemesterCourseSummary[]
 
   @@unique([instituteId, code]) // course codes only need to be unique within an institute
   @@index([instituteId])
@@ -453,4 +463,89 @@ model LibraryResource {
   @@index([instituteId])
   @@index([contributorId])
   @@index([instituteId, department, semester])
+}
+
+// ─────────────────────────────────────────────
+// SEMESTER PROMOTION — Bulk "advance every student one semester" action,
+// triggerable only by a SUPER_ADMIN. See /areas/attendance-project.md plan.
+// ─────────────────────────────────────────────
+model PromotionBatch {
+  id            Int      @id @default(autoincrement())
+  instituteId   Int
+  department    String?  // null = ran across all departments in one submit
+  status        PromotionBatchStatus @default(RUNNING)
+  totalStudents Int      @default(0)
+  promotedCount Int      @default(0)
+  skippedCount  Int      @default(0) // already at final semester
+  failedCount   Int      @default(0)
+  triggeredById Int
+  startedAt     DateTime @default(now())
+  completedAt   DateTime?
+  errorLog      Json?    // [{studentId, rollNumber, reason}]
+
+  institute   Institute @relation(fields: [instituteId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  triggeredBy User      @relation("PromotionTriggeredBy", fields: [triggeredById], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  summaries   StudentSemesterSummary[]
+
+  @@index([instituteId])
+  @@index([triggeredById])
+  // Powers the "is a run already in progress" guard and the staleness
+  // sweep for stuck RUNNING batches without a full table scan.
+  @@index([instituteId, status])
+}
+
+enum PromotionBatchStatus {
+  RUNNING
+  COMPLETED
+  COMPLETED_WITH_ERRORS
+  FAILED
+}
+
+// ─────────────────────────────────────────────
+// STUDENT SEMESTER SUMMARY — Frozen report-card snapshot of a completed
+// semester, written at the moment a student is promoted out of it.
+// ─────────────────────────────────────────────
+model StudentSemesterSummary {
+  id                 Int      @id @default(autoincrement())
+  studentId          Int
+  instituteId        Int
+  promotionBatchId   Int?
+  department         String
+  section            String
+  semester           Int      // the semester this summary is FOR
+  promotedToSemester Int
+  totalSessions      Int      @default(0)
+  totalAttended      Int      @default(0)
+  overallPercentage  Float    @default(0)
+  createdAt          DateTime @default(now())
+
+  student   Student         @relation(fields: [studentId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  institute Institute       @relation(fields: [instituteId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  batch     PromotionBatch? @relation(fields: [promotionBatchId], references: [id], onDelete: SetNull, onUpdate: NoAction)
+  courses   StudentSemesterCourseSummary[]
+
+  @@index([studentId])
+  @@index([instituteId])
+  @@index([promotionBatchId])
+}
+
+// ─────────────────────────────────────────────
+// STUDENT SEMESTER COURSE SUMMARY — Per-course line item within a frozen
+// semester summary (one row per course the student was enrolled in).
+// ─────────────────────────────────────────────
+model StudentSemesterCourseSummary {
+  id                Int    @id @default(autoincrement())
+  semesterSummaryId Int
+  courseId          Int?   // nullable — course could be deleted later, keep name/code for history
+  courseCode        String
+  courseName        String
+  totalSessions     Int    @default(0)
+  totalAttended     Int    @default(0)
+  percentage        Float  @default(0)
+
+  semesterSummary StudentSemesterSummary @relation(fields: [semesterSummaryId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  course          Course?                @relation(fields: [courseId], references: [id], onDelete: SetNull, onUpdate: NoAction)
+
+  @@index([semesterSummaryId])
+  @@index([courseId])
 }

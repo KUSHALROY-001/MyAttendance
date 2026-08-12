@@ -9,6 +9,7 @@ const adminUsersController = require("./admin/adminUsers.controller");
 const adminInstituteController = require("./admin/adminInstitute.controller");
 const adminAcademicOptionsController = require("./admin/adminAcademicOptions.controller");
 const adminApprovalsController = require("./admin/adminApprovals.controller");
+const adminPromotionsController = require("./admin/adminPromotions.controller");
 
 module.exports = {
   ...adminDashboardController,
@@ -22,4 +23,5 @@ module.exports = {
   ...adminInstituteController,
   ...adminAcademicOptionsController,
   ...adminApprovalsController,
+  ...adminPromotionsController,
 };
