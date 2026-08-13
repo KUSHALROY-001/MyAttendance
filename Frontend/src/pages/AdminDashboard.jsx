@@ -1,5 +1,5 @@
 import React from "react";
-import LoadingAnimation from "../components/common/LoadingAnimation";
+import AdminDashboardSkeleton from "../components/common/skeletons/AdminDashboardSkeleton";
 import StatCard from "../components/common/StatCard";
 import AdminTable from "../components/admin/AdminTable";
 import { Users, GraduationCap, BookOpen } from "lucide-react";
@@ -55,7 +55,7 @@ const AdminDashboard = () => {
   const { dashboardData, loading } = useAdminDashboard();
 
   if (loading) {
-    return <LoadingAnimation />;
+    return <AdminDashboardSkeleton />;
   }
 
   return (

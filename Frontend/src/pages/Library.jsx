@@ -7,6 +7,7 @@ import LibraryEmptyState from "../components/library/LibraryEmptyState";
 import FolderStructureGuide from "../components/library/FolderStructureGuide";
 import ConfirmDialog from "../components/admin/ConfirmDialog";
 import useLibrary, { inputClass, labelClass } from "../hooks/useLibrary";
+import LibrarySkeleton from "../components/common/skeletons/LibrarySkeleton";
 
 export default function Library() {
   const {
@@ -57,9 +58,7 @@ export default function Library() {
         />
 
         {loading ? (
-          <div className="flex justify-center py-20">
-            <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-indigo-500"></div>
-          </div>
+          <LibrarySkeleton count={6} />
         ) : resources.length === 0 ? (
           <LibraryEmptyState />
         ) : (

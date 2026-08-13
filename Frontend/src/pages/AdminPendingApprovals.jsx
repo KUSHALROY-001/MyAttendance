@@ -4,19 +4,12 @@ import usePendingApprovals from "../hooks/usePendingApprovals";
 import ConfirmDialog from "../components/admin/ConfirmDialog";
 import { formatDateMedium } from "../utils/formatters";
 
+import PendingApprovalsSkeleton from "../components/common/skeletons/PendingApprovalsSkeleton";
+
 const AdminPendingApprovals = () => {
   const { pendingStudents, loading, processingId, handleApprove, handleReject } =
     usePendingApprovals();
   const [rejectTarget, setRejectTarget] = useState(null);
-
-  if (loading) {
-    return (
-      <div className="flex h-64 items-center justify-center text-slate-400">
-        <Loader2 className="mr-2 h-5 w-5 animate-spin" /> Loading pending
-        signups...
-      </div>
-    );
-  }
 
   return (
     <div className="space-y-6 animate-in fade-in duration-300">
@@ -31,7 +24,9 @@ const AdminPendingApprovals = () => {
         </p>
       </div>
 
-      {pendingStudents.length === 0 ? (
+      {loading ? (
+        <PendingApprovalsSkeleton count={4} />
+      ) : pendingStudents.length === 0 ? (
         <div className="flex flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-slate-300 bg-slate-50/60 py-16 text-center dark:border-slate-700 dark:bg-slate-900/40">
           <Inbox className="h-8 w-8 text-slate-400" />
           <p className="text-sm font-semibold text-slate-600 dark:text-slate-300">

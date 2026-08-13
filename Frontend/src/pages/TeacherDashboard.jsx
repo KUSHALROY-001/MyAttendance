@@ -6,6 +6,7 @@ import AttendanceSessions from "../components/teacher/AttendanceSessions";
 import TeacherCourses from "../components/teacher/TeacherCourses";
 import StartAttendanceModal from "../components/teacher/StartAttendanceModal";
 import AttendanceSessionModal from "../components/common/AttendanceSessionModal";
+import TeacherDashboardSkeleton from "../components/common/skeletons/TeacherDashboardSkeleton";
 import useTeacherDashboard from "../hooks/useTeacherDashboard.jsx";
 
 const TeacherDashboard = () => {
@@ -31,11 +32,7 @@ const TeacherDashboard = () => {
   } = useTeacherDashboard();
 
   if (loading) {
-    return (
-      <div className="flex h-screen items-center justify-center">
-        <div className="w-8 h-8 rounded-full border-4 border-indigo-100 border-t-indigo-600 animate-spin"></div>
-      </div>
-    );
+    return <TeacherDashboardSkeleton />;
   }
 
   return (

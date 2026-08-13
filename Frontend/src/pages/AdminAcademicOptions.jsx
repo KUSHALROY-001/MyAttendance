@@ -9,6 +9,7 @@ import AcademicOptionsHeader from "../components/admin/academic-options/Academic
 import ReadOnlyAlert from "../components/admin/academic-options/ReadOnlyAlert";
 import DepartmentCardGrid from "../components/admin/academic-options/DepartmentCardGrid";
 import DepartmentModal from "../components/admin/academic-options/DepartmentModal";
+import AcademicOptionsSkeleton from "../components/common/skeletons/AcademicOptionsSkeleton";
 
 const departmentDetailSections = [
   {
@@ -92,11 +93,7 @@ const AdminAcademicOptions = () => {
   } = useAdminAcademicOptions();
 
   if (loading) {
-    return (
-      <div className="flex h-64 items-center justify-center text-slate-400">
-        <Loader2 className="mr-2 h-5 w-5 animate-spin" /> Loading academic options...
-      </div>
-    );
+    return <AcademicOptionsSkeleton count={6} />;
   }
 
   return (
