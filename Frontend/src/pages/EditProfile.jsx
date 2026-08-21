@@ -1,4 +1,4 @@
-import LoadingAnimation from "../components/common/LoadingAnimation";
+import ProfileSkeleton from "../components/common/skeletons/ProfileSkeleton";
 import { useEditProfile } from "../hooks/useEditProfile";
 import EditProfileHeader from "../components/profile/EditProfileHeader";
 import EditProfileForm from "../components/profile/EditProfileForm";
@@ -7,7 +7,7 @@ function EditProfile() {
   const profileProps = useEditProfile();
 
   if (profileProps.loading) {
-    return <LoadingAnimation />;
+    return <ProfileSkeleton />;
   }
 
   return (

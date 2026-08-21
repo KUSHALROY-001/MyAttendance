@@ -57,6 +57,11 @@ const {
   getScheduleEntryDetail,
   getUserDetailFull,
   getDepartmentDetail,
+  // Semester promotion
+  previewPromotion,
+  runPromotion,
+  listPromotionBatches,
+  getPromotionBatchDetail,
 } = require("../controllers/admin.controller");
 
 router.use(
@@ -146,6 +151,21 @@ router.get("/schedule-entries/:id/detail", getScheduleEntryDetail);
 router.get("/pending-students", readPendingStudents);
 router.post("/pending-students/:id/approve", approvePendingStudent);
 router.post("/pending-students/:id/reject", rejectPendingStudent);
+
+// Semester promotion — SUPER_ADMIN only (authenticate + requirePasswordChange
+// already applied above; this narrows past the router-wide ADMIN|SUPER_ADMIN).
+router.get(
+  "/promotions/preview",
+  authorizeRoles("SUPER_ADMIN"),
+  previewPromotion,
+);
+router.post("/promotions/run", authorizeRoles("SUPER_ADMIN"), runPromotion);
+router.get("/promotions", authorizeRoles("SUPER_ADMIN"), listPromotionBatches);
+router.get(
+  "/promotions/:batchId",
+  authorizeRoles("SUPER_ADMIN"),
+  getPromotionBatchDetail,
+);
 
 // User RUD
 router.get("/users", readUser);

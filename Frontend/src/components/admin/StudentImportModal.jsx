@@ -132,14 +132,14 @@ const StudentImportModal = ({ isOpen, onClose, onImported }) => {
 
       {step === "preview" && previewData && (
         <div className="space-y-4">
-          <p className="text-sm font-semibold text-slate-700 dark:text-slate-200">
+          <p className="text-sm font-semibold text-slate-200">
             {previewData.validCount} of {previewData.totalRows} rows are ready
             to import.
           </p>
 
           <div className="max-h-80 overflow-y-auto rounded-xl border border-slate-200 dark:border-slate-800">
             <table className="w-full text-left text-sm">
-              <thead className="text-xs text-slate-700 dark:text-slate-300 uppercase bg-slate-50 dark:bg-slate-800/50 border-b border-slate-200 dark:border-slate-800 sticky top-0">
+              <thead className="text-xs text-black dark:text-slate-300 uppercase bg-slate-50 dark:bg-slate-800/50 border-b border-slate-200 dark:border-slate-800 sticky top-0">
                 <tr>
                   <th className="px-4 py-2.5 font-semibold">Row</th>
                   <th className="px-4 py-2.5 font-semibold">Name</th>
@@ -153,13 +153,13 @@ const StudentImportModal = ({ isOpen, onClose, onImported }) => {
                     key={r.rowNumber}
                     className="border-b border-slate-100 dark:border-slate-800 last:border-0"
                   >
-                    <td className="px-4 py-2.5 text-slate-500 dark:text-slate-400">
+                    <td className="px-4 py-2.5 text-slate-200">
                       {r.rowNumber}
                     </td>
-                    <td className="px-4 py-2.5 text-slate-900 dark:text-slate-200">
+                    <td className="px-4 py-2.5 text-white">
                       {r.row?.name || "—"}
                     </td>
-                    <td className="px-4 py-2.5 text-slate-500 dark:text-slate-400">
+                    <td className="px-4 py-2.5 text-slate-200">
                       {r.row?.email || "—"}
                     </td>
                     <td className="px-4 py-2.5">

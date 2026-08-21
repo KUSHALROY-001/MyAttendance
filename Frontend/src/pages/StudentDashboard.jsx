@@ -1,6 +1,6 @@
 import { useStudentDashboard } from "../hooks/useStudentDashboard.jsx";
 import PremiumErrorState from "../components/common/PremiumErrorState";
-import LoadingAnimation from "../components/common/LoadingAnimation";
+import StudentDashboardSkeleton from "../components/common/skeletons/StudentDashboardSkeleton";
 import ClassRoutineTable from "../components/common/ClassRoutineTable";
 import AttendanceSessionModal from "../components/common/AttendanceSessionModal";
 import StudentDashHeader from "../components/student/StudentDashHeader";
@@ -49,7 +49,7 @@ const StudentDashboard = () => {
   }
 
   if (!stuData) {
-    return <LoadingAnimation />;
+    return <StudentDashboardSkeleton />;
   }
 
   return (

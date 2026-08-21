@@ -18,6 +18,7 @@ import {
   Home,
   Layers,
   Inbox,
+  GraduationCap,
 } from "lucide-react";
 
 export const NAV_ITEMS = [
@@ -72,6 +73,12 @@ export const NAV_ITEMS = [
     icon: () => <Layers className="w-5 h-5" />,
   },
   {
+    name: "Semester Promotion",
+    path: "/admin/promotions",
+    icon: () => <GraduationCap className="w-5 h-5" />,
+    superAdminOnly: true,
+  },
+  {
     name: "Institute Settings",
     path: "/admin/institute",
     icon: () => <Building2 className="w-5 h-5" />,
@@ -119,7 +126,9 @@ const AdminSidebar = ({
       </div>
 
       <nav className="no-scrollbar flex-1 space-y-1 overflow-y-auto px-4 py-6">
-        {NAV_ITEMS.map((item) => (
+        {NAV_ITEMS.filter(
+          (item) => !item.superAdminOnly || user?.role === "SUPER_ADMIN",
+        ).map((item) => (
           <NavLink
             key={item.name}
             to={item.path}

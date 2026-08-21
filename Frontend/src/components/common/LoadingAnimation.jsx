@@ -1,9 +1,9 @@
-import React from "react";
+import DashboardSkeleton from "./skeletons/DashboardSkeleton";
 
 const LoadingAnimation = () => {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-slate-900">
-      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 dark:border-indigo-400" />
+    <div className="w-full p-4 sm:p-6 lg:p-8">
+      <DashboardSkeleton />
     </div>
   );
 };

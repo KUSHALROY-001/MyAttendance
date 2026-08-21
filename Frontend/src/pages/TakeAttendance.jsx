@@ -1,5 +1,5 @@
 import React from "react";
-import LoadingAnimation from "../components/common/LoadingAnimation";
+import TakeAttendanceSkeleton from "../components/common/skeletons/TakeAttendanceSkeleton";
 import PremiumErrorState from "../components/common/PremiumErrorState";
 import useTakeAttendance from "../hooks/useTakeAttendance";
 import TakeAttendanceHeader from "../components/teacher/TakeAttendanceHeader";
@@ -23,7 +23,7 @@ const TakeAttendance = () => {
   } = useTakeAttendance();
 
   if (loading) {
-    return <LoadingAnimation />;
+    return <TakeAttendanceSkeleton />;
   }
 
   if (!allocation) {
