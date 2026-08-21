@@ -8,6 +8,7 @@ const adminRoutes = require("./routes/admin.route");
 const libraryRoutes = require("./routes/library.route");
 const authRoutes = require("./routes/auth.route");
 const errorHandler = require("./middlewares/error.middleware");
+const ApiError = require("./utils/ApiError");
 
 // Load environment variables from backend/.env (dotenv defaults to the
 // current working directory, which is backend/ when you run `npm run dev`
@@ -48,6 +49,12 @@ app.use("/api/teacher", teacherRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/library", libraryRoutes);
 app.use("/api/auth", authRoutes);
+
+// Unmatched routes — return JSON instead of Express's default HTML 404 page,
+// so the frontend always gets a parseable, user-friendly error.
+app.use((req, res, next) => {
+  next(new ApiError(404, "This page or resource doesn't exist."));
+});
 
 // Global Error Handler Middleware
 app.use(errorHandler);

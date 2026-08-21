@@ -3,6 +3,7 @@ const { prisma } = require("../utils/prisma");
 const {
   extractBearerToken,
   verifyAccessToken,
+  friendlyTokenErrorMessage,
 } = require("../utils/auth.utils");
 
 const attachAuthContext = async (req, token) => {
@@ -10,7 +11,13 @@ const attachAuthContext = async (req, token) => {
   try {
     payload = verifyAccessToken(token);
   } catch (error) {
-    throw new ApiError(401, error.message || "Invalid access token.");
+    throw new ApiError(
+      401,
+      friendlyTokenErrorMessage(error, {
+        expiredMessage: "Your session has expired. Please log in again.",
+        invalidMessage: "Invalid authentication token. Please log in again.",
+      }),
+    );
   }
 
   const user = await prisma.user.findUnique({

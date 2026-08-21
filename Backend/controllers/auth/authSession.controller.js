@@ -10,6 +10,7 @@ const {
   createCookie,
   getRefreshCookieOptions,
   buildSafeAuthUser,
+  friendlyTokenErrorMessage,
 } = require("../../utils/auth.utils");
 
 const getUserForSession = async (userId) => {
@@ -130,7 +131,13 @@ const refreshSession = asyncHandler(async (req, res) => {
   try {
     payload = verifyRefreshToken(refreshToken);
   } catch (error) {
-    throw new ApiError(401, error.message || "Invalid refresh token.");
+    throw new ApiError(
+      401,
+      friendlyTokenErrorMessage(error, {
+        expiredMessage: "Your session has expired. Please log in again.",
+        invalidMessage: "Invalid session. Please log in again.",
+      }),
+    );
   }
 
   const user = await getUserForSession(payload.userId);

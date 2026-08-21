@@ -56,6 +56,19 @@ const generateRefreshToken = (payload) =>
 const verifyAccessToken = (token) => jwt.verify(token, ACCESS_TOKEN_SECRET);
 const verifyRefreshToken = (token) => jwt.verify(token, REFRESH_TOKEN_SECRET);
 
+// jsonwebtoken throws errors with technical names/messages like
+// "jwt expired" or "invalid signature" — translate those into copy a user
+// can actually act on, instead of forwarding the raw library message.
+const friendlyTokenErrorMessage = (
+  error,
+  { expiredMessage, invalidMessage },
+) => {
+  if (error?.name === "TokenExpiredError") {
+    return expiredMessage;
+  }
+  return invalidMessage;
+};
+
 const extractBearerToken = (authHeader = "") => {
   if (!authHeader.startsWith("Bearer ")) {
     return null;
@@ -151,6 +164,7 @@ module.exports = {
   verifyAccessToken,
   verifyRefreshToken,
   extractBearerToken,
+  friendlyTokenErrorMessage,
   parseCookies,
   createCookie,
   getRefreshCookieOptions,
