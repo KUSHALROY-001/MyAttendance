@@ -29,8 +29,14 @@ const ConfirmDialog = ({
   return (
     <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
       <div
+        role="button"
+        tabIndex={0}
+        aria-label="Close dialog"
         className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm"
         onClick={onClose}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" || e.key === " ") onClose();
+        }}
       ></div>
       <div className="relative w-full max-w-sm bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-xl p-6 text-center animate-in fade-in zoom-in duration-200">
         <div className={`mx-auto w-12 h-12 ${iconBgClass} rounded-full flex items-center justify-center mb-4`}>

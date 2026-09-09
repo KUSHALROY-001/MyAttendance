@@ -116,14 +116,15 @@ const AdminPromotions = () => {
             <AdminTable
               columns={previewColumns}
               data={preview}
+              rowKey={(row) => row.department}
               emptyMessage="No departments with configured semesters found."
             />
           </div>
 
           {previewWarnings.length > 0 && (
             <div className="rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm text-amber-700 dark:border-amber-900/40 dark:bg-amber-500/5 dark:text-amber-400">
-              {previewWarnings.map((w, i) => (
-                <p key={i}>{w}</p>
+              {previewWarnings.map((w) => (
+                <p key={w}>{w}</p>
               ))}
             </div>
           )}

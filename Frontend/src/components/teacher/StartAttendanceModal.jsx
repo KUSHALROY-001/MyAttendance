@@ -14,7 +14,7 @@ const StartAttendanceModal = ({ isOpen, onClose, allocations = [] }) => {
 
   const departments = useMemo(() => {
     const depts = new Set(allocations.map((a) => a.department));
-    return Array.from(depts).sort();
+    return Array.from(depts).sort((a, b) => String(a).localeCompare(String(b)));
   }, [allocations]);
 
   const semesters = useMemo(() => {
@@ -39,7 +39,7 @@ const StartAttendanceModal = ({ isOpen, onClose, allocations = [] }) => {
         )
         .map((a) => a.section),
     );
-    return Array.from(secs).sort();
+    return Array.from(secs).sort((a, b) => String(a).localeCompare(String(b)));
   }, [allocations, selectedDept, selectedSem]);
 
   const availableCourses = useMemo(() => {
@@ -92,11 +92,15 @@ const StartAttendanceModal = ({ isOpen, onClose, allocations = [] }) => {
 
         <div className="mb-8 space-y-4">
           <div>
-            <label className="mb-2 block text-sm font-bold text-slate-800 dark:text-slate-100">
+            <label
+              htmlFor="startAttendanceDept"
+              className="mb-2 block text-sm font-bold text-slate-800 dark:text-slate-100"
+            >
               Department
             </label>
             <div className="relative">
               <select
+                id="startAttendanceDept"
                 className={selectClass}
                 value={selectedDept}
                 onChange={handleDeptChange}
@@ -118,11 +122,15 @@ const StartAttendanceModal = ({ isOpen, onClose, allocations = [] }) => {
 
           {selectedDept && (
             <div className="animate-fadeIn">
-              <label className="mb-2 block text-sm font-bold text-slate-800 dark:text-slate-100">
+              <label
+                htmlFor="startAttendanceSem"
+                className="mb-2 block text-sm font-bold text-slate-800 dark:text-slate-100"
+              >
                 Semester
               </label>
               <div className="relative">
                 <select
+                  id="startAttendanceSem"
                   className={selectClass}
                   value={selectedSem}
                   onChange={handleSemChange}
@@ -145,11 +153,15 @@ const StartAttendanceModal = ({ isOpen, onClose, allocations = [] }) => {
 
           {selectedSem && (
             <div className="animate-fadeIn">
-              <label className="mb-2 block text-sm font-bold text-slate-800 dark:text-slate-100">
+              <label
+                htmlFor="startAttendanceSec"
+                className="mb-2 block text-sm font-bold text-slate-800 dark:text-slate-100"
+              >
                 Section
               </label>
               <div className="relative">
                 <select
+                  id="startAttendanceSec"
                   className={selectClass}
                   value={selectedSec}
                   onChange={handleSecChange}
@@ -172,11 +184,15 @@ const StartAttendanceModal = ({ isOpen, onClose, allocations = [] }) => {
 
           {selectedSec && (
             <div className="animate-fadeIn">
-              <label className="mb-2 block text-sm font-bold text-slate-800 dark:text-slate-100">
+              <label
+                htmlFor="startAttendanceSubject"
+                className="mb-2 block text-sm font-bold text-slate-800 dark:text-slate-100"
+              >
                 Subject
               </label>
               <div className="relative">
                 <select
+                  id="startAttendanceSubject"
                   className={selectClass}
                   value={selectedCourseId}
                   onChange={(e) => setSelectedCourseId(e.target.value)}

@@ -21,8 +21,13 @@
  * runs never collide with previous runs' data.
  */
 
+const crypto = require("node:crypto");
+
 const BASE_URL = process.env.API_BASE_URL || "http://localhost:5000/api";
-const RUN_ID = Math.random().toString(36).slice(2, 8).toUpperCase();
+// A run-unique suffix, not a security token — but generated with a CSPRNG
+// rather than Math.random() so this script doesn't rely on a
+// non-cryptographic PRNG anywhere, even for low-stakes values.
+const RUN_ID = crypto.randomBytes(6).toString("hex").toUpperCase();
 
 // ── tiny test harness ──────────────────────────────────────────────────
 const results = [];
@@ -31,6 +36,25 @@ function record(name, passed, detail) {
   const icon = passed ? "✅" : "❌";
   console.log(`${icon} ${name}${detail ? ` — ${detail}` : ""}`);
 }
+
+// Encode a single dynamic path segment before it's spliced into a request
+// URL. The IDs/roll numbers interpolated below originate from data the
+// (local test) API previously returned — treat them the same as any other
+// untrusted input and encode them rather than trusting they're always a
+// clean id, so they can never be used to smuggle extra path segments,
+// query parameters, or a different host into the constructed URL.
+function seg(value) {
+  return encodeURIComponent(String(value));
+}
+
+// Admin-created teacher accounts start on this well-known default password
+// (see Backend/controllers/admin/adminTeachers.controller.js) and are
+// forced through a "must change password" flow before doing anything real —
+// it's a documented application default, not a secret credential for this
+// script. Kept as one named, overridable constant (rather than an inline
+// literal at the call site) so it can be swapped via env var too.
+const SEEDED_TEACHER_DEFAULT_PASSWORD =
+  process.env.TEST_TEACHER_DEFAULT_PASSWORD || "teacher123";
 
 async function req(method, path, { token, body } = {}) {
   const res = await fetch(`${BASE_URL}${path}`, {
@@ -164,7 +188,10 @@ async function seedInstituteData(institute, label) {
   // students → "password123" (see auth/authRegistration.controller.js-style
   // default), teachers → "teacher123" (see adminTeachers.controller.js).
   const teacherLogin = await req("POST", "/auth/login", {
-    body: { email: teacher.data.email, password: "teacher123" },
+    body: {
+      email: teacher.data.email,
+      password: SEEDED_TEACHER_DEFAULT_PASSWORD,
+    },
   });
   if (teacherLogin.status !== 200) {
     throw new Error(
@@ -219,7 +246,7 @@ async function main() {
 
   // 2. Admin B cannot read/edit/delete Institute A's student by ID
   {
-    const upd = await req("PUT", `/admin/students/${dataA.student.id}`, {
+    const upd = await req("PUT", `/admin/students/${seg(dataA.student.id)}`, {
       token: instB.adminToken,
       body: { batch: "HACKED" },
     });
@@ -229,9 +256,11 @@ async function main() {
       `status=${upd.status}`,
     );
 
-    const del = await req("DELETE", `/admin/students/${dataA.student.id}`, {
-      token: instB.adminToken,
-    });
+    const del = await req(
+      "DELETE",
+      `/admin/students/${seg(dataA.student.id)}`,
+      { token: instB.adminToken },
+    );
     record(
       "Admin B cannot delete Admin A's student by ID",
       del.status === 404,
@@ -241,7 +270,7 @@ async function main() {
 
   // 3. Same for teachers
   {
-    const upd = await req("PUT", `/admin/teachers/${dataA.teacher.id}`, {
+    const upd = await req("PUT", `/admin/teachers/${seg(dataA.teacher.id)}`, {
       token: instB.adminToken,
       body: { designation: "HACKED" },
     });
@@ -254,7 +283,7 @@ async function main() {
 
   // 4. Same for courses
   {
-    const upd = await req("PUT", `/admin/courses/${dataA.course.id}`, {
+    const upd = await req("PUT", `/admin/courses/${seg(dataA.course.id)}`, {
       token: instB.adminToken,
       body: { name: "HACKED" },
     });
@@ -267,10 +296,11 @@ async function main() {
 
   // 5. Same for allocations
   {
-    const upd = await req("PUT", `/admin/allocations/${dataA.allocation.id}`, {
-      token: instB.adminToken,
-      body: { section: "Z" },
-    });
+    const upd = await req(
+      "PUT",
+      `/admin/allocations/${seg(dataA.allocation.id)}`,
+      { token: instB.adminToken, body: { section: "Z" } },
+    );
     record(
       "Admin B cannot update Admin A's course allocation by ID",
       upd.status === 404,
@@ -301,7 +331,7 @@ async function main() {
   {
     const res = await req(
       "GET",
-      `/student/dashboard/${dataA.student.rollNumber}`,
+      `/student/dashboard/${seg(dataA.student.rollNumber)}`,
       { token: dataA.studentToken },
     );
     const courseName =
@@ -320,7 +350,7 @@ async function main() {
     // both used "R001".
     const res = await req(
       "GET",
-      `/student/dashboard/${dataB.student.rollNumber}`,
+      `/student/dashboard/${seg(dataB.student.rollNumber)}`,
       { token: dataB.studentToken },
     );
     record(
@@ -343,7 +373,7 @@ async function main() {
   {
     const res = await req(
       "GET",
-      `/teacher/attendance/live/${dataB.allocation.id}`,
+      `/teacher/attendance/live/${seg(dataB.allocation.id)}`,
       { token: dataA.teacherToken },
     );
     record(
@@ -390,7 +420,7 @@ async function main() {
       `created status=${created.status}`,
     );
 
-    const delAsB = await req("DELETE", `/library/${resourceAId}`, {
+    const delAsB = await req("DELETE", `/library/${seg(resourceAId)}`, {
       token: instB.adminToken,
     });
     record(
@@ -438,7 +468,7 @@ async function main() {
     // Institute A has exactly one admin (instA). If the "last admin" check
     // were counting globally instead of per-institute, it would see 2 admins
     // total (A's + B's) and wrongly ALLOW this deletion.
-    const res = await req("DELETE", `/admin/users/${instA.adminUserId}`, {
+    const res = await req("DELETE", `/admin/users/${seg(instA.adminUserId)}`, {
       token: instA.adminToken,
     });
     record(

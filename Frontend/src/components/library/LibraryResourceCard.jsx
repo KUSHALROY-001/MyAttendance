@@ -45,8 +45,14 @@ export default function LibraryResourceCard({ res, user, onEdit, onDelete }) {
               {menuOpen && (
                 <>
                   <div
+                    role="button"
+                    tabIndex={0}
+                    aria-label="Close menu"
                     className="fixed inset-0 z-10"
                     onClick={() => setMenuOpen(false)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" || e.key === " ") setMenuOpen(false);
+                    }}
                   />
                   <div className="absolute right-0 z-20 mt-1 w-36 rounded-xl border border-slate-200 bg-white py-1 shadow-lg dark:border-[#222228] dark:bg-[#19191D]">
                     <button

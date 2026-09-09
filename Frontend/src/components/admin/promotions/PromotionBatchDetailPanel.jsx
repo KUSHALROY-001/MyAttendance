@@ -7,8 +7,14 @@ const PromotionBatchDetailPanel = ({ batch, loading, onClose }) => {
   return (
     <div className="fixed inset-0 z-[60] flex justify-end">
       <div
+        role="button"
+        tabIndex={0}
+        aria-label="Close panel"
         className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm"
         onClick={onClose}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" || e.key === " ") onClose();
+        }}
       />
       <div className="relative h-full w-full max-w-lg overflow-y-auto bg-white p-6 shadow-xl dark:bg-slate-900">
         <div className="mb-6 flex items-start justify-between">
@@ -71,8 +77,8 @@ const PromotionBatchDetailPanel = ({ batch, loading, onClose }) => {
                   Failures
                 </p>
                 <ul className="space-y-1 text-red-600 dark:text-red-400">
-                  {batch.errorLog.map((e, i) => (
-                    <li key={i}>
+                  {batch.errorLog.map((e) => (
+                    <li key={e.studentId}>
                       {e.rollNumber || `Student #${e.studentId}`}: {e.reason}
                     </li>
                   ))}

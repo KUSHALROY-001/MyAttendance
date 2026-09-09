@@ -20,8 +20,14 @@ const AdminLayout = () => {
       <div className="flex h-full w-full overflow-hidden bg-slate-50 font-sans text-slate-900 transition-colors duration-300 dark:bg-[#0D0D0F] dark:text-slate-100">
         {isMobileMenuOpen && (
           <div
+            role="button"
+            tabIndex={0}
+            aria-label="Close menu"
             className="fixed inset-0 z-40 bg-slate-900/50 backdrop-blur-sm lg:hidden"
             onClick={() => setIsMobileMenuOpen(false)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") setIsMobileMenuOpen(false);
+            }}
           />
         )}
 

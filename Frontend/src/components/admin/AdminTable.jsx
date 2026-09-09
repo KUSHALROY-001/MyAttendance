@@ -7,6 +7,7 @@ const AdminTable = ({
   actions,
   emptyMessage = "No records found.",
   onRowClick,
+  rowKey = (row) => row.id,
 }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const rowsPerPage = 10;
@@ -21,8 +22,8 @@ const AdminTable = ({
         <table className="w-full text-left text-sm text-slate-500 dark:text-slate-400">
           <thead className="text-xs text-slate-700 dark:text-slate-300 uppercase bg-slate-50 dark:bg-slate-800/50 border-b border-slate-200 dark:border-slate-800">
             <tr>
-              {columns.map((col, idx) => (
-                <th key={idx} className="px-6 py-4 font-semibold">
+              {columns.map((col) => (
+                <th key={col.accessor} className="px-6 py-4 font-semibold">
                   {col.header}
                 </th>
               ))}
@@ -45,15 +46,15 @@ const AdminTable = ({
                 </td>
               </tr>
             ) : (
-              currentData.map((row, rowIndex) => (
+              currentData.map((row) => (
                 <tr
-                  key={rowIndex}
+                  key={rowKey(row)}
                   onClick={onRowClick ? () => onRowClick(row) : undefined}
                   className={`border-b border-slate-100 dark:border-slate-800 hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors ${onRowClick ? "cursor-pointer" : ""}`}
                 >
-                  {columns.map((col, colIndex) => (
+                  {columns.map((col) => (
                     <td
-                      key={colIndex}
+                      key={col.accessor}
                       className="px-6 py-4 whitespace-nowrap text-slate-900 dark:text-slate-300"
                     >
                       {col.render ? col.render(row) : row[col.accessor]}

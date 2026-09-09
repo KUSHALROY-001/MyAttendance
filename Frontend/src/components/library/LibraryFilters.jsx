@@ -13,8 +13,9 @@ export default function LibraryFilters({
   return (
     <div className="grid grid-cols-1 gap-4 rounded-xl border border-slate-200 bg-white p-4 dark:border-[#222228] dark:bg-[#151518] sm:grid-cols-2 md:grid-cols-4">
       <div>
-        <label className={`${labelClass} mb-1`}>Department</label>
+        <label htmlFor="libraryFilterDepartment" className={`${labelClass} mb-1`}>Department</label>
         <select
+          id="libraryFilterDepartment"
           name="department"
           value={filters.department}
           onChange={handleFilterChange}
@@ -29,8 +30,9 @@ export default function LibraryFilters({
         </select>
       </div>
       <div>
-        <label className={`${labelClass} mb-1`}>Semester</label>
+        <label htmlFor="libraryFilterSemester" className={`${labelClass} mb-1`}>Semester</label>
         <select
+          id="libraryFilterSemester"
           name="semester"
           value={filters.semester}
           onChange={handleFilterChange}
@@ -45,8 +47,9 @@ export default function LibraryFilters({
         </select>
       </div>
       <div>
-        <label className={`${labelClass} mb-1`}>Subject</label>
+        <label htmlFor="libraryFilterSubject" className={`${labelClass} mb-1`}>Subject</label>
         <select
+          id="libraryFilterSubject"
           name="subjectName"
           value={filters.subjectName}
           onChange={handleFilterChange}

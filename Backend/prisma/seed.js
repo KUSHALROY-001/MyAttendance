@@ -1,5 +1,12 @@
 const { PrismaClient } = require("@prisma/client");
 const bcrypt = require("bcryptjs");
+const crypto = require("node:crypto");
+
+// Uniform random float in [0, 1), generated with a CSPRNG. Used only to
+// randomize fake attendance patterns for seed/demo data — not security
+// sensitive — but avoids Math.random() so no PRNG in this script is
+// flagged as unreviewed.
+const secureRandom = () => crypto.randomInt(0, 1_000_000) / 1_000_000;
 
 const prisma = new PrismaClient();
 
@@ -698,7 +705,7 @@ async function main() {
 
       const recordsToCreate = students.map((student, idx) => {
         let status = "PRESENT";
-        const rand = Math.random();
+        const rand = secureRandom();
 
         // Give each student a personality
         if (idx === 2 && rand > 0.5)

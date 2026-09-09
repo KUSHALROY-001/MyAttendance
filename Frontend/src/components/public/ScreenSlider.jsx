@@ -82,9 +82,9 @@ function ScreenSlider({ startAt = 0 }) {
 
         {/* Dot indicators */}
         <div className="flex items-center gap-1.5">
-          {SLIDES.map((_, i) => (
+          {SLIDES.map((s, i) => (
             <button
-              key={i}
+              key={s.visual}
               onClick={() => goTo(i)}
               aria-label={`Go to slide ${i + 1}`}
               className={`h-1.5 rounded-full transition-all duration-300 focus:outline-none ${

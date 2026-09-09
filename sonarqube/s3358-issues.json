@@ -1,0 +1,977 @@
+[
+  {
+    "key": "AaBnz4tnpPWvDdRwiRQV",
+    "rule": "javascript:S3358",
+    "severity": "MAJOR",
+    "component": "KUSHALROY-001_MyAttendance:Frontend/src/components/common/skeletons/TableSkeleton.jsx",
+    "project": "KUSHALROY-001_MyAttendance",
+    "line": 41,
+    "hash": "792df1627285d4fc73fa8b891118d278",
+    "textRange": {
+      "startLine": 41,
+      "endLine": 43,
+      "startOffset": 26,
+      "endOffset": 35
+    },
+    "flows": [],
+    "status": "OPEN",
+    "message": "Extract this nested ternary operation into an independent statement.",
+    "effort": "5min",
+    "debt": "5min",
+    "assignee": "KUSHALROY-001-xVxFY@github",
+    "tags": ["confusing", "editable-source"],
+    "creationDate": "2026-08-13T08:41:26+0000",
+    "updateDate": "2026-09-03T15:06:22+0000",
+    "type": "CODE_SMELL",
+    "organization": "kushalroy-001",
+    "cleanCodeAttribute": "CLEAR",
+    "cleanCodeAttributeCategory": "INTENTIONAL",
+    "impacts": [
+      {
+        "softwareQuality": "MAINTAINABILITY",
+        "severity": "MEDIUM"
+      }
+    ],
+    "issueStatus": "OPEN",
+    "projectName": "MyAttendance",
+    "internalTags": [],
+    "lastChangeAnalysisUuid": "f0efc6db-fce9-4025-bb6b-28b0dc005fc7",
+    "lastChangeSource": "ANALYSIS"
+  },
+  {
+    "key": "AaBnz4wApPWvDdRwiRQ4",
+    "rule": "javascript:S3358",
+    "severity": "MAJOR",
+    "component": "KUSHALROY-001_MyAttendance:Frontend/src/pages/AdminPendingApprovals.jsx",
+    "project": "KUSHALROY-001_MyAttendance",
+    "line": 29,
+    "hash": "bfdaa7b751c9ebe0ecdd99f11ff0c487",
+    "textRange": {
+      "startLine": 29,
+      "endLine": 133,
+      "startOffset": 10,
+      "endOffset": 7
+    },
+    "flows": [],
+    "status": "OPEN",
+    "message": "Extract this nested ternary operation into an independent statement.",
+    "effort": "5min",
+    "debt": "5min",
+    "assignee": "KUSHALROY-001-xVxFY@github",
+    "tags": ["confusing", "editable-source"],
+    "creationDate": "2026-08-13T08:41:26+0000",
+    "updateDate": "2026-09-03T15:06:22+0000",
+    "type": "CODE_SMELL",
+    "organization": "kushalroy-001",
+    "cleanCodeAttribute": "CLEAR",
+    "cleanCodeAttributeCategory": "INTENTIONAL",
+    "impacts": [
+      {
+        "softwareQuality": "MAINTAINABILITY",
+        "severity": "MEDIUM"
+      }
+    ],
+    "issueStatus": "OPEN",
+    "projectName": "MyAttendance",
+    "internalTags": [],
+    "lastChangeAnalysisUuid": "f0efc6db-fce9-4025-bb6b-28b0dc005fc7",
+    "lastChangeSource": "ANALYSIS"
+  },
+  {
+    "key": "AaBnz4prpPWvDdRwiRPQ",
+    "rule": "javascript:S3358",
+    "severity": "MAJOR",
+    "component": "KUSHALROY-001_MyAttendance:Frontend/src/components/library/LibraryModal.jsx",
+    "project": "KUSHALROY-001_MyAttendance",
+    "line": 136,
+    "hash": "f9adefbf2aea7d17c4982aef2975a42a",
+    "textRange": {
+      "startLine": 136,
+      "endLine": 140,
+      "startOffset": 18,
+      "endOffset": 15
+    },
+    "flows": [],
+    "status": "OPEN",
+    "message": "Extract this nested ternary operation into an independent statement.",
+    "effort": "5min",
+    "debt": "5min",
+    "assignee": "KUSHALROY-001-xVxFY@github",
+    "tags": ["confusing", "editable-source"],
+    "creationDate": "2026-08-08T12:14:11+0000",
+    "updateDate": "2026-09-03T15:06:22+0000",
+    "type": "CODE_SMELL",
+    "organization": "kushalroy-001",
+    "cleanCodeAttribute": "CLEAR",
+    "cleanCodeAttributeCategory": "INTENTIONAL",
+    "impacts": [
+      {
+        "softwareQuality": "MAINTAINABILITY",
+        "severity": "MEDIUM"
+      }
+    ],
+    "issueStatus": "OPEN",
+    "projectName": "MyAttendance",
+    "internalTags": [],
+    "lastChangeAnalysisUuid": "f0efc6db-fce9-4025-bb6b-28b0dc005fc7",
+    "lastChangeSource": "ANALYSIS"
+  },
+  {
+    "key": "AaBnz4wypPWvDdRwiRRF",
+    "rule": "javascript:S3358",
+    "severity": "MAJOR",
+    "component": "KUSHALROY-001_MyAttendance:Frontend/src/pages/Library.jsx",
+    "project": "KUSHALROY-001_MyAttendance",
+    "line": 62,
+    "hash": "6c24dea066948378a33c27a9cef662b2",
+    "textRange": {
+      "startLine": 62,
+      "endLine": 76,
+      "startOffset": 12,
+      "endOffset": 9
+    },
+    "flows": [],
+    "status": "OPEN",
+    "message": "Extract this nested ternary operation into an independent statement.",
+    "effort": "5min",
+    "debt": "5min",
+    "assignee": "KUSHALROY-001-xVxFY@github",
+    "tags": ["confusing", "editable-source"],
+    "creationDate": "2026-08-08T12:14:11+0000",
+    "updateDate": "2026-09-03T15:06:22+0000",
+    "type": "CODE_SMELL",
+    "organization": "kushalroy-001",
+    "cleanCodeAttribute": "CLEAR",
+    "cleanCodeAttributeCategory": "INTENTIONAL",
+    "impacts": [
+      {
+        "softwareQuality": "MAINTAINABILITY",
+        "severity": "MEDIUM"
+      }
+    ],
+    "issueStatus": "OPEN",
+    "projectName": "MyAttendance",
+    "internalTags": [],
+    "lastChangeAnalysisUuid": "f0efc6db-fce9-4025-bb6b-28b0dc005fc7",
+    "lastChangeSource": "ANALYSIS"
+  },
+  {
+    "key": "AaBnz4zwpPWvDdRwiRRo",
+    "rule": "javascript:S3358",
+    "severity": "MAJOR",
+    "component": "KUSHALROY-001_MyAttendance:Backend/controllers/admin/adminUsers.controller.js",
+    "project": "KUSHALROY-001_MyAttendance",
+    "line": 304,
+    "hash": "6aec841fab2a21d35297c2d1d78c5907",
+    "textRange": {
+      "startLine": 304,
+      "endLine": 304,
+      "startOffset": 44,
+      "endOffset": 78
+    },
+    "flows": [],
+    "status": "OPEN",
+    "message": "Extract this nested ternary operation into an independent statement.",
+    "effort": "5min",
+    "debt": "5min",
+    "assignee": "KUSHALROY-001-xVxFY@github",
+    "tags": ["confusing", "editable-source"],
+    "creationDate": "2026-08-07T14:47:10+0000",
+    "updateDate": "2026-09-03T15:06:22+0000",
+    "type": "CODE_SMELL",
+    "organization": "kushalroy-001",
+    "cleanCodeAttribute": "CLEAR",
+    "cleanCodeAttributeCategory": "INTENTIONAL",
+    "impacts": [
+      {
+        "softwareQuality": "MAINTAINABILITY",
+        "severity": "MEDIUM"
+      }
+    ],
+    "issueStatus": "OPEN",
+    "projectName": "MyAttendance",
+    "internalTags": [],
+    "lastChangeAnalysisUuid": "f0efc6db-fce9-4025-bb6b-28b0dc005fc7",
+    "lastChangeSource": "ANALYSIS"
+  },
+  {
+    "key": "AaBnz4sOpPWvDdRwiRP9",
+    "rule": "javascript:S3358",
+    "severity": "MAJOR",
+    "component": "KUSHALROY-001_MyAttendance:Frontend/src/components/admin/ConfirmDialog.jsx",
+    "project": "KUSHALROY-001_MyAttendance",
+    "line": 18,
+    "hash": "60b4850a8cec956d0f31404dc7634a55",
+    "textRange": {
+      "startLine": 18,
+      "endLine": 20,
+      "startOffset": 8,
+      "endOffset": 48
+    },
+    "flows": [],
+    "status": "OPEN",
+    "message": "Extract this nested ternary operation into an independent statement.",
+    "effort": "5min",
+    "debt": "5min",
+    "assignee": "KUSHALROY-001-xVxFY@github",
+    "tags": ["confusing", "editable-source"],
+    "creationDate": "2026-08-07T14:47:10+0000",
+    "updateDate": "2026-09-03T15:06:22+0000",
+    "type": "CODE_SMELL",
+    "organization": "kushalroy-001",
+    "cleanCodeAttribute": "CLEAR",
+    "cleanCodeAttributeCategory": "INTENTIONAL",
+    "impacts": [
+      {
+        "softwareQuality": "MAINTAINABILITY",
+        "severity": "MEDIUM"
+      }
+    ],
+    "issueStatus": "OPEN",
+    "projectName": "MyAttendance",
+    "internalTags": [],
+    "lastChangeAnalysisUuid": "f0efc6db-fce9-4025-bb6b-28b0dc005fc7",
+    "lastChangeSource": "ANALYSIS"
+  },
+  {
+    "key": "AaBnz4sOpPWvDdRwiRP-",
+    "rule": "javascript:S3358",
+    "severity": "MAJOR",
+    "component": "KUSHALROY-001_MyAttendance:Frontend/src/components/admin/ConfirmDialog.jsx",
+    "project": "KUSHALROY-001_MyAttendance",
+    "line": 25,
+    "hash": "60b4850a8cec956d0f31404dc7634a55",
+    "textRange": {
+      "startLine": 25,
+      "endLine": 27,
+      "startOffset": 8,
+      "endOffset": 70
+    },
+    "flows": [],
+    "status": "OPEN",
+    "message": "Extract this nested ternary operation into an independent statement.",
+    "effort": "5min",
+    "debt": "5min",
+    "assignee": "KUSHALROY-001-xVxFY@github",
+    "tags": ["confusing", "editable-source"],
+    "creationDate": "2026-08-07T14:47:10+0000",
+    "updateDate": "2026-09-03T15:06:22+0000",
+    "type": "CODE_SMELL",
+    "organization": "kushalroy-001",
+    "cleanCodeAttribute": "CLEAR",
+    "cleanCodeAttributeCategory": "INTENTIONAL",
+    "impacts": [
+      {
+        "softwareQuality": "MAINTAINABILITY",
+        "severity": "MEDIUM"
+      }
+    ],
+    "issueStatus": "OPEN",
+    "projectName": "MyAttendance",
+    "internalTags": [],
+    "lastChangeAnalysisUuid": "f0efc6db-fce9-4025-bb6b-28b0dc005fc7",
+    "lastChangeSource": "ANALYSIS"
+  },
+  {
+    "key": "AaBnz4rypPWvDdRwiRP2",
+    "rule": "javascript:S3358",
+    "severity": "MAJOR",
+    "component": "KUSHALROY-001_MyAttendance:Frontend/src/components/admin/RecordDetailPanel.jsx",
+    "project": "KUSHALROY-001_MyAttendance",
+    "line": 161,
+    "hash": "caec7556b7369489eb9dd2988b16042b",
+    "textRange": {
+      "startLine": 161,
+      "endLine": 408,
+      "startOffset": 10,
+      "endOffset": 7
+    },
+    "flows": [],
+    "status": "OPEN",
+    "message": "Extract this nested ternary operation into an independent statement.",
+    "effort": "5min",
+    "debt": "5min",
+    "assignee": "KUSHALROY-001-xVxFY@github",
+    "tags": ["confusing", "editable-source"],
+    "creationDate": "2026-08-07T14:47:10+0000",
+    "updateDate": "2026-09-03T15:06:22+0000",
+    "type": "CODE_SMELL",
+    "organization": "kushalroy-001",
+    "cleanCodeAttribute": "CLEAR",
+    "cleanCodeAttributeCategory": "INTENTIONAL",
+    "impacts": [
+      {
+        "softwareQuality": "MAINTAINABILITY",
+        "severity": "MEDIUM"
+      }
+    ],
+    "issueStatus": "OPEN",
+    "projectName": "MyAttendance",
+    "internalTags": [],
+    "lastChangeAnalysisUuid": "f0efc6db-fce9-4025-bb6b-28b0dc005fc7",
+    "lastChangeSource": "ANALYSIS"
+  },
+  {
+    "key": "AaBnz4ropPWvDdRwiRPy",
+    "rule": "javascript:S3358",
+    "severity": "MAJOR",
+    "component": "KUSHALROY-001_MyAttendance:Frontend/src/components/admin/academic-options/DepartmentModal.jsx",
+    "project": "KUSHALROY-001_MyAttendance",
+    "line": 150,
+    "hash": "5e2957c075abb43c51ec0d9cf5bd1f24",
+    "textRange": {
+      "startLine": 150,
+      "endLine": 150,
+      "startOffset": 36,
+      "endOffset": 83
+    },
+    "flows": [],
+    "status": "OPEN",
+    "message": "Extract this nested ternary operation into an independent statement.",
+    "effort": "5min",
+    "debt": "5min",
+    "assignee": "KUSHALROY-001-xVxFY@github",
+    "tags": ["confusing", "editable-source"],
+    "creationDate": "2026-08-07T14:47:10+0000",
+    "updateDate": "2026-09-03T15:06:22+0000",
+    "type": "CODE_SMELL",
+    "organization": "kushalroy-001",
+    "cleanCodeAttribute": "CLEAR",
+    "cleanCodeAttributeCategory": "INTENTIONAL",
+    "impacts": [
+      {
+        "softwareQuality": "MAINTAINABILITY",
+        "severity": "MEDIUM"
+      }
+    ],
+    "issueStatus": "OPEN",
+    "projectName": "MyAttendance",
+    "internalTags": [],
+    "lastChangeAnalysisUuid": "f0efc6db-fce9-4025-bb6b-28b0dc005fc7",
+    "lastChangeSource": "ANALYSIS"
+  },
+  {
+    "key": "AaBnz4t5pPWvDdRwiRQY",
+    "rule": "javascript:S3358",
+    "severity": "MAJOR",
+    "component": "KUSHALROY-001_MyAttendance:Frontend/src/components/common/AttendanceSessionModal.jsx",
+    "project": "KUSHALROY-001_MyAttendance",
+    "line": 52,
+    "hash": "caec7556b7369489eb9dd2988b16042b",
+    "textRange": {
+      "startLine": 52,
+      "endLine": 116,
+      "startOffset": 10,
+      "endOffset": 7
+    },
+    "flows": [],
+    "status": "OPEN",
+    "message": "Extract this nested ternary operation into an independent statement.",
+    "effort": "5min",
+    "debt": "5min",
+    "assignee": "KUSHALROY-001-xVxFY@github",
+    "tags": ["confusing", "editable-source"],
+    "creationDate": "2026-08-07T14:47:10+0000",
+    "updateDate": "2026-09-03T15:06:22+0000",
+    "type": "CODE_SMELL",
+    "organization": "kushalroy-001",
+    "cleanCodeAttribute": "CLEAR",
+    "cleanCodeAttributeCategory": "INTENTIONAL",
+    "impacts": [
+      {
+        "softwareQuality": "MAINTAINABILITY",
+        "severity": "MEDIUM"
+      }
+    ],
+    "issueStatus": "OPEN",
+    "projectName": "MyAttendance",
+    "internalTags": [],
+    "lastChangeAnalysisUuid": "f0efc6db-fce9-4025-bb6b-28b0dc005fc7",
+    "lastChangeSource": "ANALYSIS"
+  },
+  {
+    "key": "AaBnz4zwpPWvDdRwiRRm",
+    "rule": "javascript:S3358",
+    "severity": "MAJOR",
+    "component": "KUSHALROY-001_MyAttendance:Backend/controllers/admin/adminUsers.controller.js",
+    "project": "KUSHALROY-001_MyAttendance",
+    "line": 101,
+    "hash": "1fea497dd31e8b00826525dd927e680e",
+    "textRange": {
+      "startLine": 101,
+      "endLine": 103,
+      "startOffset": 10,
+      "endOffset": 19
+    },
+    "flows": [],
+    "status": "OPEN",
+    "message": "Extract this nested ternary operation into an independent statement.",
+    "effort": "5min",
+    "debt": "5min",
+    "assignee": "KUSHALROY-001-xVxFY@github",
+    "tags": ["confusing", "editable-source"],
+    "creationDate": "2026-08-01T10:26:12+0000",
+    "updateDate": "2026-09-03T15:06:22+0000",
+    "type": "CODE_SMELL",
+    "organization": "kushalroy-001",
+    "cleanCodeAttribute": "CLEAR",
+    "cleanCodeAttributeCategory": "INTENTIONAL",
+    "impacts": [
+      {
+        "softwareQuality": "MAINTAINABILITY",
+        "severity": "MEDIUM"
+      }
+    ],
+    "issueStatus": "OPEN",
+    "projectName": "MyAttendance",
+    "internalTags": [],
+    "lastChangeAnalysisUuid": "f0efc6db-fce9-4025-bb6b-28b0dc005fc7",
+    "lastChangeSource": "ANALYSIS"
+  },
+  {
+    "key": "AaBnz4zwpPWvDdRwiRRn",
+    "rule": "javascript:S3358",
+    "severity": "MAJOR",
+    "component": "KUSHALROY-001_MyAttendance:Backend/controllers/admin/adminUsers.controller.js",
+    "project": "KUSHALROY-001_MyAttendance",
+    "line": 190,
+    "hash": "484805373ad16fdef3df9802e8f3a480",
+    "textRange": {
+      "startLine": 190,
+      "endLine": 192,
+      "startOffset": 8,
+      "endOffset": 17
+    },
+    "flows": [],
+    "status": "OPEN",
+    "message": "Extract this nested ternary operation into an independent statement.",
+    "effort": "5min",
+    "debt": "5min",
+    "assignee": "KUSHALROY-001-xVxFY@github",
+    "tags": ["confusing", "editable-source"],
+    "creationDate": "2026-08-01T10:26:12+0000",
+    "updateDate": "2026-09-03T15:06:22+0000",
+    "type": "CODE_SMELL",
+    "organization": "kushalroy-001",
+    "cleanCodeAttribute": "CLEAR",
+    "cleanCodeAttributeCategory": "INTENTIONAL",
+    "impacts": [
+      {
+        "softwareQuality": "MAINTAINABILITY",
+        "severity": "MEDIUM"
+      }
+    ],
+    "issueStatus": "OPEN",
+    "projectName": "MyAttendance",
+    "internalTags": [],
+    "lastChangeAnalysisUuid": "f0efc6db-fce9-4025-bb6b-28b0dc005fc7",
+    "lastChangeSource": "ANALYSIS"
+  },
+  {
+    "key": "AaBnz4uCpPWvDdRwiRQZ",
+    "rule": "javascript:S3358",
+    "severity": "MAJOR",
+    "component": "KUSHALROY-001_MyAttendance:Frontend/src/components/teacher/AttendanceSessions.jsx",
+    "project": "KUSHALROY-001_MyAttendance",
+    "line": 59,
+    "hash": "bc281761dee301eddd1f12e029706fcf",
+    "textRange": {
+      "startLine": 59,
+      "endLine": 106,
+      "startOffset": 10,
+      "endOffset": 11
+    },
+    "flows": [],
+    "status": "OPEN",
+    "message": "Extract this nested ternary operation into an independent statement.",
+    "effort": "5min",
+    "debt": "5min",
+    "assignee": "KUSHALROY-001-xVxFY@github",
+    "tags": ["confusing", "editable-source"],
+    "creationDate": "2026-08-01T10:26:12+0000",
+    "updateDate": "2026-09-03T15:06:22+0000",
+    "type": "CODE_SMELL",
+    "organization": "kushalroy-001",
+    "cleanCodeAttribute": "CLEAR",
+    "cleanCodeAttributeCategory": "INTENTIONAL",
+    "impacts": [
+      {
+        "softwareQuality": "MAINTAINABILITY",
+        "severity": "MEDIUM"
+      }
+    ],
+    "issueStatus": "OPEN",
+    "projectName": "MyAttendance",
+    "internalTags": [],
+    "lastChangeAnalysisUuid": "f0efc6db-fce9-4025-bb6b-28b0dc005fc7",
+    "lastChangeSource": "ANALYSIS"
+  },
+  {
+    "key": "AaBnz4uCpPWvDdRwiRQb",
+    "rule": "javascript:S3358",
+    "severity": "MAJOR",
+    "component": "KUSHALROY-001_MyAttendance:Frontend/src/components/teacher/AttendanceSessions.jsx",
+    "project": "KUSHALROY-001_MyAttendance",
+    "line": 107,
+    "hash": "306e922e3fe706acabe2db4e11b83290",
+    "textRange": {
+      "startLine": 107,
+      "endLine": 129,
+      "startOffset": 12,
+      "endOffset": 9
+    },
+    "flows": [],
+    "status": "OPEN",
+    "message": "Extract this nested ternary operation into an independent statement.",
+    "effort": "5min",
+    "debt": "5min",
+    "assignee": "KUSHALROY-001-xVxFY@github",
+    "tags": ["confusing", "editable-source"],
+    "creationDate": "2026-08-01T10:26:12+0000",
+    "updateDate": "2026-09-03T15:06:22+0000",
+    "type": "CODE_SMELL",
+    "organization": "kushalroy-001",
+    "cleanCodeAttribute": "CLEAR",
+    "cleanCodeAttributeCategory": "INTENTIONAL",
+    "impacts": [
+      {
+        "softwareQuality": "MAINTAINABILITY",
+        "severity": "MEDIUM"
+      }
+    ],
+    "issueStatus": "OPEN",
+    "projectName": "MyAttendance",
+    "internalTags": [],
+    "lastChangeAnalysisUuid": "f0efc6db-fce9-4025-bb6b-28b0dc005fc7",
+    "lastChangeSource": "ANALYSIS"
+  },
+  {
+    "key": "AaBnz4zKpPWvDdRwiRRi",
+    "rule": "javascript:S3358",
+    "severity": "MAJOR",
+    "component": "KUSHALROY-001_MyAttendance:Backend/utils/auth.utils.js",
+    "project": "KUSHALROY-001_MyAttendance",
+    "line": 131,
+    "hash": "1fea497dd31e8b00826525dd927e680e",
+    "textRange": {
+      "startLine": 131,
+      "endLine": 142,
+      "startOffset": 6,
+      "endOffset": 9
+    },
+    "flows": [],
+    "status": "OPEN",
+    "message": "Extract this nested ternary operation into an independent statement.",
+    "effort": "5min",
+    "debt": "5min",
+    "assignee": "KUSHALROY-001-xVxFY@github",
+    "tags": ["confusing", "editable-source"],
+    "creationDate": "2026-07-31T09:55:48+0000",
+    "updateDate": "2026-09-03T15:06:22+0000",
+    "type": "CODE_SMELL",
+    "organization": "kushalroy-001",
+    "cleanCodeAttribute": "CLEAR",
+    "cleanCodeAttributeCategory": "INTENTIONAL",
+    "impacts": [
+      {
+        "softwareQuality": "MAINTAINABILITY",
+        "severity": "MEDIUM"
+      }
+    ],
+    "issueStatus": "OPEN",
+    "projectName": "MyAttendance",
+    "internalTags": [],
+    "lastChangeAnalysisUuid": "f0efc6db-fce9-4025-bb6b-28b0dc005fc7",
+    "lastChangeSource": "ANALYSIS"
+  },
+  {
+    "key": "AaBnz4qjpPWvDdRwiRPZ",
+    "rule": "javascript:S3358",
+    "severity": "MAJOR",
+    "component": "KUSHALROY-001_MyAttendance:Frontend/src/components/student/RecentAttendanceList.jsx",
+    "project": "KUSHALROY-001_MyAttendance",
+    "line": 26,
+    "hash": "af41a4d58b6f915f5655c59b9ff05ab2",
+    "textRange": {
+      "startLine": 26,
+      "endLine": 32,
+      "startOffset": 20,
+      "endOffset": 93
+    },
+    "flows": [],
+    "status": "OPEN",
+    "message": "Extract this nested ternary operation into an independent statement.",
+    "effort": "5min",
+    "debt": "5min",
+    "assignee": "KUSHALROY-001-xVxFY@github",
+    "tags": ["confusing", "editable-source"],
+    "creationDate": "2026-07-31T09:55:48+0000",
+    "updateDate": "2026-09-03T15:06:22+0000",
+    "type": "CODE_SMELL",
+    "organization": "kushalroy-001",
+    "cleanCodeAttribute": "CLEAR",
+    "cleanCodeAttributeCategory": "INTENTIONAL",
+    "impacts": [
+      {
+        "softwareQuality": "MAINTAINABILITY",
+        "severity": "MEDIUM"
+      }
+    ],
+    "issueStatus": "OPEN",
+    "projectName": "MyAttendance",
+    "internalTags": [],
+    "lastChangeAnalysisUuid": "f0efc6db-fce9-4025-bb6b-28b0dc005fc7",
+    "lastChangeSource": "ANALYSIS"
+  },
+  {
+    "key": "AaBnz4qjpPWvDdRwiRPa",
+    "rule": "javascript:S3358",
+    "severity": "MAJOR",
+    "component": "KUSHALROY-001_MyAttendance:Frontend/src/components/student/RecentAttendanceList.jsx",
+    "project": "KUSHALROY-001_MyAttendance",
+    "line": 28,
+    "hash": "bf01a38827328f348dea9662f8c11582",
+    "textRange": {
+      "startLine": 28,
+      "endLine": 32,
+      "startOffset": 22,
+      "endOffset": 93
+    },
+    "flows": [],
+    "status": "OPEN",
+    "message": "Extract this nested ternary operation into an independent statement.",
+    "effort": "5min",
+    "debt": "5min",
+    "assignee": "KUSHALROY-001-xVxFY@github",
+    "tags": ["confusing", "editable-source"],
+    "creationDate": "2026-07-31T09:55:48+0000",
+    "updateDate": "2026-09-03T15:06:22+0000",
+    "type": "CODE_SMELL",
+    "organization": "kushalroy-001",
+    "cleanCodeAttribute": "CLEAR",
+    "cleanCodeAttributeCategory": "INTENTIONAL",
+    "impacts": [
+      {
+        "softwareQuality": "MAINTAINABILITY",
+        "severity": "MEDIUM"
+      }
+    ],
+    "issueStatus": "OPEN",
+    "projectName": "MyAttendance",
+    "internalTags": [],
+    "lastChangeAnalysisUuid": "f0efc6db-fce9-4025-bb6b-28b0dc005fc7",
+    "lastChangeSource": "ANALYSIS"
+  },
+  {
+    "key": "AaBnz4qjpPWvDdRwiRPb",
+    "rule": "javascript:S3358",
+    "severity": "MAJOR",
+    "component": "KUSHALROY-001_MyAttendance:Frontend/src/components/student/RecentAttendanceList.jsx",
+    "project": "KUSHALROY-001_MyAttendance",
+    "line": 30,
+    "hash": "2085f0c547932e9bf6a6526f5736592a",
+    "textRange": {
+      "startLine": 30,
+      "endLine": 32,
+      "startOffset": 24,
+      "endOffset": 93
+    },
+    "flows": [],
+    "status": "OPEN",
+    "message": "Extract this nested ternary operation into an independent statement.",
+    "effort": "5min",
+    "debt": "5min",
+    "assignee": "KUSHALROY-001-xVxFY@github",
+    "tags": ["confusing", "editable-source"],
+    "creationDate": "2026-07-31T09:55:48+0000",
+    "updateDate": "2026-09-03T15:06:22+0000",
+    "type": "CODE_SMELL",
+    "organization": "kushalroy-001",
+    "cleanCodeAttribute": "CLEAR",
+    "cleanCodeAttributeCategory": "INTENTIONAL",
+    "impacts": [
+      {
+        "softwareQuality": "MAINTAINABILITY",
+        "severity": "MEDIUM"
+      }
+    ],
+    "issueStatus": "OPEN",
+    "projectName": "MyAttendance",
+    "internalTags": [],
+    "lastChangeAnalysisUuid": "f0efc6db-fce9-4025-bb6b-28b0dc005fc7",
+    "lastChangeSource": "ANALYSIS"
+  },
+  {
+    "key": "AaBnz4twpPWvDdRwiRQW",
+    "rule": "javascript:S3358",
+    "severity": "MAJOR",
+    "component": "KUSHALROY-001_MyAttendance:Frontend/src/components/common/ClassRoutineTable.jsx",
+    "project": "KUSHALROY-001_MyAttendance",
+    "line": 148,
+    "hash": "ba2cf47ecbf3d65d894a4b89e94a76b9",
+    "textRange": {
+      "startLine": 148,
+      "endLine": 150,
+      "startOffset": 30,
+      "endOffset": 71
+    },
+    "flows": [],
+    "status": "OPEN",
+    "message": "Extract this nested ternary operation into an independent statement.",
+    "effort": "5min",
+    "debt": "5min",
+    "assignee": "KUSHALROY-001-xVxFY@github",
+    "tags": ["confusing", "editable-source"],
+    "creationDate": "2026-05-10T11:08:23+0000",
+    "updateDate": "2026-09-03T15:06:22+0000",
+    "type": "CODE_SMELL",
+    "organization": "kushalroy-001",
+    "cleanCodeAttribute": "CLEAR",
+    "cleanCodeAttributeCategory": "INTENTIONAL",
+    "impacts": [
+      {
+        "softwareQuality": "MAINTAINABILITY",
+        "severity": "MEDIUM"
+      }
+    ],
+    "issueStatus": "OPEN",
+    "projectName": "MyAttendance",
+    "internalTags": [],
+    "lastChangeAnalysisUuid": "f0efc6db-fce9-4025-bb6b-28b0dc005fc7",
+    "lastChangeSource": "ANALYSIS"
+  },
+  {
+    "key": "AaBnz4uapPWvDdRwiRQm",
+    "rule": "javascript:S3358",
+    "severity": "MAJOR",
+    "component": "KUSHALROY-001_MyAttendance:Frontend/src/components/public/PublicVisuals.jsx",
+    "project": "KUSHALROY-001_MyAttendance",
+    "line": 94,
+    "hash": "48476cda5366304afcec2f9acb25a618",
+    "textRange": {
+      "startLine": 94,
+      "endLine": 96,
+      "startOffset": 28,
+      "endOffset": 93
+    },
+    "flows": [],
+    "status": "OPEN",
+    "message": "Extract this nested ternary operation into an independent statement.",
+    "effort": "5min",
+    "debt": "5min",
+    "assignee": "KUSHALROY-001-xVxFY@github",
+    "tags": ["confusing", "editable-source"],
+    "creationDate": "2026-05-10T11:08:23+0000",
+    "updateDate": "2026-09-03T15:06:22+0000",
+    "type": "CODE_SMELL",
+    "organization": "kushalroy-001",
+    "cleanCodeAttribute": "CLEAR",
+    "cleanCodeAttributeCategory": "INTENTIONAL",
+    "impacts": [
+      {
+        "softwareQuality": "MAINTAINABILITY",
+        "severity": "MEDIUM"
+      }
+    ],
+    "issueStatus": "OPEN",
+    "projectName": "MyAttendance",
+    "internalTags": [],
+    "lastChangeAnalysisUuid": "f0efc6db-fce9-4025-bb6b-28b0dc005fc7",
+    "lastChangeSource": "ANALYSIS"
+  },
+  {
+    "key": "AaBnz4qjpPWvDdRwiRPc",
+    "rule": "javascript:S3358",
+    "severity": "MAJOR",
+    "component": "KUSHALROY-001_MyAttendance:Frontend/src/components/student/RecentAttendanceList.jsx",
+    "project": "KUSHALROY-001_MyAttendance",
+    "line": 40,
+    "hash": "af41a4d58b6f915f5655c59b9ff05ab2",
+    "textRange": {
+      "startLine": 40,
+      "endLine": 46,
+      "startOffset": 24,
+      "endOffset": 43
+    },
+    "flows": [],
+    "status": "OPEN",
+    "message": "Extract this nested ternary operation into an independent statement.",
+    "effort": "5min",
+    "debt": "5min",
+    "assignee": "KUSHALROY-001-xVxFY@github",
+    "tags": ["confusing", "editable-source"],
+    "creationDate": "2026-03-17T19:15:06+0000",
+    "updateDate": "2026-09-03T15:06:22+0000",
+    "type": "CODE_SMELL",
+    "organization": "kushalroy-001",
+    "cleanCodeAttribute": "CLEAR",
+    "cleanCodeAttributeCategory": "INTENTIONAL",
+    "impacts": [
+      {
+        "softwareQuality": "MAINTAINABILITY",
+        "severity": "MEDIUM"
+      }
+    ],
+    "issueStatus": "OPEN",
+    "projectName": "MyAttendance",
+    "internalTags": [],
+    "lastChangeAnalysisUuid": "f0efc6db-fce9-4025-bb6b-28b0dc005fc7",
+    "lastChangeSource": "ANALYSIS"
+  },
+  {
+    "key": "AaBnz4qjpPWvDdRwiRPd",
+    "rule": "javascript:S3358",
+    "severity": "MAJOR",
+    "component": "KUSHALROY-001_MyAttendance:Frontend/src/components/student/RecentAttendanceList.jsx",
+    "project": "KUSHALROY-001_MyAttendance",
+    "line": 42,
+    "hash": "bf01a38827328f348dea9662f8c11582",
+    "textRange": {
+      "startLine": 42,
+      "endLine": 46,
+      "startOffset": 26,
+      "endOffset": 43
+    },
+    "flows": [],
+    "status": "OPEN",
+    "message": "Extract this nested ternary operation into an independent statement.",
+    "effort": "5min",
+    "debt": "5min",
+    "assignee": "KUSHALROY-001-xVxFY@github",
+    "tags": ["confusing", "editable-source"],
+    "creationDate": "2026-03-17T19:15:06+0000",
+    "updateDate": "2026-09-03T15:06:22+0000",
+    "type": "CODE_SMELL",
+    "organization": "kushalroy-001",
+    "cleanCodeAttribute": "CLEAR",
+    "cleanCodeAttributeCategory": "INTENTIONAL",
+    "impacts": [
+      {
+        "softwareQuality": "MAINTAINABILITY",
+        "severity": "MEDIUM"
+      }
+    ],
+    "issueStatus": "OPEN",
+    "projectName": "MyAttendance",
+    "internalTags": [],
+    "lastChangeAnalysisUuid": "f0efc6db-fce9-4025-bb6b-28b0dc005fc7",
+    "lastChangeSource": "ANALYSIS"
+  },
+  {
+    "key": "AaBnz4qjpPWvDdRwiRPe",
+    "rule": "javascript:S3358",
+    "severity": "MAJOR",
+    "component": "KUSHALROY-001_MyAttendance:Frontend/src/components/student/RecentAttendanceList.jsx",
+    "project": "KUSHALROY-001_MyAttendance",
+    "line": 44,
+    "hash": "2085f0c547932e9bf6a6526f5736592a",
+    "textRange": {
+      "startLine": 44,
+      "endLine": 46,
+      "startOffset": 28,
+      "endOffset": 43
+    },
+    "flows": [],
+    "status": "OPEN",
+    "message": "Extract this nested ternary operation into an independent statement.",
+    "effort": "5min",
+    "debt": "5min",
+    "assignee": "KUSHALROY-001-xVxFY@github",
+    "tags": ["confusing", "editable-source"],
+    "creationDate": "2026-03-17T19:15:06+0000",
+    "updateDate": "2026-09-03T15:06:22+0000",
+    "type": "CODE_SMELL",
+    "organization": "kushalroy-001",
+    "cleanCodeAttribute": "CLEAR",
+    "cleanCodeAttributeCategory": "INTENTIONAL",
+    "impacts": [
+      {
+        "softwareQuality": "MAINTAINABILITY",
+        "severity": "MEDIUM"
+      }
+    ],
+    "issueStatus": "OPEN",
+    "projectName": "MyAttendance",
+    "internalTags": [],
+    "lastChangeAnalysisUuid": "f0efc6db-fce9-4025-bb6b-28b0dc005fc7",
+    "lastChangeSource": "ANALYSIS"
+  },
+  {
+    "key": "AaBnz4qjpPWvDdRwiRPf",
+    "rule": "javascript:S3358",
+    "severity": "MAJOR",
+    "component": "KUSHALROY-001_MyAttendance:Frontend/src/components/student/RecentAttendanceList.jsx",
+    "project": "KUSHALROY-001_MyAttendance",
+    "line": 63,
+    "hash": "af41a4d58b6f915f5655c59b9ff05ab2",
+    "textRange": {
+      "startLine": 63,
+      "endLine": 67,
+      "startOffset": 24,
+      "endOffset": 43
+    },
+    "flows": [],
+    "status": "OPEN",
+    "message": "Extract this nested ternary operation into an independent statement.",
+    "effort": "5min",
+    "debt": "5min",
+    "assignee": "KUSHALROY-001-xVxFY@github",
+    "tags": ["confusing", "editable-source"],
+    "creationDate": "2026-03-17T19:15:06+0000",
+    "updateDate": "2026-09-03T15:06:22+0000",
+    "type": "CODE_SMELL",
+    "organization": "kushalroy-001",
+    "cleanCodeAttribute": "CLEAR",
+    "cleanCodeAttributeCategory": "INTENTIONAL",
+    "impacts": [
+      {
+        "softwareQuality": "MAINTAINABILITY",
+        "severity": "MEDIUM"
+      }
+    ],
+    "issueStatus": "OPEN",
+    "projectName": "MyAttendance",
+    "internalTags": [],
+    "lastChangeAnalysisUuid": "f0efc6db-fce9-4025-bb6b-28b0dc005fc7",
+    "lastChangeSource": "ANALYSIS"
+  },
+  {
+    "key": "AaBnz4qjpPWvDdRwiRPg",
+    "rule": "javascript:S3358",
+    "severity": "MAJOR",
+    "component": "KUSHALROY-001_MyAttendance:Frontend/src/components/student/RecentAttendanceList.jsx",
+    "project": "KUSHALROY-001_MyAttendance",
+    "line": 65,
+    "hash": "bf01a38827328f348dea9662f8c11582",
+    "textRange": {
+      "startLine": 65,
+      "endLine": 67,
+      "startOffset": 26,
+      "endOffset": 43
+    },
+    "flows": [],
+    "status": "OPEN",
+    "message": "Extract this nested ternary operation into an independent statement.",
+    "effort": "5min",
+    "debt": "5min",
+    "assignee": "KUSHALROY-001-xVxFY@github",
+    "tags": ["confusing", "editable-source"],
+    "creationDate": "2026-03-10T07:16:51+0000",
+    "updateDate": "2026-09-03T15:06:22+0000",
+    "type": "CODE_SMELL",
+    "organization": "kushalroy-001",
+    "cleanCodeAttribute": "CLEAR",
+    "cleanCodeAttributeCategory": "INTENTIONAL",
+    "impacts": [
+      {
+        "softwareQuality": "MAINTAINABILITY",
+        "severity": "MEDIUM"
+      }
+    ],
+    "issueStatus": "OPEN",
+    "projectName": "MyAttendance",
+    "internalTags": [],
+    "lastChangeAnalysisUuid": "f0efc6db-fce9-4025-bb6b-28b0dc005fc7",
+    "lastChangeSource": "ANALYSIS"
+  }
+]

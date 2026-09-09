@@ -1,7 +1,11 @@
 import React from "react";
 import Skeleton from "./Skeleton";
+import { useSkeletonKeys } from "../../../hooks/useSkeletonKeys";
 
 const TableSkeleton = ({ rows = 6, columns = 5 }) => {
+  const headerKeys = useSkeletonKeys(columns);
+  const rowKeys = useSkeletonKeys(rows);
+  const rowColKeys = useSkeletonKeys(columns);
   return (
     <div className="space-y-4 animate-in fade-in duration-300">
       {/* Toolbar / Search Filter Skeleton */}
@@ -20,8 +24,8 @@ const TableSkeleton = ({ rows = 6, columns = 5 }) => {
       <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900">
         {/* Table Header */}
         <div className="flex items-center border-b border-slate-200 bg-slate-50 px-6 py-3.5 dark:border-slate-800 dark:bg-slate-800/50">
-          {Array.from({ length: columns }).map((_, i) => (
-            <div key={i} className="flex-1 px-2">
+          {headerKeys.map((key) => (
+            <div key={key} className="flex-1 px-2">
               <Skeleton variant="text" className="h-4 w-20" />
             </div>
           ))}
@@ -29,10 +33,10 @@ const TableSkeleton = ({ rows = 6, columns = 5 }) => {
 
         {/* Table Rows */}
         <div className="divide-y divide-slate-100 dark:divide-slate-800">
-          {Array.from({ length: rows }).map((_, rowIndex) => (
-            <div key={rowIndex} className="flex items-center px-6 py-4">
-              {Array.from({ length: columns }).map((_, colIndex) => (
-                <div key={colIndex} className="flex-1 px-2">
+          {rowKeys.map((rowKey) => (
+            <div key={rowKey} className="flex items-center px-6 py-4">
+              {rowColKeys.map((colKey, colIndex) => (
+                <div key={colKey} className="flex-1 px-2">
                   <Skeleton
                     variant="text"
                     className={`h-4 ${

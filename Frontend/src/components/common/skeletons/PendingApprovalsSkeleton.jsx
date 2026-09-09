@@ -1,12 +1,14 @@
 import React from "react";
 import Skeleton from "./Skeleton";
+import { useSkeletonKeys } from "../../../hooks/useSkeletonKeys";
 
 const PendingApprovalsSkeleton = ({ count = 4 }) => {
+  const keys = useSkeletonKeys(count);
   return (
     <div className="grid grid-cols-1 gap-4 lg:grid-cols-2 animate-in fade-in duration-300">
-      {Array.from({ length: count }).map((_, i) => (
+      {keys.map((key) => (
         <div
-          key={i}
+          key={key}
           className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-700 dark:bg-slate-900/60 space-y-4"
         >
           {/* Header */}

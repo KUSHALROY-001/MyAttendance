@@ -1,0 +1,782 @@
+[
+  {
+    "key": "AaBnz4tZpPWvDdRwiRQQ",
+    "rule": "javascript:S6479",
+    "severity": "MAJOR",
+    "component": "KUSHALROY-001_MyAttendance:Frontend/src/components/common/skeletons/AcademicOptionsSkeleton.jsx",
+    "project": "KUSHALROY-001_MyAttendance",
+    "line": 8,
+    "hash": "11a4777f86d340962e4cc576573f659a",
+    "textRange": {
+      "startLine": 8,
+      "endLine": 8,
+      "startOffset": 15,
+      "endOffset": 16
+    },
+    "flows": [],
+    "status": "OPEN",
+    "message": "Do not use Array index in keys",
+    "effort": "5min",
+    "debt": "5min",
+    "assignee": "KUSHALROY-001-xVxFY@github",
+    "tags": ["jsx", "performance", "react"],
+    "creationDate": "2026-08-13T08:41:26+0000",
+    "updateDate": "2026-09-03T15:06:22+0000",
+    "type": "CODE_SMELL",
+    "organization": "kushalroy-001",
+    "cleanCodeAttribute": "LOGICAL",
+    "cleanCodeAttributeCategory": "INTENTIONAL",
+    "impacts": [
+      {
+        "softwareQuality": "MAINTAINABILITY",
+        "severity": "MEDIUM"
+      }
+    ],
+    "issueStatus": "OPEN",
+    "projectName": "MyAttendance",
+    "internalTags": [],
+    "lastChangeAnalysisUuid": "f0efc6db-fce9-4025-bb6b-28b0dc005fc7",
+    "lastChangeSource": "ANALYSIS"
+  },
+  {
+    "key": "AaBnz4tRpPWvDdRwiRQP",
+    "rule": "javascript:S6479",
+    "severity": "MAJOR",
+    "component": "KUSHALROY-001_MyAttendance:Frontend/src/components/common/skeletons/CardGridSkeleton.jsx",
+    "project": "KUSHALROY-001_MyAttendance",
+    "line": 17,
+    "hash": "11a4777f86d340962e4cc576573f659a",
+    "textRange": {
+      "startLine": 17,
+      "endLine": 17,
+      "startOffset": 17,
+      "endOffset": 18
+    },
+    "flows": [],
+    "status": "OPEN",
+    "message": "Do not use Array index in keys",
+    "effort": "5min",
+    "debt": "5min",
+    "assignee": "KUSHALROY-001-xVxFY@github",
+    "tags": ["jsx", "performance", "react"],
+    "creationDate": "2026-08-13T08:41:26+0000",
+    "updateDate": "2026-09-03T15:06:22+0000",
+    "type": "CODE_SMELL",
+    "organization": "kushalroy-001",
+    "cleanCodeAttribute": "LOGICAL",
+    "cleanCodeAttributeCategory": "INTENTIONAL",
+    "impacts": [
+      {
+        "softwareQuality": "MAINTAINABILITY",
+        "severity": "MEDIUM"
+      }
+    ],
+    "issueStatus": "OPEN",
+    "projectName": "MyAttendance",
+    "internalTags": [],
+    "lastChangeAnalysisUuid": "f0efc6db-fce9-4025-bb6b-28b0dc005fc7",
+    "lastChangeSource": "ANALYSIS"
+  },
+  {
+    "key": "AaBnz4tgpPWvDdRwiRQR",
+    "rule": "javascript:S6479",
+    "severity": "MAJOR",
+    "component": "KUSHALROY-001_MyAttendance:Frontend/src/components/common/skeletons/LibrarySkeleton.jsx",
+    "project": "KUSHALROY-001_MyAttendance",
+    "line": 9,
+    "hash": "11a4777f86d340962e4cc576573f659a",
+    "textRange": {
+      "startLine": 9,
+      "endLine": 9,
+      "startOffset": 15,
+      "endOffset": 16
+    },
+    "flows": [],
+    "status": "OPEN",
+    "message": "Do not use Array index in keys",
+    "effort": "5min",
+    "debt": "5min",
+    "assignee": "KUSHALROY-001-xVxFY@github",
+    "tags": ["jsx", "performance", "react"],
+    "creationDate": "2026-08-13T08:41:26+0000",
+    "updateDate": "2026-09-03T15:06:22+0000",
+    "type": "CODE_SMELL",
+    "organization": "kushalroy-001",
+    "cleanCodeAttribute": "LOGICAL",
+    "cleanCodeAttributeCategory": "INTENTIONAL",
+    "impacts": [
+      {
+        "softwareQuality": "MAINTAINABILITY",
+        "severity": "MEDIUM"
+      }
+    ],
+    "issueStatus": "OPEN",
+    "projectName": "MyAttendance",
+    "internalTags": [],
+    "lastChangeAnalysisUuid": "f0efc6db-fce9-4025-bb6b-28b0dc005fc7",
+    "lastChangeSource": "ANALYSIS"
+  },
+  {
+    "key": "AaBnz4tJpPWvDdRwiRQO",
+    "rule": "javascript:S6479",
+    "severity": "MAJOR",
+    "component": "KUSHALROY-001_MyAttendance:Frontend/src/components/common/skeletons/PendingApprovalsSkeleton.jsx",
+    "project": "KUSHALROY-001_MyAttendance",
+    "line": 9,
+    "hash": "11a4777f86d340962e4cc576573f659a",
+    "textRange": {
+      "startLine": 9,
+      "endLine": 9,
+      "startOffset": 15,
+      "endOffset": 16
+    },
+    "flows": [],
+    "status": "OPEN",
+    "message": "Do not use Array index in keys",
+    "effort": "5min",
+    "debt": "5min",
+    "assignee": "KUSHALROY-001-xVxFY@github",
+    "tags": ["jsx", "performance", "react"],
+    "creationDate": "2026-08-13T08:41:26+0000",
+    "updateDate": "2026-09-03T15:06:22+0000",
+    "type": "CODE_SMELL",
+    "organization": "kushalroy-001",
+    "cleanCodeAttribute": "LOGICAL",
+    "cleanCodeAttributeCategory": "INTENTIONAL",
+    "impacts": [
+      {
+        "softwareQuality": "MAINTAINABILITY",
+        "severity": "MEDIUM"
+      }
+    ],
+    "issueStatus": "OPEN",
+    "projectName": "MyAttendance",
+    "internalTags": [],
+    "lastChangeAnalysisUuid": "f0efc6db-fce9-4025-bb6b-28b0dc005fc7",
+    "lastChangeSource": "ANALYSIS"
+  },
+  {
+    "key": "AaBnz4tnpPWvDdRwiRQS",
+    "rule": "javascript:S6479",
+    "severity": "MAJOR",
+    "component": "KUSHALROY-001_MyAttendance:Frontend/src/components/common/skeletons/TableSkeleton.jsx",
+    "project": "KUSHALROY-001_MyAttendance",
+    "line": 24,
+    "hash": "bdfe0f17124194d782d596979281e0ab",
+    "textRange": {
+      "startLine": 24,
+      "endLine": 24,
+      "startOffset": 22,
+      "endOffset": 23
+    },
+    "flows": [],
+    "status": "OPEN",
+    "message": "Do not use Array index in keys",
+    "effort": "5min",
+    "debt": "5min",
+    "assignee": "KUSHALROY-001-xVxFY@github",
+    "tags": ["jsx", "performance", "react"],
+    "creationDate": "2026-08-13T08:41:26+0000",
+    "updateDate": "2026-09-03T15:06:22+0000",
+    "type": "CODE_SMELL",
+    "organization": "kushalroy-001",
+    "cleanCodeAttribute": "LOGICAL",
+    "cleanCodeAttributeCategory": "INTENTIONAL",
+    "impacts": [
+      {
+        "softwareQuality": "MAINTAINABILITY",
+        "severity": "MEDIUM"
+      }
+    ],
+    "issueStatus": "OPEN",
+    "projectName": "MyAttendance",
+    "internalTags": [],
+    "lastChangeAnalysisUuid": "f0efc6db-fce9-4025-bb6b-28b0dc005fc7",
+    "lastChangeSource": "ANALYSIS"
+  },
+  {
+    "key": "AaBnz4tnpPWvDdRwiRQT",
+    "rule": "javascript:S6479",
+    "severity": "MAJOR",
+    "component": "KUSHALROY-001_MyAttendance:Frontend/src/components/common/skeletons/TableSkeleton.jsx",
+    "project": "KUSHALROY-001_MyAttendance",
+    "line": 33,
+    "hash": "7e085d638aeefd0e6180260b413f987a",
+    "textRange": {
+      "startLine": 33,
+      "endLine": 33,
+      "startOffset": 22,
+      "endOffset": 30
+    },
+    "flows": [],
+    "status": "OPEN",
+    "message": "Do not use Array index in keys",
+    "effort": "5min",
+    "debt": "5min",
+    "assignee": "KUSHALROY-001-xVxFY@github",
+    "tags": ["jsx", "performance", "react"],
+    "creationDate": "2026-08-13T08:41:26+0000",
+    "updateDate": "2026-09-03T15:06:22+0000",
+    "type": "CODE_SMELL",
+    "organization": "kushalroy-001",
+    "cleanCodeAttribute": "LOGICAL",
+    "cleanCodeAttributeCategory": "INTENTIONAL",
+    "impacts": [
+      {
+        "softwareQuality": "MAINTAINABILITY",
+        "severity": "MEDIUM"
+      }
+    ],
+    "issueStatus": "OPEN",
+    "projectName": "MyAttendance",
+    "internalTags": [],
+    "lastChangeAnalysisUuid": "f0efc6db-fce9-4025-bb6b-28b0dc005fc7",
+    "lastChangeSource": "ANALYSIS"
+  },
+  {
+    "key": "AaBnz4tnpPWvDdRwiRQU",
+    "rule": "javascript:S6479",
+    "severity": "MAJOR",
+    "component": "KUSHALROY-001_MyAttendance:Frontend/src/components/common/skeletons/TableSkeleton.jsx",
+    "project": "KUSHALROY-001_MyAttendance",
+    "line": 35,
+    "hash": "8b99e6b53649e7b63fa0440bfae45dcb",
+    "textRange": {
+      "startLine": 35,
+      "endLine": 35,
+      "startOffset": 26,
+      "endOffset": 34
+    },
+    "flows": [],
+    "status": "OPEN",
+    "message": "Do not use Array index in keys",
+    "effort": "5min",
+    "debt": "5min",
+    "assignee": "KUSHALROY-001-xVxFY@github",
+    "tags": ["jsx", "performance", "react"],
+    "creationDate": "2026-08-13T08:41:26+0000",
+    "updateDate": "2026-09-03T15:06:22+0000",
+    "type": "CODE_SMELL",
+    "organization": "kushalroy-001",
+    "cleanCodeAttribute": "LOGICAL",
+    "cleanCodeAttributeCategory": "INTENTIONAL",
+    "impacts": [
+      {
+        "softwareQuality": "MAINTAINABILITY",
+        "severity": "MEDIUM"
+      }
+    ],
+    "issueStatus": "OPEN",
+    "projectName": "MyAttendance",
+    "internalTags": [],
+    "lastChangeAnalysisUuid": "f0efc6db-fce9-4025-bb6b-28b0dc005fc7",
+    "lastChangeSource": "ANALYSIS"
+  },
+  {
+    "key": "AaBnz4rWpPWvDdRwiRPl",
+    "rule": "javascript:S6479",
+    "severity": "MAJOR",
+    "component": "KUSHALROY-001_MyAttendance:Frontend/src/components/admin/promotions/PromotionBatchDetailPanel.jsx",
+    "project": "KUSHALROY-001_MyAttendance",
+    "line": 75,
+    "hash": "47bb6ac66f8e0b7dbf3695b992c2fca9",
+    "textRange": {
+      "startLine": 75,
+      "endLine": 75,
+      "startOffset": 29,
+      "endOffset": 30
+    },
+    "flows": [],
+    "status": "OPEN",
+    "message": "Do not use Array index in keys",
+    "effort": "5min",
+    "debt": "5min",
+    "assignee": "KUSHALROY-001-xVxFY@github",
+    "tags": ["jsx", "performance", "react"],
+    "creationDate": "2026-08-12T16:03:48+0000",
+    "updateDate": "2026-09-03T15:06:22+0000",
+    "type": "CODE_SMELL",
+    "organization": "kushalroy-001",
+    "cleanCodeAttribute": "LOGICAL",
+    "cleanCodeAttributeCategory": "INTENTIONAL",
+    "impacts": [
+      {
+        "softwareQuality": "MAINTAINABILITY",
+        "severity": "MEDIUM"
+      }
+    ],
+    "issueStatus": "OPEN",
+    "projectName": "MyAttendance",
+    "internalTags": [],
+    "lastChangeAnalysisUuid": "f0efc6db-fce9-4025-bb6b-28b0dc005fc7",
+    "lastChangeSource": "ANALYSIS"
+  },
+  {
+    "key": "AaBnz4wZpPWvDdRwiRQ-",
+    "rule": "javascript:S6479",
+    "severity": "MAJOR",
+    "component": "KUSHALROY-001_MyAttendance:Frontend/src/pages/AdminPromotions.jsx",
+    "project": "KUSHALROY-001_MyAttendance",
+    "line": 126,
+    "hash": "5b87a976935e50085b46527aaa119799",
+    "textRange": {
+      "startLine": 126,
+      "endLine": 126,
+      "startOffset": 24,
+      "endOffset": 25
+    },
+    "flows": [],
+    "status": "OPEN",
+    "message": "Do not use Array index in keys",
+    "effort": "5min",
+    "debt": "5min",
+    "assignee": "KUSHALROY-001-xVxFY@github",
+    "tags": ["jsx", "performance", "react"],
+    "creationDate": "2026-08-12T16:03:48+0000",
+    "updateDate": "2026-09-03T15:06:22+0000",
+    "type": "CODE_SMELL",
+    "organization": "kushalroy-001",
+    "cleanCodeAttribute": "LOGICAL",
+    "cleanCodeAttributeCategory": "INTENTIONAL",
+    "impacts": [
+      {
+        "softwareQuality": "MAINTAINABILITY",
+        "severity": "MEDIUM"
+      }
+    ],
+    "issueStatus": "OPEN",
+    "projectName": "MyAttendance",
+    "internalTags": [],
+    "lastChangeAnalysisUuid": "f0efc6db-fce9-4025-bb6b-28b0dc005fc7",
+    "lastChangeSource": "ANALYSIS"
+  },
+  {
+    "key": "AaBnz4rfpPWvDdRwiRPq",
+    "rule": "javascript:S6479",
+    "severity": "MAJOR",
+    "component": "KUSHALROY-001_MyAttendance:Frontend/src/components/admin/academic-options/DepartmentCard.jsx",
+    "project": "KUSHALROY-001_MyAttendance",
+    "line": 133,
+    "hash": "d70e7b08084a8dc0b1ddca1896b51181",
+    "textRange": {
+      "startLine": 133,
+      "endLine": 133,
+      "startOffset": 21,
+      "endOffset": 24
+    },
+    "flows": [],
+    "status": "OPEN",
+    "message": "Do not use Array index in keys",
+    "effort": "5min",
+    "debt": "5min",
+    "assignee": "KUSHALROY-001-xVxFY@github",
+    "tags": ["jsx", "performance", "react"],
+    "creationDate": "2026-08-07T14:47:10+0000",
+    "updateDate": "2026-09-03T15:06:22+0000",
+    "type": "CODE_SMELL",
+    "organization": "kushalroy-001",
+    "cleanCodeAttribute": "LOGICAL",
+    "cleanCodeAttributeCategory": "INTENTIONAL",
+    "impacts": [
+      {
+        "softwareQuality": "MAINTAINABILITY",
+        "severity": "MEDIUM"
+      }
+    ],
+    "issueStatus": "OPEN",
+    "projectName": "MyAttendance",
+    "internalTags": [],
+    "lastChangeAnalysisUuid": "f0efc6db-fce9-4025-bb6b-28b0dc005fc7",
+    "lastChangeSource": "ANALYSIS"
+  },
+  {
+    "key": "AaBnz4rfpPWvDdRwiRPr",
+    "rule": "javascript:S6479",
+    "severity": "MAJOR",
+    "component": "KUSHALROY-001_MyAttendance:Frontend/src/components/admin/academic-options/DepartmentCard.jsx",
+    "project": "KUSHALROY-001_MyAttendance",
+    "line": 147,
+    "hash": "edbfc6c83aaa68edf8aec288ec494e4e",
+    "textRange": {
+      "startLine": 147,
+      "endLine": 147,
+      "startOffset": 38,
+      "endOffset": 42
+    },
+    "flows": [],
+    "status": "OPEN",
+    "message": "Do not use Array index in keys",
+    "effort": "5min",
+    "debt": "5min",
+    "assignee": "KUSHALROY-001-xVxFY@github",
+    "tags": ["jsx", "performance", "react"],
+    "creationDate": "2026-08-07T14:47:10+0000",
+    "updateDate": "2026-09-03T15:06:22+0000",
+    "type": "CODE_SMELL",
+    "organization": "kushalroy-001",
+    "cleanCodeAttribute": "LOGICAL",
+    "cleanCodeAttributeCategory": "INTENTIONAL",
+    "impacts": [
+      {
+        "softwareQuality": "MAINTAINABILITY",
+        "severity": "MEDIUM"
+      }
+    ],
+    "issueStatus": "OPEN",
+    "projectName": "MyAttendance",
+    "internalTags": [],
+    "lastChangeAnalysisUuid": "f0efc6db-fce9-4025-bb6b-28b0dc005fc7",
+    "lastChangeSource": "ANALYSIS"
+  },
+  {
+    "key": "AaBnz4ropPWvDdRwiRPv",
+    "rule": "javascript:S6479",
+    "severity": "MAJOR",
+    "component": "KUSHALROY-001_MyAttendance:Frontend/src/components/admin/academic-options/DepartmentModal.jsx",
+    "project": "KUSHALROY-001_MyAttendance",
+    "line": 79,
+    "hash": "0dfd4962214954d675377d11fe111fba",
+    "textRange": {
+      "startLine": 79,
+      "endLine": 79,
+      "startOffset": 21,
+      "endOffset": 26
+    },
+    "flows": [],
+    "status": "OPEN",
+    "message": "Do not use Array index in keys",
+    "effort": "5min",
+    "debt": "5min",
+    "assignee": "KUSHALROY-001-xVxFY@github",
+    "tags": ["jsx", "performance", "react"],
+    "creationDate": "2026-08-07T14:47:10+0000",
+    "updateDate": "2026-09-03T15:06:22+0000",
+    "type": "CODE_SMELL",
+    "organization": "kushalroy-001",
+    "cleanCodeAttribute": "LOGICAL",
+    "cleanCodeAttributeCategory": "INTENTIONAL",
+    "impacts": [
+      {
+        "softwareQuality": "MAINTAINABILITY",
+        "severity": "MEDIUM"
+      }
+    ],
+    "issueStatus": "OPEN",
+    "projectName": "MyAttendance",
+    "internalTags": [],
+    "lastChangeAnalysisUuid": "f0efc6db-fce9-4025-bb6b-28b0dc005fc7",
+    "lastChangeSource": "ANALYSIS"
+  },
+  {
+    "key": "AaBnz4ropPWvDdRwiRPx",
+    "rule": "javascript:S6479",
+    "severity": "MAJOR",
+    "component": "KUSHALROY-001_MyAttendance:Frontend/src/components/admin/academic-options/DepartmentModal.jsx",
+    "project": "KUSHALROY-001_MyAttendance",
+    "line": 111,
+    "hash": "d9d37749e44b0d6552ab531e7e3543cc",
+    "textRange": {
+      "startLine": 111,
+      "endLine": 111,
+      "startOffset": 31,
+      "endOffset": 37
+    },
+    "flows": [],
+    "status": "OPEN",
+    "message": "Do not use Array index in keys",
+    "effort": "5min",
+    "debt": "5min",
+    "assignee": "KUSHALROY-001-xVxFY@github",
+    "tags": ["jsx", "performance", "react"],
+    "creationDate": "2026-08-07T14:47:10+0000",
+    "updateDate": "2026-09-03T15:06:22+0000",
+    "type": "CODE_SMELL",
+    "organization": "kushalroy-001",
+    "cleanCodeAttribute": "LOGICAL",
+    "cleanCodeAttributeCategory": "INTENTIONAL",
+    "impacts": [
+      {
+        "softwareQuality": "MAINTAINABILITY",
+        "severity": "MEDIUM"
+      }
+    ],
+    "issueStatus": "OPEN",
+    "projectName": "MyAttendance",
+    "internalTags": [],
+    "lastChangeAnalysisUuid": "f0efc6db-fce9-4025-bb6b-28b0dc005fc7",
+    "lastChangeSource": "ANALYSIS"
+  },
+  {
+    "key": "AaBnz4uipPWvDdRwiRQn",
+    "rule": "javascript:S6479",
+    "severity": "MAJOR",
+    "component": "KUSHALROY-001_MyAttendance:Frontend/src/components/public/ScreenSlider.jsx",
+    "project": "KUSHALROY-001_MyAttendance",
+    "line": 87,
+    "hash": "11a4777f86d340962e4cc576573f659a",
+    "textRange": {
+      "startLine": 87,
+      "endLine": 87,
+      "startOffset": 19,
+      "endOffset": 20
+    },
+    "flows": [],
+    "status": "OPEN",
+    "message": "Do not use Array index in keys",
+    "effort": "5min",
+    "debt": "5min",
+    "assignee": "KUSHALROY-001-xVxFY@github",
+    "tags": ["jsx", "performance", "react"],
+    "creationDate": "2026-07-31T09:55:48+0000",
+    "updateDate": "2026-09-03T15:06:22+0000",
+    "type": "CODE_SMELL",
+    "organization": "kushalroy-001",
+    "cleanCodeAttribute": "LOGICAL",
+    "cleanCodeAttributeCategory": "INTENTIONAL",
+    "impacts": [
+      {
+        "softwareQuality": "MAINTAINABILITY",
+        "severity": "MEDIUM"
+      }
+    ],
+    "issueStatus": "OPEN",
+    "projectName": "MyAttendance",
+    "internalTags": [],
+    "lastChangeAnalysisUuid": "f0efc6db-fce9-4025-bb6b-28b0dc005fc7",
+    "lastChangeSource": "ANALYSIS"
+  },
+  {
+    "key": "AaBnz4uCpPWvDdRwiRQc",
+    "rule": "javascript:S6479",
+    "severity": "MAJOR",
+    "component": "KUSHALROY-001_MyAttendance:Frontend/src/components/teacher/AttendanceSessions.jsx",
+    "project": "KUSHALROY-001_MyAttendance",
+    "line": 111,
+    "hash": "0dfd4962214954d675377d11fe111fba",
+    "textRange": {
+      "startLine": 111,
+      "endLine": 111,
+      "startOffset": 21,
+      "endOffset": 26
+    },
+    "flows": [],
+    "status": "OPEN",
+    "message": "Do not use Array index in keys",
+    "effort": "5min",
+    "debt": "5min",
+    "assignee": "KUSHALROY-001-xVxFY@github",
+    "tags": ["jsx", "performance", "react"],
+    "creationDate": "2026-05-06T16:27:59+0000",
+    "updateDate": "2026-09-03T15:06:22+0000",
+    "type": "CODE_SMELL",
+    "organization": "kushalroy-001",
+    "cleanCodeAttribute": "LOGICAL",
+    "cleanCodeAttributeCategory": "INTENTIONAL",
+    "impacts": [
+      {
+        "softwareQuality": "MAINTAINABILITY",
+        "severity": "MEDIUM"
+      }
+    ],
+    "issueStatus": "OPEN",
+    "projectName": "MyAttendance",
+    "internalTags": [],
+    "lastChangeAnalysisUuid": "f0efc6db-fce9-4025-bb6b-28b0dc005fc7",
+    "lastChangeSource": "ANALYSIS"
+  },
+  {
+    "key": "AaBnz4sppPWvDdRwiRQE",
+    "rule": "javascript:S6479",
+    "severity": "MAJOR",
+    "component": "KUSHALROY-001_MyAttendance:Frontend/src/components/admin/AdminTable.jsx",
+    "project": "KUSHALROY-001_MyAttendance",
+    "line": 25,
+    "hash": "480bd026ceb99823131f5fd2f5dc1178",
+    "textRange": {
+      "startLine": 25,
+      "endLine": 25,
+      "startOffset": 25,
+      "endOffset": 28
+    },
+    "flows": [],
+    "status": "OPEN",
+    "message": "Do not use Array index in keys",
+    "effort": "5min",
+    "debt": "5min",
+    "assignee": "KUSHALROY-001-xVxFY@github",
+    "tags": ["jsx", "performance", "react"],
+    "creationDate": "2026-04-13T05:35:21+0000",
+    "updateDate": "2026-09-03T15:06:22+0000",
+    "type": "CODE_SMELL",
+    "organization": "kushalroy-001",
+    "cleanCodeAttribute": "LOGICAL",
+    "cleanCodeAttributeCategory": "INTENTIONAL",
+    "impacts": [
+      {
+        "softwareQuality": "MAINTAINABILITY",
+        "severity": "MEDIUM"
+      }
+    ],
+    "issueStatus": "OPEN",
+    "projectName": "MyAttendance",
+    "internalTags": [],
+    "lastChangeAnalysisUuid": "f0efc6db-fce9-4025-bb6b-28b0dc005fc7",
+    "lastChangeSource": "ANALYSIS"
+  },
+  {
+    "key": "AaBnz4sppPWvDdRwiRQF",
+    "rule": "javascript:S6479",
+    "severity": "MAJOR",
+    "component": "KUSHALROY-001_MyAttendance:Frontend/src/components/admin/AdminTable.jsx",
+    "project": "KUSHALROY-001_MyAttendance",
+    "line": 50,
+    "hash": "0dafe89b9d9450419ed96124e020f95e",
+    "textRange": {
+      "startLine": 50,
+      "endLine": 50,
+      "startOffset": 23,
+      "endOffset": 31
+    },
+    "flows": [],
+    "status": "OPEN",
+    "message": "Do not use Array index in keys",
+    "effort": "5min",
+    "debt": "5min",
+    "assignee": "KUSHALROY-001-xVxFY@github",
+    "tags": ["jsx", "performance", "react"],
+    "creationDate": "2026-04-13T05:35:21+0000",
+    "updateDate": "2026-09-03T15:06:22+0000",
+    "type": "CODE_SMELL",
+    "organization": "kushalroy-001",
+    "cleanCodeAttribute": "LOGICAL",
+    "cleanCodeAttributeCategory": "INTENTIONAL",
+    "impacts": [
+      {
+        "softwareQuality": "MAINTAINABILITY",
+        "severity": "MEDIUM"
+      }
+    ],
+    "issueStatus": "OPEN",
+    "projectName": "MyAttendance",
+    "internalTags": [],
+    "lastChangeAnalysisUuid": "f0efc6db-fce9-4025-bb6b-28b0dc005fc7",
+    "lastChangeSource": "ANALYSIS"
+  },
+  {
+    "key": "AaBnz4sppPWvDdRwiRQG",
+    "rule": "javascript:S6479",
+    "severity": "MAJOR",
+    "component": "KUSHALROY-001_MyAttendance:Frontend/src/components/admin/AdminTable.jsx",
+    "project": "KUSHALROY-001_MyAttendance",
+    "line": 56,
+    "hash": "62e637878cb8c837669807316b79fae2",
+    "textRange": {
+      "startLine": 56,
+      "endLine": 56,
+      "startOffset": 27,
+      "endOffset": 35
+    },
+    "flows": [],
+    "status": "OPEN",
+    "message": "Do not use Array index in keys",
+    "effort": "5min",
+    "debt": "5min",
+    "assignee": "KUSHALROY-001-xVxFY@github",
+    "tags": ["jsx", "performance", "react"],
+    "creationDate": "2026-04-13T05:35:21+0000",
+    "updateDate": "2026-09-03T15:06:22+0000",
+    "type": "CODE_SMELL",
+    "organization": "kushalroy-001",
+    "cleanCodeAttribute": "LOGICAL",
+    "cleanCodeAttributeCategory": "INTENTIONAL",
+    "impacts": [
+      {
+        "softwareQuality": "MAINTAINABILITY",
+        "severity": "MEDIUM"
+      }
+    ],
+    "issueStatus": "OPEN",
+    "projectName": "MyAttendance",
+    "internalTags": [],
+    "lastChangeAnalysisUuid": "f0efc6db-fce9-4025-bb6b-28b0dc005fc7",
+    "lastChangeSource": "ANALYSIS"
+  },
+  {
+    "key": "AaBnz4rEpPWvDdRwiRPh",
+    "rule": "javascript:S6479",
+    "severity": "MAJOR",
+    "component": "KUSHALROY-001_MyAttendance:Frontend/src/components/student/QuickStats.jsx",
+    "project": "KUSHALROY-001_MyAttendance",
+    "line": 12,
+    "hash": "d70e7b08084a8dc0b1ddca1896b51181",
+    "textRange": {
+      "startLine": 12,
+      "endLine": 12,
+      "startOffset": 19,
+      "endOffset": 22
+    },
+    "flows": [],
+    "status": "OPEN",
+    "message": "Do not use Array index in keys",
+    "effort": "5min",
+    "debt": "5min",
+    "assignee": "KUSHALROY-001-xVxFY@github",
+    "tags": ["jsx", "performance", "react"],
+    "creationDate": "2026-03-17T06:34:18+0000",
+    "updateDate": "2026-09-03T15:06:22+0000",
+    "type": "CODE_SMELL",
+    "organization": "kushalroy-001",
+    "cleanCodeAttribute": "LOGICAL",
+    "cleanCodeAttributeCategory": "INTENTIONAL",
+    "impacts": [
+      {
+        "softwareQuality": "MAINTAINABILITY",
+        "severity": "MEDIUM"
+      }
+    ],
+    "issueStatus": "OPEN",
+    "projectName": "MyAttendance",
+    "internalTags": [],
+    "lastChangeAnalysisUuid": "f0efc6db-fce9-4025-bb6b-28b0dc005fc7",
+    "lastChangeSource": "ANALYSIS"
+  },
+  {
+    "key": "AaBnz4qapPWvDdRwiRPX",
+    "rule": "javascript:S6479",
+    "severity": "MAJOR",
+    "component": "KUSHALROY-001_MyAttendance:Frontend/src/components/student/AttendanceCalendar.jsx",
+    "project": "KUSHALROY-001_MyAttendance",
+    "line": 75,
+    "hash": "d70e7b08084a8dc0b1ddca1896b51181",
+    "textRange": {
+      "startLine": 75,
+      "endLine": 75,
+      "startOffset": 17,
+      "endOffset": 20
+    },
+    "flows": [],
+    "status": "OPEN",
+    "message": "Do not use Array index in keys",
+    "effort": "5min",
+    "debt": "5min",
+    "assignee": "KUSHALROY-001-xVxFY@github",
+    "tags": ["jsx", "performance", "react"],
+    "creationDate": "2026-03-10T07:16:51+0000",
+    "updateDate": "2026-09-03T15:06:22+0000",
+    "type": "CODE_SMELL",
+    "organization": "kushalroy-001",
+    "cleanCodeAttribute": "LOGICAL",
+    "cleanCodeAttributeCategory": "INTENTIONAL",
+    "impacts": [
+      {
+        "softwareQuality": "MAINTAINABILITY",
+        "severity": "MEDIUM"
+      }
+    ],
+    "issueStatus": "OPEN",
+    "projectName": "MyAttendance",
+    "internalTags": [],
+    "lastChangeAnalysisUuid": "f0efc6db-fce9-4025-bb6b-28b0dc005fc7",
+    "lastChangeSource": "ANALYSIS"
+  }
+]

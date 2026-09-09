@@ -12,7 +12,15 @@ const SessionCard = ({ session, showCourseName = true, onClick }) => {
 
   return (
     <div
+      role="button"
+      tabIndex={0}
       onClick={() => onClick && onClick(session.id)}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          onClick && onClick(session.id);
+        }
+      }}
       className="group flex cursor-pointer flex-col rounded-2xl border border-slate-200 bg-white p-2 md:p-4 transition-all hover:border-indigo-200 hover:shadow-md dark:border-slate-800 dark:bg-slate-900"
     >
       <div className="mb-4 flex items-start justify-between">

@@ -37,12 +37,16 @@ const AssignSlotModal = ({
       <form onSubmit={handleAssignSlot} className="space-y-4">
         {/* Teacher search */}
         <div className="space-y-2">
-          <label className="text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase">
+          <label
+            htmlFor="assignSlotTeacherSearch"
+            className="text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase"
+          >
             Select Teacher (Allocated)
           </label>
           <div className="relative">
             <Search className="w-4 h-4 absolute left-3 top-2.5 text-slate-400" />
             <input
+              id="assignSlotTeacherSearch"
               type="text"
               placeholder="Search teacher by name..."
               value={teacherSearch}
@@ -60,6 +64,7 @@ const AssignSlotModal = ({
               filteredAllocations.map((a) => (
                 <label
                   key={a.id}
+                  aria-label={`Select ${a.teacherName} for ${a.courseName}`}
                   className={`flex items-center gap-3 px-3 py-2.5 cursor-pointer transition hover:bg-slate-50 dark:hover:bg-slate-800 ${selectedAllocationId === a.id.toString() ? "bg-indigo-50 dark:bg-indigo-900/20" : ""}`}
                 >
                   <input
@@ -87,10 +92,14 @@ const AssignSlotModal = ({
         {/* Room + Type */}
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-1">
-            <label className="text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase">
+            <label
+              htmlFor="assignSlotRoom"
+              className="text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase"
+            >
               Room / Venue
             </label>
             <input
+              id="assignSlotRoom"
               type="text"
               value={slotRoom}
               onChange={(e) => setSlotRoom(e.target.value)}
@@ -99,10 +108,14 @@ const AssignSlotModal = ({
             />
           </div>
           <div className="space-y-1">
-            <label className="text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase">
+            <label
+              htmlFor="assignSlotType"
+              className="text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase"
+            >
               Type
             </label>
             <select
+              id="assignSlotType"
               value={slotType}
               onChange={(e) => setSlotType(e.target.value)}
               className="w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm outline-none text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500"

@@ -24,8 +24,17 @@ const AdminToolbar = ({ searchProps, filters = [], actions }) => {
         {/* Search Section */}
         {searchProps && (
           <div
+            role="button"
+            tabIndex={0}
+            aria-label="Expand search"
             className={`flex items-center transition-all duration-300 ease-in-out ${isSearchExpanded || searchProps.value ? "bg-slate-50 dark:bg-slate-800 rounded-full px-3 py-1.5" : "p-1.5 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-full cursor-pointer"}`}
             onClick={!isSearchExpanded ? expandSearch : undefined}
+            onKeyDown={(e) => {
+              if (!isSearchExpanded && (e.key === "Enter" || e.key === " ")) {
+                e.preventDefault();
+                expandSearch();
+              }
+            }}
           >
             <Search className="w-5 h-5 text-slate-500 shrink-0" />
             <input

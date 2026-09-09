@@ -39,8 +39,9 @@ export default function LibraryModal({
         >
           <div className="grid grid-cols-2 gap-4">
             <div className="col-span-2 space-y-1.5">
-              <label className={labelClass}>Resource Title</label>
+              <label htmlFor="libraryResourceTitle" className={labelClass}>Resource Title</label>
               <input
+                id="libraryResourceTitle"
                 name="title"
                 required
                 defaultValue={editingResource?.title || ""}
@@ -50,8 +51,9 @@ export default function LibraryModal({
             </div>
 
             <div className="col-span-2 space-y-1.5">
-              <label className={labelClass}>Subject Name</label>
+              <label htmlFor="libraryResourceSubjectName" className={labelClass}>Subject Name</label>
               <input
+                id="libraryResourceSubjectName"
                 name="subjectName"
                 required
                 defaultValue={editingResource?.subjectName || ""}
@@ -61,8 +63,9 @@ export default function LibraryModal({
             </div>
 
             <div className="col-span-2 space-y-1.5 md:col-span-1">
-              <label className={labelClass}>Department</label>
+              <label htmlFor="libraryResourceDepartment" className={labelClass}>Department</label>
               <select
+                id="libraryResourceDepartment"
                 name="department"
                 required
                 defaultValue={editingResource?.department || ""}
@@ -78,8 +81,9 @@ export default function LibraryModal({
             </div>
 
             <div className="col-span-2 space-y-1.5 md:col-span-1">
-              <label className={labelClass}>Semester</label>
+              <label htmlFor="libraryResourceSemester" className={labelClass}>Semester</label>
               <select
+                id="libraryResourceSemester"
                 name="semester"
                 required
                 defaultValue={editingResource?.semester || ""}
@@ -95,8 +99,9 @@ export default function LibraryModal({
             </div>
 
             <div className="col-span-2 space-y-1.5">
-              <label className={labelClass}>Google Drive Link</label>
+              <label htmlFor="libraryResourceDriveLink" className={labelClass}>Google Drive Link</label>
               <input
+                id="libraryResourceDriveLink"
                 name="driveLink"
                 type="text"
                 required
@@ -107,8 +112,9 @@ export default function LibraryModal({
             </div>
 
             <div className="col-span-2 space-y-1.5">
-              <label className={labelClass}>Description (Optional)</label>
+              <label htmlFor="libraryResourceDescription" className={labelClass}>Description (Optional)</label>
               <textarea
+                id="libraryResourceDescription"
                 name="description"
                 rows="3"
                 defaultValue={editingResource?.description || ""}
