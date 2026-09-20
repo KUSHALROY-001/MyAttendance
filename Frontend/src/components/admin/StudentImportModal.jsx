@@ -68,7 +68,16 @@ const StudentImportModal = ({ isOpen, onClose, onImported }) => {
           </button>
 
           <div
+            role="button"
+            tabIndex={0}
+            aria-label="Choose file to import"
             onClick={() => fileInputRef.current?.click()}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                fileInputRef.current?.click();
+              }
+            }}
             className="cursor-pointer rounded-2xl border-2 border-dashed border-slate-400 dark:border-slate-700 bg-slate-50 px-6 py-10 text-center hover:border-indigo-400 dark:hover:border-indigo-500 transition"
           >
             <input

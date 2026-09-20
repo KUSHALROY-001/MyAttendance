@@ -17,6 +17,11 @@ dotenv.config();
 
 const app = express();
 
+// Don't advertise the framework in the X-Powered-By response header —
+// it's free reconnaissance for anyone probing for framework-specific
+// exploits.
+app.disable("x-powered-by");
+
 // CORS — required because the frontend sends credentials (refresh-token cookie).
 // FRONTEND_URL can be a comma-separated list if you need more than one origin
 // (e.g. local dev + a deployed preview URL).

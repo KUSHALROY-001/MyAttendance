@@ -1,0 +1,542 @@
+[
+  {
+    "key": "AaBnz4ynpPWvDdRwiRRe",
+    "rule": "jssecurity:S5145",
+    "severity": "MINOR",
+    "component": "KUSHALROY-001_MyAttendance:Backend/middlewares/error.middleware.js",
+    "project": "KUSHALROY-001_MyAttendance",
+    "line": 91,
+    "hash": "9c379598232ad8ada176afef7b181f06",
+    "textRange": {
+      "startLine": 91,
+      "endLine": 91,
+      "startOffset": 12,
+      "endOffset": 17
+    },
+    "flows": [
+      {
+        "locations": [
+          {
+            "component": "KUSHALROY-001_MyAttendance:Backend/middlewares/error.middleware.js",
+            "textRange": {
+              "startLine": 91,
+              "endLine": 91,
+              "startOffset": 12,
+              "endOffset": 17
+            },
+            "msg": "Sink: this invocation is not safe; a malicious value can be used as argument"
+          },
+          {
+            "component": "KUSHALROY-001_MyAttendance:Backend/middlewares/error.middleware.js",
+            "textRange": {
+              "startLine": 91,
+              "endLine": 91,
+              "startOffset": 18,
+              "endOffset": 54
+            },
+            "msg": "This concatenation can propagate malicious content to the newly created string"
+          },
+          {
+            "component": "KUSHALROY-001_MyAttendance:Backend/middlewares/error.middleware.js",
+            "textRange": {
+              "startLine": 91,
+              "endLine": 91,
+              "startOffset": 40,
+              "endOffset": 51
+            },
+            "msg": "Source: a user can craft an HTTP request with malicious content"
+          }
+        ]
+      }
+    ],
+    "status": "OPEN",
+    "message": "Change this code to not log user-controlled data.",
+    "effort": "30min",
+    "debt": "30min",
+    "assignee": "KUSHALROY-001-xVxFY@github",
+    "tags": ["cwe"],
+    "creationDate": "2026-08-21T05:10:06+0000",
+    "updateDate": "2026-09-03T15:06:22+0000",
+    "type": "VULNERABILITY",
+    "organization": "kushalroy-001",
+    "cleanCodeAttribute": "COMPLETE",
+    "cleanCodeAttributeCategory": "INTENTIONAL",
+    "impacts": [
+      {
+        "softwareQuality": "SECURITY",
+        "severity": "LOW"
+      }
+    ],
+    "issueStatus": "OPEN",
+    "projectName": "MyAttendance",
+    "internalTags": [],
+    "lastChangeAnalysisUuid": "f0efc6db-fce9-4025-bb6b-28b0dc005fc7",
+    "lastChangeSource": "ANALYSIS"
+  },
+  {
+    "key": "AaBnz402pPWvDdRwiRSD",
+    "rule": "text:S8564",
+    "severity": "MAJOR",
+    "component": "KUSHALROY-001_MyAttendance:Backend/package.json",
+    "project": "KUSHALROY-001_MyAttendance",
+    "flows": [],
+    "status": "OPEN",
+    "message": "Dependency versions are not predictable if the lock file (package-lock.json, npm-shrinkwrap.json, bun.lock, bun.lockb, pnpm-lock.yaml or yarn.lock) is missing.",
+    "effort": "5min",
+    "debt": "5min",
+    "assignee": "KUSHALROY-001-xVxFY@github",
+    "tags": [],
+    "creationDate": "2026-08-10T05:20:34+0000",
+    "updateDate": "2026-09-03T15:06:22+0000",
+    "type": "VULNERABILITY",
+    "organization": "kushalroy-001",
+    "cleanCodeAttribute": "COMPLETE",
+    "cleanCodeAttributeCategory": "INTENTIONAL",
+    "impacts": [
+      {
+        "softwareQuality": "SECURITY",
+        "severity": "MEDIUM"
+      }
+    ],
+    "issueStatus": "OPEN",
+    "projectName": "MyAttendance",
+    "internalTags": [],
+    "lastChangeAnalysisUuid": "f0efc6db-fce9-4025-bb6b-28b0dc005fc7",
+    "lastChangeSource": "ANALYSIS"
+  },
+  {
+    "key": "AaBnz41MpPWvDdRwiRSH",
+    "rule": "javascript:S2245",
+    "severity": "MAJOR",
+    "component": "KUSHALROY-001_MyAttendance:Backend/isolation-test.js",
+    "project": "KUSHALROY-001_MyAttendance",
+    "line": 25,
+    "hash": "8419cb8098e428fa59a849d7d054bb86",
+    "textRange": {
+      "startLine": 25,
+      "endLine": 25,
+      "startOffset": 15,
+      "endOffset": 28
+    },
+    "flows": [],
+    "status": "OPEN",
+    "message": "Make sure that using this pseudorandom number generator is safe here.",
+    "effort": "10min",
+    "debt": "10min",
+    "assignee": "KUSHALROY-001-xVxFY@github",
+    "tags": ["cwe", "former-hotspot"],
+    "creationDate": "2026-08-07T14:47:10+0000",
+    "updateDate": "2026-09-03T15:06:22+0000",
+    "type": "VULNERABILITY",
+    "organization": "kushalroy-001",
+    "cleanCodeAttribute": "TRUSTWORTHY",
+    "cleanCodeAttributeCategory": "RESPONSIBLE",
+    "impacts": [
+      {
+        "softwareQuality": "SECURITY",
+        "severity": "MEDIUM"
+      }
+    ],
+    "issueStatus": "OPEN",
+    "projectName": "MyAttendance",
+    "internalTags": [],
+    "lastChangeAnalysisUuid": "f0efc6db-fce9-4025-bb6b-28b0dc005fc7",
+    "lastChangeSource": "ANALYSIS"
+  },
+  {
+    "key": "AaBnz41MpPWvDdRwiRSN",
+    "rule": "jssecurity:S7044",
+    "severity": "MAJOR",
+    "component": "KUSHALROY-001_MyAttendance:Backend/isolation-test.js",
+    "project": "KUSHALROY-001_MyAttendance",
+    "line": 36,
+    "hash": "c9110706003717882cb7d1b94fbc5c20",
+    "textRange": {
+      "startLine": 36,
+      "endLine": 36,
+      "startOffset": 20,
+      "endOffset": 25
+    },
+    "flows": [
+      {
+        "locations": [
+          {
+            "component": "KUSHALROY-001_MyAttendance:Backend/isolation-test.js",
+            "textRange": {
+              "startLine": 36,
+              "endLine": 36,
+              "startOffset": 20,
+              "endOffset": 25
+            },
+            "msg": "Sink: this invocation is not safe; a malicious value can be used as argument"
+          },
+          {
+            "component": "KUSHALROY-001_MyAttendance:Backend/isolation-test.js",
+            "textRange": {
+              "startLine": 36,
+              "endLine": 36,
+              "startOffset": 26,
+              "endOffset": 46
+            },
+            "msg": "This concatenation can propagate malicious content to the newly created string"
+          },
+          {
+            "component": "KUSHALROY-001_MyAttendance:Backend/isolation-test.js",
+            "textRange": {
+              "startLine": 36,
+              "endLine": 36,
+              "startOffset": 40,
+              "endOffset": 44
+            },
+            "msg": "A malicious value was previously assigned to field �??path�??"
+          },
+          {
+            "component": "KUSHALROY-001_MyAttendance:Backend/isolation-test.js",
+            "textRange": {
+              "startLine": 35,
+              "endLine": 35,
+              "startOffset": 27,
+              "endOffset": 31
+            },
+            "msg": "A malicious value can be assigned to field �??path�??"
+          },
+          {
+            "component": "KUSHALROY-001_MyAttendance:Backend/isolation-test.js",
+            "textRange": {
+              "startLine": 222,
+              "endLine": 222,
+              "startOffset": 22,
+              "endOffset": 25
+            },
+            "msg": "Function call: Control is passed to this function, which is on the path to a security sink"
+          },
+          {
+            "component": "KUSHALROY-001_MyAttendance:Backend/isolation-test.js",
+            "textRange": {
+              "startLine": 222,
+              "endLine": 222,
+              "startOffset": 33,
+              "endOffset": 70
+            },
+            "msg": "This concatenation can propagate malicious content to the newly created string"
+          },
+          {
+            "component": "KUSHALROY-001_MyAttendance:Backend/isolation-test.js",
+            "textRange": {
+              "startLine": 222,
+              "endLine": 222,
+              "startOffset": 66,
+              "endOffset": 68
+            },
+            "msg": "A malicious value was previously assigned to field �??id�??"
+          },
+          {
+            "component": "KUSHALROY-001_MyAttendance:Backend/isolation-test.js",
+            "textRange": {
+              "startLine": 46,
+              "endLine": 46,
+              "startOffset": 21,
+              "endOffset": 25
+            },
+            "msg": "Source: when this remote server gets compromised, this response will contain malicious data"
+          }
+        ]
+      }
+    ],
+    "status": "OPEN",
+    "message": "Change this code to not construct the URL\u0027s path from user-controlled data.",
+    "effort": "30min",
+    "debt": "30min",
+    "assignee": "KUSHALROY-001-xVxFY@github",
+    "tags": ["cwe"],
+    "creationDate": "2026-08-07T14:47:10+0000",
+    "updateDate": "2026-09-03T15:06:22+0000",
+    "type": "VULNERABILITY",
+    "organization": "kushalroy-001",
+    "cleanCodeAttribute": "COMPLETE",
+    "cleanCodeAttributeCategory": "INTENTIONAL",
+    "impacts": [
+      {
+        "softwareQuality": "SECURITY",
+        "severity": "MEDIUM"
+      }
+    ],
+    "issueStatus": "OPEN",
+    "projectName": "MyAttendance",
+    "internalTags": [],
+    "lastChangeAnalysisUuid": "f0efc6db-fce9-4025-bb6b-28b0dc005fc7",
+    "lastChangeSource": "ANALYSIS"
+  },
+  {
+    "key": "AaBnz41MpPWvDdRwiRSO",
+    "rule": "jssecurity:S8476",
+    "severity": "MINOR",
+    "component": "KUSHALROY-001_MyAttendance:Backend/isolation-test.js",
+    "project": "KUSHALROY-001_MyAttendance",
+    "line": 36,
+    "hash": "c9110706003717882cb7d1b94fbc5c20",
+    "textRange": {
+      "startLine": 36,
+      "endLine": 36,
+      "startOffset": 20,
+      "endOffset": 25
+    },
+    "flows": [
+      {
+        "locations": [
+          {
+            "component": "KUSHALROY-001_MyAttendance:Backend/isolation-test.js",
+            "textRange": {
+              "startLine": 36,
+              "endLine": 36,
+              "startOffset": 20,
+              "endOffset": 25
+            },
+            "msg": "Sink: this invocation is not safe; a malicious value can be used as argument"
+          },
+          {
+            "component": "KUSHALROY-001_MyAttendance:Backend/isolation-test.js",
+            "textRange": {
+              "startLine": 36,
+              "endLine": 36,
+              "startOffset": 26,
+              "endOffset": 46
+            },
+            "msg": "This concatenation can propagate malicious content to the newly created string"
+          },
+          {
+            "component": "KUSHALROY-001_MyAttendance:Backend/isolation-test.js",
+            "textRange": {
+              "startLine": 36,
+              "endLine": 36,
+              "startOffset": 40,
+              "endOffset": 44
+            },
+            "msg": "A malicious value was previously assigned to field �??path�??"
+          },
+          {
+            "component": "KUSHALROY-001_MyAttendance:Backend/isolation-test.js",
+            "textRange": {
+              "startLine": 35,
+              "endLine": 35,
+              "startOffset": 27,
+              "endOffset": 31
+            },
+            "msg": "A malicious value can be assigned to field �??path�??"
+          },
+          {
+            "component": "KUSHALROY-001_MyAttendance:Backend/isolation-test.js",
+            "textRange": {
+              "startLine": 222,
+              "endLine": 222,
+              "startOffset": 22,
+              "endOffset": 25
+            },
+            "msg": "Function call: Control is passed to this function, which is on the path to a security sink"
+          },
+          {
+            "component": "KUSHALROY-001_MyAttendance:Backend/isolation-test.js",
+            "textRange": {
+              "startLine": 222,
+              "endLine": 222,
+              "startOffset": 33,
+              "endOffset": 70
+            },
+            "msg": "This concatenation can propagate malicious content to the newly created string"
+          },
+          {
+            "component": "KUSHALROY-001_MyAttendance:Backend/isolation-test.js",
+            "textRange": {
+              "startLine": 222,
+              "endLine": 222,
+              "startOffset": 66,
+              "endOffset": 68
+            },
+            "msg": "A malicious value was previously assigned to field �??id�??"
+          },
+          {
+            "component": "KUSHALROY-001_MyAttendance:Backend/isolation-test.js",
+            "textRange": {
+              "startLine": 46,
+              "endLine": 46,
+              "startOffset": 21,
+              "endOffset": 25
+            },
+            "msg": "Source: when this remote server gets compromised, this response will contain malicious data"
+          }
+        ]
+      }
+    ],
+    "status": "OPEN",
+    "message": "Ensure that tainted data is validated before being used to construct a client-side request URL.",
+    "effort": "20min",
+    "debt": "20min",
+    "assignee": "KUSHALROY-001-xVxFY@github",
+    "tags": ["cwe"],
+    "creationDate": "2026-08-07T14:47:10+0000",
+    "updateDate": "2026-09-03T15:06:22+0000",
+    "type": "VULNERABILITY",
+    "organization": "kushalroy-001",
+    "cleanCodeAttribute": "TRUSTWORTHY",
+    "cleanCodeAttributeCategory": "RESPONSIBLE",
+    "impacts": [
+      {
+        "softwareQuality": "SECURITY",
+        "severity": "HIGH"
+      }
+    ],
+    "issueStatus": "OPEN",
+    "projectName": "MyAttendance",
+    "internalTags": [],
+    "lastChangeAnalysisUuid": "f0efc6db-fce9-4025-bb6b-28b0dc005fc7",
+    "lastChangeSource": "ANALYSIS"
+  },
+  {
+    "key": "AaBnz41MpPWvDdRwiRSJ",
+    "rule": "javascript:S2068",
+    "severity": "MAJOR",
+    "component": "KUSHALROY-001_MyAttendance:Backend/isolation-test.js",
+    "project": "KUSHALROY-001_MyAttendance",
+    "line": 167,
+    "hash": "a55be4b48432288fdf692e81f4622111",
+    "textRange": {
+      "startLine": 167,
+      "endLine": 167,
+      "startOffset": 49,
+      "endOffset": 61
+    },
+    "flows": [],
+    "status": "OPEN",
+    "message": "Review this potentially hard-coded password.",
+    "effort": "30min",
+    "debt": "30min",
+    "assignee": "KUSHALROY-001-xVxFY@github",
+    "tags": ["cwe", "former-hotspot", "secret"],
+    "creationDate": "2026-08-07T14:47:10+0000",
+    "updateDate": "2026-09-03T15:06:22+0000",
+    "type": "VULNERABILITY",
+    "organization": "kushalroy-001",
+    "cleanCodeAttribute": "TRUSTWORTHY",
+    "cleanCodeAttributeCategory": "RESPONSIBLE",
+    "impacts": [
+      {
+        "softwareQuality": "SECURITY",
+        "severity": "MEDIUM"
+      }
+    ],
+    "issueStatus": "OPEN",
+    "projectName": "MyAttendance",
+    "internalTags": [],
+    "lastChangeAnalysisUuid": "f0efc6db-fce9-4025-bb6b-28b0dc005fc7",
+    "lastChangeSource": "ANALYSIS"
+  },
+  {
+    "key": "AaBnz41CpPWvDdRwiRSG",
+    "rule": "javascript:S2245",
+    "severity": "MAJOR",
+    "component": "KUSHALROY-001_MyAttendance:Backend/prisma/seed.js",
+    "project": "KUSHALROY-001_MyAttendance",
+    "line": 701,
+    "hash": "a675c7b719a1a29071403b924c234ea1",
+    "textRange": {
+      "startLine": 701,
+      "endLine": 701,
+      "startOffset": 21,
+      "endOffset": 34
+    },
+    "flows": [],
+    "status": "OPEN",
+    "message": "Make sure that using this pseudorandom number generator is safe here.",
+    "effort": "10min",
+    "debt": "10min",
+    "assignee": "KUSHALROY-001-xVxFY@github",
+    "tags": ["cwe", "former-hotspot"],
+    "creationDate": "2026-04-28T12:45:04+0000",
+    "updateDate": "2026-09-03T15:06:22+0000",
+    "type": "VULNERABILITY",
+    "organization": "kushalroy-001",
+    "cleanCodeAttribute": "TRUSTWORTHY",
+    "cleanCodeAttributeCategory": "RESPONSIBLE",
+    "impacts": [
+      {
+        "softwareQuality": "SECURITY",
+        "severity": "MEDIUM"
+      }
+    ],
+    "issueStatus": "OPEN",
+    "projectName": "MyAttendance",
+    "internalTags": [],
+    "lastChangeAnalysisUuid": "f0efc6db-fce9-4025-bb6b-28b0dc005fc7",
+    "lastChangeSource": "ANALYSIS"
+  },
+  {
+    "key": "AaBnz4yfpPWvDdRwiRRd",
+    "rule": "text:S8564",
+    "severity": "MAJOR",
+    "component": "KUSHALROY-001_MyAttendance:Frontend/package.json",
+    "project": "KUSHALROY-001_MyAttendance",
+    "flows": [],
+    "status": "OPEN",
+    "message": "Dependency versions are not predictable if the lock file (package-lock.json, npm-shrinkwrap.json, bun.lock, bun.lockb, pnpm-lock.yaml or yarn.lock) is missing.",
+    "effort": "5min",
+    "debt": "5min",
+    "assignee": "KUSHALROY-001-xVxFY@github",
+    "tags": [],
+    "creationDate": "2026-04-28T12:45:04+0000",
+    "updateDate": "2026-09-03T15:06:22+0000",
+    "type": "VULNERABILITY",
+    "organization": "kushalroy-001",
+    "cleanCodeAttribute": "COMPLETE",
+    "cleanCodeAttributeCategory": "INTENTIONAL",
+    "impacts": [
+      {
+        "softwareQuality": "SECURITY",
+        "severity": "MEDIUM"
+      }
+    ],
+    "issueStatus": "OPEN",
+    "projectName": "MyAttendance",
+    "internalTags": [],
+    "lastChangeAnalysisUuid": "f0efc6db-fce9-4025-bb6b-28b0dc005fc7",
+    "lastChangeSource": "ANALYSIS"
+  },
+  {
+    "key": "AaBnz40vpPWvDdRwiRSB",
+    "rule": "javascript:S5689",
+    "severity": "MINOR",
+    "component": "KUSHALROY-001_MyAttendance:Backend/app.js",
+    "project": "KUSHALROY-001_MyAttendance",
+    "line": 18,
+    "hash": "4af77bcf43147b78489dd9c4043bfe01",
+    "textRange": {
+      "startLine": 18,
+      "endLine": 18,
+      "startOffset": 6,
+      "endOffset": 9
+    },
+    "flows": [],
+    "status": "OPEN",
+    "message": "This framework implicitly discloses version information by default. Make sure it is safe here.",
+    "effort": "5min",
+    "debt": "5min",
+    "assignee": "KUSHALROY-001-xVxFY@github",
+    "tags": ["cwe", "express.js", "former-hotspot"],
+    "creationDate": "2026-02-24T18:59:53+0000",
+    "updateDate": "2026-09-03T15:06:22+0000",
+    "type": "VULNERABILITY",
+    "organization": "kushalroy-001",
+    "cleanCodeAttribute": "TRUSTWORTHY",
+    "cleanCodeAttributeCategory": "RESPONSIBLE",
+    "impacts": [
+      {
+        "softwareQuality": "SECURITY",
+        "severity": "LOW"
+      }
+    ],
+    "issueStatus": "OPEN",
+    "projectName": "MyAttendance",
+    "internalTags": [],
+    "lastChangeAnalysisUuid": "f0efc6db-fce9-4025-bb6b-28b0dc005fc7",
+    "lastChangeSource": "ANALYSIS"
+  }
+]

@@ -1,8 +1,9 @@
-import React from "react";
+import React, { useState } from "react";
 import { Outlet } from "react-router-dom";
 import useAdminLayout from "../hooks/useAdminLayout";
 import AdminSidebar from "../components/admin/AdminSidebar";
 import AdminHeader from "../components/admin/AdminHeader";
+import ConfirmDialog from "../components/admin/ConfirmDialog";
 
 const AdminLayout = () => {
   const {
@@ -15,13 +16,21 @@ const AdminLayout = () => {
     handleLogout,
   } = useAdminLayout();
 
+  const [isLogoutConfirmOpen, setIsLogoutConfirmOpen] = useState(false);
+
   return (
     <div className="h-screen w-full">
       <div className="flex h-full w-full overflow-hidden bg-slate-50 font-sans text-slate-900 transition-colors duration-300 dark:bg-[#0D0D0F] dark:text-slate-100">
         {isMobileMenuOpen && (
           <div
+            role="button"
+            tabIndex={0}
+            aria-label="Close menu"
             className="fixed inset-0 z-40 bg-slate-900/50 backdrop-blur-sm lg:hidden"
             onClick={() => setIsMobileMenuOpen(false)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") setIsMobileMenuOpen(false);
+            }}
           />
         )}
 
@@ -32,7 +41,7 @@ const AdminLayout = () => {
           navigate={navigate}
           theme={theme}
           toggleTheme={toggleTheme}
-          handleLogout={handleLogout}
+          handleLogout={() => setIsLogoutConfirmOpen(true)}
         />
 
         <main className="flex min-w-0 flex-1 flex-col overflow-hidden">
@@ -50,6 +59,16 @@ const AdminLayout = () => {
           </div>
         </main>
       </div>
+
+      <ConfirmDialog
+        isOpen={isLogoutConfirmOpen}
+        onClose={() => setIsLogoutConfirmOpen(false)}
+        onConfirm={handleLogout}
+        title="Log Out"
+        message="Are you sure you want to log out of your admin account?"
+        confirmText="Logout"
+        confirmVariant="danger"
+      />
     </div>
   );
 };

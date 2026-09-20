@@ -17,6 +17,7 @@ export function useEditProfile() {
   const [formData, setFormData] = useState(getInitialForm(null));
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [savingAvatar, setSavingAvatar] = useState(false);
 
   const [academicOptions, setAcademicOptions] = useState([]);
 
@@ -126,11 +127,62 @@ export function useEditProfile() {
     }
   };
 
+  // file comes straight from an <input type="file"> onChange - the
+  // caller doesn't need to know anything about FormData/upload mechanics,
+  // same division of responsibility as handleSubmit above. Deliberately
+  // does NOT navigate away on success (unlike handleSubmit) - changing a
+  // picture should feel instant and keep you on the page looking at it,
+  // not bounce you back to the dashboard.
+  const handleUploadAvatar = async (file) => {
+    if (!file) return;
+    setSavingAvatar(true);
+
+    try {
+      const body = new FormData();
+      body.append("avatar", file);
+      const response = await api.post("/api/auth/avatar", body, {
+        hideAuthRedirect: true,
+      });
+
+      const { avatarUrl, hasCustomAvatar } = response.data;
+      setProfile((current) =>
+        current ? { ...current, avatarUrl, hasCustomAvatar } : current,
+      );
+      // Sidebar/header reads the avatar from AuthContext's `user`, not
+      // this page's own `profile` state - refresh it too so a picture
+      // change shows up everywhere immediately, same as handleSubmit
+      // does for a name change.
+      await refreshCurrentUser();
+      toast.success("Profile picture updated.");
+    } finally {
+      setSavingAvatar(false);
+    }
+  };
+
+  const handleRemoveAvatar = async () => {
+    setSavingAvatar(true);
+
+    try {
+      const response = await api.delete("/api/auth/avatar", {
+        hideAuthRedirect: true,
+      });
+      const { avatarUrl, hasCustomAvatar } = response.data;
+      setProfile((current) =>
+        current ? { ...current, avatarUrl, hasCustomAvatar } : current,
+      );
+      await refreshCurrentUser();
+      toast.success("Profile picture removed.");
+    } finally {
+      setSavingAvatar(false);
+    }
+  };
+
   return {
     profile,
     formData,
     loading,
     saving,
+    savingAvatar,
     academicOptions,
     role,
     dashboardPath,
@@ -140,5 +192,7 @@ export function useEditProfile() {
     handleSemChange,
     updateField,
     handleSubmit,
+    handleUploadAvatar,
+    handleRemoveAvatar,
   };
 }

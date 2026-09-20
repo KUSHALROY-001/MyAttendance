@@ -1,6 +1,7 @@
 const { prisma } = require("../utils/prisma");
 const ApiError = require("../utils/ApiError");
 const asyncHandler = require("../utils/asyncHandler");
+const { resolveAvatarUrl } = require("../utils/cloudinary");
 
 const STATUS_MAP = {
   PRESENT: "Present",
@@ -342,6 +343,39 @@ const getCourseAttendance = asyncHandler(async (req, res) => {
 });
 
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+*/
+// Carry-forward rule for pre-filling: what should a student's status be in the
+// next class, given how they were marked in their previous class today?
+// LATE -> Present (they did attend; being late once doesn't mean late again)
+// LEAVE -> Absent (the roster UI only offers Present / Late / Absent)
+const PREFILL_STATUS_MAP = {
+  PRESENT: "Present",
+  LATE: "Present",
+  ABSENT: "Absent",
+  LEAVE: "Absent",
+};
+
+// "Today" starts at the teacher's local midnight (sent by the browser) so the
+// server's timezone doesn't matter. Anything implausible falls back to the
+// server's own midnight.
+const resolveDayStart = (rawValue) => {
+  const now = new Date();
+  const parsed = rawValue ? new Date(rawValue) : null;
+  const MAX_AGE_MS = 36 * 60 * 60 * 1000;
+
+  if (
+    parsed &&
+    !Number.isNaN(parsed.getTime()) &&
+    parsed <= now &&
+    now - parsed <= MAX_AGE_MS
+  ) {
+    return parsed;
+  }
+
+  const fallback = new Date();
+  fallback.setHours(0, 0, 0, 0);
+  return fallback;
+};
+
 const getLiveAttendance = asyncHandler(async (req, res) => {
   const { allocationId } = req.params;
   const instituteId = req.user.instituteId;
@@ -353,7 +387,7 @@ const getLiveAttendance = asyncHandler(async (req, res) => {
       department: true,
       semester: true,
       section: true,
-      course: { select: { name: true, code: true } },
+      course: { select: { id: true, name: true, code: true } },
     },
   });
 
@@ -370,17 +404,98 @@ const getLiveAttendance = asyncHandler(async (req, res) => {
     select: {
       id: true,
       rollNumber: true,
-      user: { select: { name: true } },
+      user: {
+        select: {
+          name: true,
+          avatarPublicId: true,
+          avatarUpdatedAt: true,
+        },
+      },
     },
   });
 
+  const studentIds = students.map((student) => student.id);
+
+  // Pull the cached per-course attendance stats for these students so the
+  // teacher can see each student's standing while taking attendance.
+  const stats = await prisma.studentAttendanceStat.findMany({
+    where: { courseId: alloc.course.id, studentId: { in: studentIds } },
+    select: { studentId: true, totalSessions: true, totalAttended: true },
+  });
+  const statsByStudent = new Map(stats.map((stat) => [stat.studentId, stat]));
+
+  // Each student's most recent attendance record from today, in ANY course.
+  // Newest first, so the first record we see per student is their latest class.
+  const dayStart = resolveDayStart(req.query.dayStart);
+  const todaysRecords = studentIds.length
+    ? await prisma.attendanceRecord.findMany({
+        where: {
+          studentId: { in: studentIds },
+          session: {
+            date: { gte: dayStart },
+            courseAllocation: { instituteId },
+          },
+        },
+        orderBy: { session: { date: "desc" } },
+        select: {
+          studentId: true,
+          status: true,
+          session: {
+            select: {
+              date: true,
+              courseAllocation: {
+                select: { course: { select: { name: true, code: true } } },
+              },
+            },
+          },
+        },
+      })
+    : [];
+
+  const previousByStudent = new Map();
+  for (const record of todaysRecords) {
+    if (!previousByStudent.has(record.studentId)) {
+      previousByStudent.set(record.studentId, record);
+    }
+  }
+
   return res.status(200).json({
     allocation: alloc,
-    students: students.map(({ id, user, rollNumber }) => ({
-      id,
-      name: user?.name || "Unknown",
-      rollNumber,
-    })),
+    students: students.map(({ id, user, rollNumber }) => {
+      const stat = statsByStudent.get(id);
+      const previous = previousByStudent.get(id);
+      const totalClasses = stat?.totalSessions ?? 0;
+      const attendedClasses = stat?.totalAttended ?? 0;
+
+      return {
+        id,
+        name: user?.name || "Unknown",
+        rollNumber,
+        avatar: resolveAvatarUrl({
+          avatarPublicId: user?.avatarPublicId,
+          avatarUpdatedAt: user?.avatarUpdatedAt,
+        }),
+        totalClasses,
+        attendedClasses,
+        // null (not 0) when no class has been held yet, so the UI can show "New"
+        attendancePercentage:
+          totalClasses > 0
+            ? Math.round((attendedClasses / totalClasses) * 100)
+            : null,
+        // null when the student has no earlier class today (e.g. first period)
+        suggestedStatus: previous
+          ? PREFILL_STATUS_MAP[previous.status] || "Present"
+          : null,
+        previousClass: previous
+          ? {
+              status: STATUS_MAP[previous.status] || "Leave",
+              courseCode: previous.session.courseAllocation?.course?.code || "",
+              courseName: previous.session.courseAllocation?.course?.name || "",
+              at: previous.session.date,
+            }
+          : null,
+      };
+    }),
   });
 });
 

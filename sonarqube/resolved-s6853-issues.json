@@ -1,0 +1,821 @@
+[
+  {
+    "key": "AaBnz4rNpPWvDdRwiRPi",
+    "rule": "javascript:S6853",
+    "severity": "MAJOR",
+    "component": "KUSHALROY-001_MyAttendance:Frontend/src/components/admin/promotions/PromotionScopeHeader.jsx",
+    "project": "KUSHALROY-001_MyAttendance",
+    "line": 16,
+    "hash": "0dad93e1cf1341b9fcfee5efde1e1d73",
+    "textRange": {
+      "startLine": 16,
+      "endLine": 16,
+      "startOffset": 9,
+      "endOffset": 14
+    },
+    "flows": [],
+    "status": "OPEN",
+    "message": "A form label must be associated with a control.",
+    "effort": "5min",
+    "debt": "5min",
+    "assignee": "KUSHALROY-001-xVxFY@github",
+    "tags": ["accessibility", "react"],
+    "creationDate": "2026-08-12T16:03:48+0000",
+    "updateDate": "2026-09-03T15:06:22+0000",
+    "type": "CODE_SMELL",
+    "organization": "kushalroy-001",
+    "cleanCodeAttribute": "LOGICAL",
+    "cleanCodeAttributeCategory": "INTENTIONAL",
+    "impacts": [
+      {
+        "softwareQuality": "RELIABILITY",
+        "severity": "MEDIUM"
+      }
+    ],
+    "issueStatus": "OPEN",
+    "projectName": "MyAttendance",
+    "internalTags": [],
+    "lastChangeAnalysisUuid": "f0efc6db-fce9-4025-bb6b-28b0dc005fc7",
+    "lastChangeSource": "ANALYSIS"
+  },
+  {
+    "key": "AaBnz4ropPWvDdRwiRPu",
+    "rule": "javascript:S6853",
+    "severity": "MAJOR",
+    "component": "KUSHALROY-001_MyAttendance:Frontend/src/components/admin/academic-options/DepartmentModal.jsx",
+    "project": "KUSHALROY-001_MyAttendance",
+    "line": 66,
+    "hash": "60d57a2f3897d85266625975f6938e8a",
+    "textRange": {
+      "startLine": 66,
+      "endLine": 66,
+      "startOffset": 13,
+      "endOffset": 18
+    },
+    "flows": [],
+    "status": "OPEN",
+    "message": "A form label must be associated with a control.",
+    "effort": "5min",
+    "debt": "5min",
+    "assignee": "KUSHALROY-001-xVxFY@github",
+    "tags": ["accessibility", "react"],
+    "creationDate": "2026-08-07T14:47:10+0000",
+    "updateDate": "2026-09-03T15:06:22+0000",
+    "type": "CODE_SMELL",
+    "organization": "kushalroy-001",
+    "cleanCodeAttribute": "LOGICAL",
+    "cleanCodeAttributeCategory": "INTENTIONAL",
+    "impacts": [
+      {
+        "softwareQuality": "RELIABILITY",
+        "severity": "MEDIUM"
+      }
+    ],
+    "issueStatus": "OPEN",
+    "projectName": "MyAttendance",
+    "internalTags": [],
+    "lastChangeAnalysisUuid": "f0efc6db-fce9-4025-bb6b-28b0dc005fc7",
+    "lastChangeSource": "ANALYSIS"
+  },
+  {
+    "key": "AaBnz4ropPWvDdRwiRPw",
+    "rule": "javascript:S6853",
+    "severity": "MAJOR",
+    "component": "KUSHALROY-001_MyAttendance:Frontend/src/components/admin/academic-options/DepartmentModal.jsx",
+    "project": "KUSHALROY-001_MyAttendance",
+    "line": 99,
+    "hash": "55bde5ebead65928ddc2ed2c3b97b7fd",
+    "textRange": {
+      "startLine": 99,
+      "endLine": 99,
+      "startOffset": 19,
+      "endOffset": 24
+    },
+    "flows": [],
+    "status": "OPEN",
+    "message": "A form label must be associated with a control.",
+    "effort": "5min",
+    "debt": "5min",
+    "assignee": "KUSHALROY-001-xVxFY@github",
+    "tags": ["accessibility", "react"],
+    "creationDate": "2026-08-07T14:47:10+0000",
+    "updateDate": "2026-09-03T15:06:22+0000",
+    "type": "CODE_SMELL",
+    "organization": "kushalroy-001",
+    "cleanCodeAttribute": "LOGICAL",
+    "cleanCodeAttributeCategory": "INTENTIONAL",
+    "impacts": [
+      {
+        "softwareQuality": "RELIABILITY",
+        "severity": "MEDIUM"
+      }
+    ],
+    "issueStatus": "OPEN",
+    "projectName": "MyAttendance",
+    "internalTags": [],
+    "lastChangeAnalysisUuid": "f0efc6db-fce9-4025-bb6b-28b0dc005fc7",
+    "lastChangeSource": "ANALYSIS"
+  },
+  {
+    "key": "AaBnz4sxpPWvDdRwiRQH",
+    "rule": "javascript:S6853",
+    "severity": "MAJOR",
+    "component": "KUSHALROY-001_MyAttendance:Frontend/src/components/admin/AssignSlotModal.jsx",
+    "project": "KUSHALROY-001_MyAttendance",
+    "line": 40,
+    "hash": "b8c5f5963ae5c786b359e4676bb1c037",
+    "textRange": {
+      "startLine": 40,
+      "endLine": 40,
+      "startOffset": 11,
+      "endOffset": 16
+    },
+    "flows": [],
+    "status": "OPEN",
+    "message": "A form label must be associated with a control.",
+    "effort": "5min",
+    "debt": "5min",
+    "assignee": "KUSHALROY-001-xVxFY@github",
+    "tags": ["accessibility", "react"],
+    "creationDate": "2026-08-01T10:26:12+0000",
+    "updateDate": "2026-09-03T15:06:22+0000",
+    "type": "CODE_SMELL",
+    "organization": "kushalroy-001",
+    "cleanCodeAttribute": "LOGICAL",
+    "cleanCodeAttributeCategory": "INTENTIONAL",
+    "impacts": [
+      {
+        "softwareQuality": "RELIABILITY",
+        "severity": "MEDIUM"
+      }
+    ],
+    "issueStatus": "OPEN",
+    "projectName": "MyAttendance",
+    "internalTags": [],
+    "lastChangeAnalysisUuid": "f0efc6db-fce9-4025-bb6b-28b0dc005fc7",
+    "lastChangeSource": "ANALYSIS"
+  },
+  {
+    "key": "AaBnz4sxpPWvDdRwiRQI",
+    "rule": "javascript:S6853",
+    "severity": "MAJOR",
+    "component": "KUSHALROY-001_MyAttendance:Frontend/src/components/admin/AssignSlotModal.jsx",
+    "project": "KUSHALROY-001_MyAttendance",
+    "line": 61,
+    "hash": "8be788feb26c8751f2190b902ece29d6",
+    "textRange": {
+      "startLine": 61,
+      "endLine": 61,
+      "startOffset": 17,
+      "endOffset": 22
+    },
+    "flows": [],
+    "status": "OPEN",
+    "message": "A form label must have accessible text.",
+    "effort": "5min",
+    "debt": "5min",
+    "assignee": "KUSHALROY-001-xVxFY@github",
+    "tags": ["accessibility", "react"],
+    "creationDate": "2026-08-01T10:26:12+0000",
+    "updateDate": "2026-09-03T15:06:22+0000",
+    "type": "CODE_SMELL",
+    "organization": "kushalroy-001",
+    "cleanCodeAttribute": "LOGICAL",
+    "cleanCodeAttributeCategory": "INTENTIONAL",
+    "impacts": [
+      {
+        "softwareQuality": "RELIABILITY",
+        "severity": "MEDIUM"
+      }
+    ],
+    "issueStatus": "OPEN",
+    "projectName": "MyAttendance",
+    "internalTags": [],
+    "lastChangeAnalysisUuid": "f0efc6db-fce9-4025-bb6b-28b0dc005fc7",
+    "lastChangeSource": "ANALYSIS"
+  },
+  {
+    "key": "AaBnz4sxpPWvDdRwiRQJ",
+    "rule": "javascript:S6853",
+    "severity": "MAJOR",
+    "component": "KUSHALROY-001_MyAttendance:Frontend/src/components/admin/AssignSlotModal.jsx",
+    "project": "KUSHALROY-001_MyAttendance",
+    "line": 90,
+    "hash": "b8c5f5963ae5c786b359e4676bb1c037",
+    "textRange": {
+      "startLine": 90,
+      "endLine": 90,
+      "startOffset": 13,
+      "endOffset": 18
+    },
+    "flows": [],
+    "status": "OPEN",
+    "message": "A form label must be associated with a control.",
+    "effort": "5min",
+    "debt": "5min",
+    "assignee": "KUSHALROY-001-xVxFY@github",
+    "tags": ["accessibility", "react"],
+    "creationDate": "2026-08-01T10:26:12+0000",
+    "updateDate": "2026-09-03T15:06:22+0000",
+    "type": "CODE_SMELL",
+    "organization": "kushalroy-001",
+    "cleanCodeAttribute": "LOGICAL",
+    "cleanCodeAttributeCategory": "INTENTIONAL",
+    "impacts": [
+      {
+        "softwareQuality": "RELIABILITY",
+        "severity": "MEDIUM"
+      }
+    ],
+    "issueStatus": "OPEN",
+    "projectName": "MyAttendance",
+    "internalTags": [],
+    "lastChangeAnalysisUuid": "f0efc6db-fce9-4025-bb6b-28b0dc005fc7",
+    "lastChangeSource": "ANALYSIS"
+  },
+  {
+    "key": "AaBnz4sxpPWvDdRwiRQK",
+    "rule": "javascript:S6853",
+    "severity": "MAJOR",
+    "component": "KUSHALROY-001_MyAttendance:Frontend/src/components/admin/AssignSlotModal.jsx",
+    "project": "KUSHALROY-001_MyAttendance",
+    "line": 102,
+    "hash": "b8c5f5963ae5c786b359e4676bb1c037",
+    "textRange": {
+      "startLine": 102,
+      "endLine": 102,
+      "startOffset": 13,
+      "endOffset": 18
+    },
+    "flows": [],
+    "status": "OPEN",
+    "message": "A form label must be associated with a control.",
+    "effort": "5min",
+    "debt": "5min",
+    "assignee": "KUSHALROY-001-xVxFY@github",
+    "tags": ["accessibility", "react"],
+    "creationDate": "2026-08-01T10:26:12+0000",
+    "updateDate": "2026-09-03T15:06:22+0000",
+    "type": "CODE_SMELL",
+    "organization": "kushalroy-001",
+    "cleanCodeAttribute": "LOGICAL",
+    "cleanCodeAttributeCategory": "INTENTIONAL",
+    "impacts": [
+      {
+        "softwareQuality": "RELIABILITY",
+        "severity": "MEDIUM"
+      }
+    ],
+    "issueStatus": "OPEN",
+    "projectName": "MyAttendance",
+    "internalTags": [],
+    "lastChangeAnalysisUuid": "f0efc6db-fce9-4025-bb6b-28b0dc005fc7",
+    "lastChangeSource": "ANALYSIS"
+  },
+  {
+    "key": "AaBnz4tCpPWvDdRwiRQM",
+    "rule": "javascript:S6853",
+    "severity": "MAJOR",
+    "component": "KUSHALROY-001_MyAttendance:Frontend/src/components/admin/SessionsReportTable.jsx",
+    "project": "KUSHALROY-001_MyAttendance",
+    "line": 96,
+    "hash": "287acfabf314eafdedb0572cfa7548ba",
+    "textRange": {
+      "startLine": 96,
+      "endLine": 96,
+      "startOffset": 13,
+      "endOffset": 18
+    },
+    "flows": [],
+    "status": "OPEN",
+    "message": "A form label must be associated with a control.",
+    "effort": "5min",
+    "debt": "5min",
+    "assignee": "KUSHALROY-001-xVxFY@github",
+    "tags": ["accessibility", "react"],
+    "creationDate": "2026-08-01T10:26:12+0000",
+    "updateDate": "2026-09-03T15:06:22+0000",
+    "type": "CODE_SMELL",
+    "organization": "kushalroy-001",
+    "cleanCodeAttribute": "LOGICAL",
+    "cleanCodeAttributeCategory": "INTENTIONAL",
+    "impacts": [
+      {
+        "softwareQuality": "RELIABILITY",
+        "severity": "MEDIUM"
+      }
+    ],
+    "issueStatus": "OPEN",
+    "projectName": "MyAttendance",
+    "internalTags": [],
+    "lastChangeAnalysisUuid": "f0efc6db-fce9-4025-bb6b-28b0dc005fc7",
+    "lastChangeSource": "ANALYSIS"
+  },
+  {
+    "key": "AaBnz4p7pPWvDdRwiRPR",
+    "rule": "javascript:S6853",
+    "severity": "MAJOR",
+    "component": "KUSHALROY-001_MyAttendance:Frontend/src/components/library/LibraryFilters.jsx",
+    "project": "KUSHALROY-001_MyAttendance",
+    "line": 16,
+    "hash": "53ed0308d81aeed5aa05dbdc56483239",
+    "textRange": {
+      "startLine": 16,
+      "endLine": 16,
+      "startOffset": 9,
+      "endOffset": 14
+    },
+    "flows": [],
+    "status": "OPEN",
+    "message": "A form label must be associated with a control.",
+    "effort": "5min",
+    "debt": "5min",
+    "assignee": "KUSHALROY-001-xVxFY@github",
+    "tags": ["accessibility", "react"],
+    "creationDate": "2026-05-06T16:27:59+0000",
+    "updateDate": "2026-09-03T15:06:22+0000",
+    "type": "CODE_SMELL",
+    "organization": "kushalroy-001",
+    "cleanCodeAttribute": "LOGICAL",
+    "cleanCodeAttributeCategory": "INTENTIONAL",
+    "impacts": [
+      {
+        "softwareQuality": "RELIABILITY",
+        "severity": "MEDIUM"
+      }
+    ],
+    "issueStatus": "OPEN",
+    "projectName": "MyAttendance",
+    "internalTags": [],
+    "lastChangeAnalysisUuid": "f0efc6db-fce9-4025-bb6b-28b0dc005fc7",
+    "lastChangeSource": "ANALYSIS"
+  },
+  {
+    "key": "AaBnz4p7pPWvDdRwiRPS",
+    "rule": "javascript:S6853",
+    "severity": "MAJOR",
+    "component": "KUSHALROY-001_MyAttendance:Frontend/src/components/library/LibraryFilters.jsx",
+    "project": "KUSHALROY-001_MyAttendance",
+    "line": 32,
+    "hash": "9ddbebbe226fc0a80a5a1b750e360b98",
+    "textRange": {
+      "startLine": 32,
+      "endLine": 32,
+      "startOffset": 9,
+      "endOffset": 14
+    },
+    "flows": [],
+    "status": "OPEN",
+    "message": "A form label must be associated with a control.",
+    "effort": "5min",
+    "debt": "5min",
+    "assignee": "KUSHALROY-001-xVxFY@github",
+    "tags": ["accessibility", "react"],
+    "creationDate": "2026-05-06T16:27:59+0000",
+    "updateDate": "2026-09-03T15:06:22+0000",
+    "type": "CODE_SMELL",
+    "organization": "kushalroy-001",
+    "cleanCodeAttribute": "LOGICAL",
+    "cleanCodeAttributeCategory": "INTENTIONAL",
+    "impacts": [
+      {
+        "softwareQuality": "RELIABILITY",
+        "severity": "MEDIUM"
+      }
+    ],
+    "issueStatus": "OPEN",
+    "projectName": "MyAttendance",
+    "internalTags": [],
+    "lastChangeAnalysisUuid": "f0efc6db-fce9-4025-bb6b-28b0dc005fc7",
+    "lastChangeSource": "ANALYSIS"
+  },
+  {
+    "key": "AaBnz4p7pPWvDdRwiRPT",
+    "rule": "javascript:S6853",
+    "severity": "MAJOR",
+    "component": "KUSHALROY-001_MyAttendance:Frontend/src/components/library/LibraryFilters.jsx",
+    "project": "KUSHALROY-001_MyAttendance",
+    "line": 48,
+    "hash": "0d380f89b7fa908ad8be038fb24d3922",
+    "textRange": {
+      "startLine": 48,
+      "endLine": 48,
+      "startOffset": 9,
+      "endOffset": 14
+    },
+    "flows": [],
+    "status": "OPEN",
+    "message": "A form label must be associated with a control.",
+    "effort": "5min",
+    "debt": "5min",
+    "assignee": "KUSHALROY-001-xVxFY@github",
+    "tags": ["accessibility", "react"],
+    "creationDate": "2026-05-06T16:27:59+0000",
+    "updateDate": "2026-09-03T15:06:22+0000",
+    "type": "CODE_SMELL",
+    "organization": "kushalroy-001",
+    "cleanCodeAttribute": "LOGICAL",
+    "cleanCodeAttributeCategory": "INTENTIONAL",
+    "impacts": [
+      {
+        "softwareQuality": "RELIABILITY",
+        "severity": "MEDIUM"
+      }
+    ],
+    "issueStatus": "OPEN",
+    "projectName": "MyAttendance",
+    "internalTags": [],
+    "lastChangeAnalysisUuid": "f0efc6db-fce9-4025-bb6b-28b0dc005fc7",
+    "lastChangeSource": "ANALYSIS"
+  },
+  {
+    "key": "AaBnz4uKpPWvDdRwiRQf",
+    "rule": "javascript:S6853",
+    "severity": "MAJOR",
+    "component": "KUSHALROY-001_MyAttendance:Frontend/src/components/teacher/StartAttendanceModal.jsx",
+    "project": "KUSHALROY-001_MyAttendance",
+    "line": 95,
+    "hash": "277474e76efc32253a137337e214cfc0",
+    "textRange": {
+      "startLine": 95,
+      "endLine": 95,
+      "startOffset": 13,
+      "endOffset": 18
+    },
+    "flows": [],
+    "status": "OPEN",
+    "message": "A form label must be associated with a control.",
+    "effort": "5min",
+    "debt": "5min",
+    "assignee": "KUSHALROY-001-xVxFY@github",
+    "tags": ["accessibility", "react"],
+    "creationDate": "2026-05-06T16:27:59+0000",
+    "updateDate": "2026-09-03T15:06:22+0000",
+    "type": "CODE_SMELL",
+    "organization": "kushalroy-001",
+    "cleanCodeAttribute": "LOGICAL",
+    "cleanCodeAttributeCategory": "INTENTIONAL",
+    "impacts": [
+      {
+        "softwareQuality": "RELIABILITY",
+        "severity": "MEDIUM"
+      }
+    ],
+    "issueStatus": "OPEN",
+    "projectName": "MyAttendance",
+    "internalTags": [],
+    "lastChangeAnalysisUuid": "f0efc6db-fce9-4025-bb6b-28b0dc005fc7",
+    "lastChangeSource": "ANALYSIS"
+  },
+  {
+    "key": "AaBnz4uKpPWvDdRwiRQg",
+    "rule": "javascript:S6853",
+    "severity": "MAJOR",
+    "component": "KUSHALROY-001_MyAttendance:Frontend/src/components/teacher/StartAttendanceModal.jsx",
+    "project": "KUSHALROY-001_MyAttendance",
+    "line": 121,
+    "hash": "277474e76efc32253a137337e214cfc0",
+    "textRange": {
+      "startLine": 121,
+      "endLine": 121,
+      "startOffset": 15,
+      "endOffset": 20
+    },
+    "flows": [],
+    "status": "OPEN",
+    "message": "A form label must be associated with a control.",
+    "effort": "5min",
+    "debt": "5min",
+    "assignee": "KUSHALROY-001-xVxFY@github",
+    "tags": ["accessibility", "react"],
+    "creationDate": "2026-05-06T16:27:59+0000",
+    "updateDate": "2026-09-03T15:06:22+0000",
+    "type": "CODE_SMELL",
+    "organization": "kushalroy-001",
+    "cleanCodeAttribute": "LOGICAL",
+    "cleanCodeAttributeCategory": "INTENTIONAL",
+    "impacts": [
+      {
+        "softwareQuality": "RELIABILITY",
+        "severity": "MEDIUM"
+      }
+    ],
+    "issueStatus": "OPEN",
+    "projectName": "MyAttendance",
+    "internalTags": [],
+    "lastChangeAnalysisUuid": "f0efc6db-fce9-4025-bb6b-28b0dc005fc7",
+    "lastChangeSource": "ANALYSIS"
+  },
+  {
+    "key": "AaBnz4uKpPWvDdRwiRQh",
+    "rule": "javascript:S6853",
+    "severity": "MAJOR",
+    "component": "KUSHALROY-001_MyAttendance:Frontend/src/components/teacher/StartAttendanceModal.jsx",
+    "project": "KUSHALROY-001_MyAttendance",
+    "line": 148,
+    "hash": "277474e76efc32253a137337e214cfc0",
+    "textRange": {
+      "startLine": 148,
+      "endLine": 148,
+      "startOffset": 15,
+      "endOffset": 20
+    },
+    "flows": [],
+    "status": "OPEN",
+    "message": "A form label must be associated with a control.",
+    "effort": "5min",
+    "debt": "5min",
+    "assignee": "KUSHALROY-001-xVxFY@github",
+    "tags": ["accessibility", "react"],
+    "creationDate": "2026-05-06T16:27:59+0000",
+    "updateDate": "2026-09-03T15:06:22+0000",
+    "type": "CODE_SMELL",
+    "organization": "kushalroy-001",
+    "cleanCodeAttribute": "LOGICAL",
+    "cleanCodeAttributeCategory": "INTENTIONAL",
+    "impacts": [
+      {
+        "softwareQuality": "RELIABILITY",
+        "severity": "MEDIUM"
+      }
+    ],
+    "issueStatus": "OPEN",
+    "projectName": "MyAttendance",
+    "internalTags": [],
+    "lastChangeAnalysisUuid": "f0efc6db-fce9-4025-bb6b-28b0dc005fc7",
+    "lastChangeSource": "ANALYSIS"
+  },
+  {
+    "key": "AaBnz4uKpPWvDdRwiRQi",
+    "rule": "javascript:S6853",
+    "severity": "MAJOR",
+    "component": "KUSHALROY-001_MyAttendance:Frontend/src/components/teacher/StartAttendanceModal.jsx",
+    "project": "KUSHALROY-001_MyAttendance",
+    "line": 175,
+    "hash": "277474e76efc32253a137337e214cfc0",
+    "textRange": {
+      "startLine": 175,
+      "endLine": 175,
+      "startOffset": 15,
+      "endOffset": 20
+    },
+    "flows": [],
+    "status": "OPEN",
+    "message": "A form label must be associated with a control.",
+    "effort": "5min",
+    "debt": "5min",
+    "assignee": "KUSHALROY-001-xVxFY@github",
+    "tags": ["accessibility", "react"],
+    "creationDate": "2026-05-06T16:27:59+0000",
+    "updateDate": "2026-09-03T15:06:22+0000",
+    "type": "CODE_SMELL",
+    "organization": "kushalroy-001",
+    "cleanCodeAttribute": "LOGICAL",
+    "cleanCodeAttributeCategory": "INTENTIONAL",
+    "impacts": [
+      {
+        "softwareQuality": "RELIABILITY",
+        "severity": "MEDIUM"
+      }
+    ],
+    "issueStatus": "OPEN",
+    "projectName": "MyAttendance",
+    "internalTags": [],
+    "lastChangeAnalysisUuid": "f0efc6db-fce9-4025-bb6b-28b0dc005fc7",
+    "lastChangeSource": "ANALYSIS"
+  },
+  {
+    "key": "AaBnz4prpPWvDdRwiRPK",
+    "rule": "javascript:S6853",
+    "severity": "MAJOR",
+    "component": "KUSHALROY-001_MyAttendance:Frontend/src/components/library/LibraryModal.jsx",
+    "project": "KUSHALROY-001_MyAttendance",
+    "line": 42,
+    "hash": "5cb118aea2e39e3d99a75fb35fb6fc3d",
+    "textRange": {
+      "startLine": 42,
+      "endLine": 42,
+      "startOffset": 15,
+      "endOffset": 20
+    },
+    "flows": [],
+    "status": "OPEN",
+    "message": "A form label must be associated with a control.",
+    "effort": "5min",
+    "debt": "5min",
+    "assignee": "KUSHALROY-001-xVxFY@github",
+    "tags": ["accessibility", "react"],
+    "creationDate": "2026-04-28T12:45:04+0000",
+    "updateDate": "2026-09-03T15:06:22+0000",
+    "type": "CODE_SMELL",
+    "organization": "kushalroy-001",
+    "cleanCodeAttribute": "LOGICAL",
+    "cleanCodeAttributeCategory": "INTENTIONAL",
+    "impacts": [
+      {
+        "softwareQuality": "RELIABILITY",
+        "severity": "MEDIUM"
+      }
+    ],
+    "issueStatus": "OPEN",
+    "projectName": "MyAttendance",
+    "internalTags": [],
+    "lastChangeAnalysisUuid": "f0efc6db-fce9-4025-bb6b-28b0dc005fc7",
+    "lastChangeSource": "ANALYSIS"
+  },
+  {
+    "key": "AaBnz4prpPWvDdRwiRPL",
+    "rule": "javascript:S6853",
+    "severity": "MAJOR",
+    "component": "KUSHALROY-001_MyAttendance:Frontend/src/components/library/LibraryModal.jsx",
+    "project": "KUSHALROY-001_MyAttendance",
+    "line": 53,
+    "hash": "f6bdea7e4467da05846575dc30d32f34",
+    "textRange": {
+      "startLine": 53,
+      "endLine": 53,
+      "startOffset": 15,
+      "endOffset": 20
+    },
+    "flows": [],
+    "status": "OPEN",
+    "message": "A form label must be associated with a control.",
+    "effort": "5min",
+    "debt": "5min",
+    "assignee": "KUSHALROY-001-xVxFY@github",
+    "tags": ["accessibility", "react"],
+    "creationDate": "2026-04-28T12:45:04+0000",
+    "updateDate": "2026-09-03T15:06:22+0000",
+    "type": "CODE_SMELL",
+    "organization": "kushalroy-001",
+    "cleanCodeAttribute": "LOGICAL",
+    "cleanCodeAttributeCategory": "INTENTIONAL",
+    "impacts": [
+      {
+        "softwareQuality": "RELIABILITY",
+        "severity": "MEDIUM"
+      }
+    ],
+    "issueStatus": "OPEN",
+    "projectName": "MyAttendance",
+    "internalTags": [],
+    "lastChangeAnalysisUuid": "f0efc6db-fce9-4025-bb6b-28b0dc005fc7",
+    "lastChangeSource": "ANALYSIS"
+  },
+  {
+    "key": "AaBnz4prpPWvDdRwiRPM",
+    "rule": "javascript:S6853",
+    "severity": "MAJOR",
+    "component": "KUSHALROY-001_MyAttendance:Frontend/src/components/library/LibraryModal.jsx",
+    "project": "KUSHALROY-001_MyAttendance",
+    "line": 64,
+    "hash": "7fe91f53479c51e7e003b06779d01f1c",
+    "textRange": {
+      "startLine": 64,
+      "endLine": 64,
+      "startOffset": 15,
+      "endOffset": 20
+    },
+    "flows": [],
+    "status": "OPEN",
+    "message": "A form label must be associated with a control.",
+    "effort": "5min",
+    "debt": "5min",
+    "assignee": "KUSHALROY-001-xVxFY@github",
+    "tags": ["accessibility", "react"],
+    "creationDate": "2026-04-28T12:45:04+0000",
+    "updateDate": "2026-09-03T15:06:22+0000",
+    "type": "CODE_SMELL",
+    "organization": "kushalroy-001",
+    "cleanCodeAttribute": "LOGICAL",
+    "cleanCodeAttributeCategory": "INTENTIONAL",
+    "impacts": [
+      {
+        "softwareQuality": "RELIABILITY",
+        "severity": "MEDIUM"
+      }
+    ],
+    "issueStatus": "OPEN",
+    "projectName": "MyAttendance",
+    "internalTags": [],
+    "lastChangeAnalysisUuid": "f0efc6db-fce9-4025-bb6b-28b0dc005fc7",
+    "lastChangeSource": "ANALYSIS"
+  },
+  {
+    "key": "AaBnz4prpPWvDdRwiRPN",
+    "rule": "javascript:S6853",
+    "severity": "MAJOR",
+    "component": "KUSHALROY-001_MyAttendance:Frontend/src/components/library/LibraryModal.jsx",
+    "project": "KUSHALROY-001_MyAttendance",
+    "line": 81,
+    "hash": "53a27b24da3e8dcc62327c71d96f9dc0",
+    "textRange": {
+      "startLine": 81,
+      "endLine": 81,
+      "startOffset": 15,
+      "endOffset": 20
+    },
+    "flows": [],
+    "status": "OPEN",
+    "message": "A form label must be associated with a control.",
+    "effort": "5min",
+    "debt": "5min",
+    "assignee": "KUSHALROY-001-xVxFY@github",
+    "tags": ["accessibility", "react"],
+    "creationDate": "2026-04-28T12:45:04+0000",
+    "updateDate": "2026-09-03T15:06:22+0000",
+    "type": "CODE_SMELL",
+    "organization": "kushalroy-001",
+    "cleanCodeAttribute": "LOGICAL",
+    "cleanCodeAttributeCategory": "INTENTIONAL",
+    "impacts": [
+      {
+        "softwareQuality": "RELIABILITY",
+        "severity": "MEDIUM"
+      }
+    ],
+    "issueStatus": "OPEN",
+    "projectName": "MyAttendance",
+    "internalTags": [],
+    "lastChangeAnalysisUuid": "f0efc6db-fce9-4025-bb6b-28b0dc005fc7",
+    "lastChangeSource": "ANALYSIS"
+  },
+  {
+    "key": "AaBnz4prpPWvDdRwiRPO",
+    "rule": "javascript:S6853",
+    "severity": "MAJOR",
+    "component": "KUSHALROY-001_MyAttendance:Frontend/src/components/library/LibraryModal.jsx",
+    "project": "KUSHALROY-001_MyAttendance",
+    "line": 98,
+    "hash": "867e0d923ab2ea2b4e2f5fc4ce85a53c",
+    "textRange": {
+      "startLine": 98,
+      "endLine": 98,
+      "startOffset": 15,
+      "endOffset": 20
+    },
+    "flows": [],
+    "status": "OPEN",
+    "message": "A form label must be associated with a control.",
+    "effort": "5min",
+    "debt": "5min",
+    "assignee": "KUSHALROY-001-xVxFY@github",
+    "tags": ["accessibility", "react"],
+    "creationDate": "2026-04-28T12:45:04+0000",
+    "updateDate": "2026-09-03T15:06:22+0000",
+    "type": "CODE_SMELL",
+    "organization": "kushalroy-001",
+    "cleanCodeAttribute": "LOGICAL",
+    "cleanCodeAttributeCategory": "INTENTIONAL",
+    "impacts": [
+      {
+        "softwareQuality": "RELIABILITY",
+        "severity": "MEDIUM"
+      }
+    ],
+    "issueStatus": "OPEN",
+    "projectName": "MyAttendance",
+    "internalTags": [],
+    "lastChangeAnalysisUuid": "f0efc6db-fce9-4025-bb6b-28b0dc005fc7",
+    "lastChangeSource": "ANALYSIS"
+  },
+  {
+    "key": "AaBnz4prpPWvDdRwiRPP",
+    "rule": "javascript:S6853",
+    "severity": "MAJOR",
+    "component": "KUSHALROY-001_MyAttendance:Frontend/src/components/library/LibraryModal.jsx",
+    "project": "KUSHALROY-001_MyAttendance",
+    "line": 110,
+    "hash": "a5529dcec2f4989fe5e8bc68f8d6a2e3",
+    "textRange": {
+      "startLine": 110,
+      "endLine": 110,
+      "startOffset": 15,
+      "endOffset": 20
+    },
+    "flows": [],
+    "status": "OPEN",
+    "message": "A form label must be associated with a control.",
+    "effort": "5min",
+    "debt": "5min",
+    "assignee": "KUSHALROY-001-xVxFY@github",
+    "tags": ["accessibility", "react"],
+    "creationDate": "2026-04-28T12:45:04+0000",
+    "updateDate": "2026-09-03T15:06:22+0000",
+    "type": "CODE_SMELL",
+    "organization": "kushalroy-001",
+    "cleanCodeAttribute": "LOGICAL",
+    "cleanCodeAttributeCategory": "INTENTIONAL",
+    "impacts": [
+      {
+        "softwareQuality": "RELIABILITY",
+        "severity": "MEDIUM"
+      }
+    ],
+    "issueStatus": "OPEN",
+    "projectName": "MyAttendance",
+    "internalTags": [],
+    "lastChangeAnalysisUuid": "f0efc6db-fce9-4025-bb6b-28b0dc005fc7",
+    "lastChangeSource": "ANALYSIS"
+  }
+]

@@ -106,9 +106,9 @@ const AttendanceSessions = ({ sessions = [], onSessionClick }) => {
           )
         ) : sortedSessions.length > 0 ? (
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            {sortedSessions.map((session, index) => (
+            {sortedSessions.map((session) => (
               <SessionCard
-                key={index}
+                key={session.id}
                 session={session}
                 onClick={onSessionClick}
               />

@@ -1,4 +1,5 @@
 const jwt = require("jsonwebtoken");
+const { resolveAvatarUrl } = require("./cloudinary");
 
 if (
   process.env.NODE_ENV === "production" &&
@@ -147,6 +148,11 @@ const buildSafeAuthUser = (user) => {
     email: user.email,
     role: user.role,
     mustChangePassword: Boolean(user.mustChangePassword),
+    avatarUrl: resolveAvatarUrl({
+      avatarPublicId: user.avatarPublicId,
+      avatarUpdatedAt: user.avatarUpdatedAt,
+    }),
+    hasCustomAvatar: Boolean(user.avatarPublicId),
     institute: user.institute
       ? {
           id: user.institute.id,

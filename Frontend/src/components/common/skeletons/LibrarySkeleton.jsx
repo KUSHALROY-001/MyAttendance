@@ -1,12 +1,14 @@
 import React from "react";
 import Skeleton from "./Skeleton";
+import { useSkeletonKeys } from "../../../hooks/useSkeletonKeys";
 
 const LibrarySkeleton = ({ count = 6 }) => {
+  const keys = useSkeletonKeys(count);
   return (
     <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 animate-in fade-in duration-300">
-      {Array.from({ length: count }).map((_, i) => (
+      {keys.map((key) => (
         <div
-          key={i}
+          key={key}
           className="flex flex-col justify-between rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900 space-y-4"
         >
           <div className="space-y-3">

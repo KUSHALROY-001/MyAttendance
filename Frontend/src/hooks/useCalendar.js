@@ -23,7 +23,11 @@ export const useCalendar = (attendanceByDate = {}) => {
     const endDate = new Date(year, month, lastOfMonth.getDate() + endOffset);
 
     const days = [];
-    for (let dt = new Date(startDate); dt <= endDate; dt.setDate(dt.getDate() + 1)) {
+    for (
+      let dt = new Date(startDate);
+      dt <= endDate;
+      dt = new Date(dt.getFullYear(), dt.getMonth(), dt.getDate() + 1)
+    ) {
       if (dt.getDay() === 0) continue; // skip Sundays
       
       const d = new Date(dt);

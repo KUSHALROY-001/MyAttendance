@@ -3,6 +3,33 @@ import { useParams, useNavigate } from "react-router-dom";
 import axios from "../api/axios";
 import { calculateLiveAttendanceStats } from "../utils/teacherHelpers";
 
+const getLocalDateKey = () => {
+  const now = new Date();
+  const month = String(now.getMonth() + 1).padStart(2, "0");
+  const day = String(now.getDate()).padStart(2, "0");
+  return `${now.getFullYear()}-${month}-${day}`;
+};
+
+const getLocalDayStart = () => {
+  const start = new Date();
+  start.setHours(0, 0, 0, 0);
+  return start;
+};
+
+// Drafts are stored as { date, marks }. Anything else (older flat-map drafts,
+// or a draft from a previous day) is ignored so it can't hide today's pre-fill.
+const readTodaysDraft = (key) => {
+  try {
+    const draft = JSON.parse(localStorage.getItem(key));
+    if (draft?.date === getLocalDateKey() && draft.marks) {
+      return draft.marks;
+    }
+  } catch {
+    // corrupt draft - fall through
+  }
+  return null;
+};
+
 export const useTakeAttendance = () => {
   const { allocationId } = useParams();
   const navigate = useNavigate();
@@ -17,16 +44,20 @@ export const useTakeAttendance = () => {
       try {
         const res = await axios.get(
           `/api/teacher/attendance/live/${allocationId}`,
+          { params: { dayStart: getLocalDayStart().toISOString() } },
         );
         setData(res.data);
 
-        const savedMarks = localStorage.getItem(`attendance_${allocationId}`);
+        const savedMarks = readTodaysDraft(`attendance_${allocationId}`);
         if (savedMarks) {
-          setAttendance(JSON.parse(savedMarks));
+          setAttendance(savedMarks);
         } else {
+          // Pre-fill from each student's previous class today (any subject);
+          // students with no earlier class today default to Present.
           const initialAttendance = {};
           res.data.students.forEach((student) => {
-            initialAttendance[student.id] = "Present";
+            initialAttendance[student.id] =
+              student.suggestedStatus || "Present";
           });
           setAttendance(initialAttendance);
         }
@@ -44,7 +75,7 @@ export const useTakeAttendance = () => {
     if (Object.keys(attendance).length > 0) {
       localStorage.setItem(
         `attendance_${allocationId}`,
-        JSON.stringify(attendance),
+        JSON.stringify({ date: getLocalDateKey(), marks: attendance }),
       );
     }
   }, [attendance, allocationId]);

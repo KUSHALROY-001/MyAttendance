@@ -68,7 +68,15 @@ const DepartmentCard = ({
 
   return (
     <div
+      role="button"
+      tabIndex={0}
       onClick={() => onOpenDetail(dept)}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          onOpenDetail(dept);
+        }
+      }}
       className={`relative rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900/60 transition-all ${
         !isSuperAdmin
           ? "opacity-65 bg-slate-50/80 dark:bg-slate-900/40 cursor-pointer group"
@@ -128,12 +136,21 @@ const DepartmentCard = ({
           </p>
         ) : (
           <div className="space-y-1.5 max-h-40 overflow-y-auto pr-1 custom-scrollbar">
-            {semesters.map((s, idx) => (
+            {semesters.map((s) => (
               <div
-                key={idx}
+                key={s.semester}
+                role="button"
+                tabIndex={0}
                 onClick={(event) => {
                   event.stopPropagation();
                   onOpenSemesterAudit(dept, s.semester);
+                }}
+                onKeyDown={(event) => {
+                  if (event.key === "Enter" || event.key === " ") {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    onOpenSemesterAudit(dept, s.semester);
+                  }
                 }}
                 className="relative flex items-center justify-between text-xs rounded-lg bg-slate-50 dark:bg-slate-800/50 px-3 py-1.5 cursor-pointer hover:bg-indigo-50 dark:hover:bg-indigo-500/10"
               >
@@ -141,15 +158,21 @@ const DepartmentCard = ({
                   Sem {s.semester}
                 </span>
                 <div className="flex items-center gap-1 flex-wrap justify-end">
-                  {(findAuditedSemester(detail, s.semester)?.sections ||
+                  {(
+                    findAuditedSemester(detail, s.semester)?.sections ||
                     s.sections ||
-                    []).map((sec, sIdx) => (
-                    <SectionChip key={sIdx} section={sec} />
+                    []
+                  ).map((sec) => (
+                    <SectionChip key={getSectionName(sec)} section={sec} />
                   ))}
                 </div>
                 {activeSemesterAudit?.departmentId === dept.id &&
                   activeSemesterAudit?.semester === Number(s.semester) && (
-                    <div onClick={(event) => event.stopPropagation()}>
+                    <div
+                      role="presentation"
+                      onClick={(event) => event.stopPropagation()}
+                      onKeyDown={(event) => event.stopPropagation()}
+                    >
                       <SemesterAuditPopover
                         semester={findAuditedSemester(detail, s.semester) || s}
                       />

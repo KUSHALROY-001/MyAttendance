@@ -70,9 +70,9 @@ const AttendanceCalendar = ({
           </div>
         ))}
 
-        {days.map((day, idx) => (
+        {days.map((day) => (
           <div
-            key={idx}
+            key={day.date.getTime()}
             className={`group relative flex cursor-pointer flex-col items-center ${
               !day.isCurrentMonth ? "opacity-40" : ""
             }`}

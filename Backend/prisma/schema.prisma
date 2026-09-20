@@ -64,6 +64,20 @@ model User {
   // creation, so this stays false for them. See requirePasswordChange
   // middleware for enforcement.
   mustChangePassword Boolean @default(false)
+  // Cloudinary public_id for a self-uploaded profile picture (one stable
+  // id per user, keyed only by userId - see utils/cloudinary.js#buildAvatarPublicId
+  // - so re-uploading always overwrites the same asset in place rather
+  // than accumulating orphaned old ones). Null until the user uploads one;
+  // the actual delivery URL is never stored, only rebuilt on read via
+  // resolveAvatarUrl, so a cloud_name change or delivery-option change
+  // later needs no backfill.
+  avatarPublicId String?
+  // Bumped to now() on every upload/removal so the delivery URL built
+  // from avatarPublicId includes a fresh Cloudinary version - without
+  // this, overwriting the same public_id can leave the CDN (and the
+  // browser) serving the previous image for a while after a change. See
+  // utils/cloudinary.js#resolveAvatarUrl.
+  avatarUpdatedAt DateTime?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 

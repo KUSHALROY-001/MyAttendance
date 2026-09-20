@@ -5,6 +5,7 @@ const {
   stampOnUpdate,
   auditActorSelect,
 } = require("../../utils/auditStamp");
+const { resolveAvatarUrl } = require("../../utils/cloudinary");
 
 const getAllowedRolesForUser = (user, actingUserRole) => {
   // SUPER_ADMIN is permanent once granted — never a valid target to move
@@ -254,6 +255,8 @@ const getUserDetailFull = asyncHandler(async (req, res) => {
       status: true,
       createdAt: true,
       updatedAt: true,
+      avatarPublicId: true,
+      avatarUpdatedAt: true,
       createdBy: auditActorSelect,
       updatedBy: auditActorSelect,
       student: {
@@ -295,6 +298,10 @@ const getUserDetailFull = asyncHandler(async (req, res) => {
     email: user.email,
     role: user.role,
     status: user.status,
+    avatarUrl: resolveAvatarUrl({
+      avatarPublicId: user.avatarPublicId,
+      avatarUpdatedAt: user.avatarUpdatedAt,
+    }),
     recordCreatedAt: user.createdAt,
     recordUpdatedAt: user.updatedAt,
     createdBy: user.createdBy,

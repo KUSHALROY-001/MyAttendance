@@ -24,8 +24,14 @@ const AdminModal = ({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 outline-none focus:outline-none">
       <div
+        role="button"
+        tabIndex={0}
+        aria-label="Close modal"
         className="absolute inset-0 bg-slate-950/70 backdrop-blur-sm transition-opacity"
         onClick={onClose}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" || e.key === " ") onClose();
+        }}
       ></div>
       <div className="relative w-full max-w-3xl bg-transperant border border-slate-200 dark:border-[#1E2638] rounded-3xl shadow-2xl flex flex-col max-h-[92vh] overflow-hidden">
         {/* Header */}

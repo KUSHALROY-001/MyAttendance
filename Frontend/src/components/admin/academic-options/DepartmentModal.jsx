@@ -2,7 +2,10 @@ import React from "react";
 import { PlusCircle, XCircle, X } from "lucide-react";
 import AdminModal from "../AdminModal";
 import SectionInputAdder from "./SectionInputAdder";
-import { INPUT_CLASS, LABEL_CLASS } from "../../../utils/academicOptionsHelpers";
+import {
+  INPUT_CLASS,
+  LABEL_CLASS,
+} from "../../../utils/academicOptionsHelpers";
 
 const DepartmentModal = ({
   isOpen,
@@ -21,7 +24,9 @@ const DepartmentModal = ({
     <AdminModal
       isOpen={isOpen}
       onClose={onClose}
-      title={currentRecord ? "Edit Department Option" : "Add New Department Option"}
+      title={
+        currentRecord ? "Edit Department Option" : "Add New Department Option"
+      }
     >
       <form onSubmit={onSave} className="space-y-4">
         <div className="space-y-1.5">
@@ -63,7 +68,7 @@ const DepartmentModal = ({
 
         <div className="space-y-3 pt-2">
           <div className="flex items-center justify-between">
-            <label className={LABEL_CLASS}>Configure Semesters & Sections</label>
+            <p className={LABEL_CLASS}>Configure Semesters & Sections</p>
             <button
               type="button"
               onClick={onAddSemester}
@@ -76,7 +81,7 @@ const DepartmentModal = ({
           <div className="space-y-3 max-h-60 overflow-y-auto pr-1 custom-scrollbar">
             {formData.semesterDetails.map((semDetail, index) => (
               <div
-                key={index}
+                key={semDetail.semester}
                 className="p-3.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/70 dark:bg-slate-800/40 space-y-2.5"
               >
                 <div className="flex items-center justify-between">
@@ -86,7 +91,9 @@ const DepartmentModal = ({
                   {formData.semesterDetails.length > 1 && (
                     <button
                       type="button"
-                      onClick={() => onRequestRemoveSemester(index, semDetail.semester)}
+                      onClick={() =>
+                        onRequestRemoveSemester(index, semDetail.semester)
+                      }
                       className="text-slate-400 hover:text-rose-500 dark:hover:text-rose-400 transition"
                       title="Remove Semester"
                     >
@@ -96,9 +103,9 @@ const DepartmentModal = ({
                 </div>
 
                 <div>
-                  <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5">
+                  <p className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5">
                     Sections
-                  </label>
+                  </p>
 
                   <div className="flex flex-wrap items-center gap-2 rounded-xl border border-slate-300 bg-white p-2.5 dark:border-slate-600 dark:bg-slate-900/70 min-h-[52px]">
                     {(semDetail.sections || []).map((sec, secIdx) => {
@@ -108,7 +115,7 @@ const DepartmentModal = ({
                           : String(sec || "");
                       return (
                         <div
-                          key={secIdx}
+                          key={sectionName}
                           className="inline-flex items-center gap-1.5 rounded-lg border-2 border-slate-900 bg-white px-3 py-1 text-sm font-bold text-slate-900 shadow-sm dark:border-slate-200 dark:bg-slate-800 dark:text-slate-100 transition-all hover:scale-105"
                         >
                           <span>{sectionName}</span>
@@ -147,7 +154,11 @@ const DepartmentModal = ({
             disabled={saving}
             className="inline-flex items-center justify-center rounded-xl bg-indigo-600 px-5 py-2 text-sm font-bold text-white shadow-md hover:bg-indigo-500 disabled:opacity-50 transition"
           >
-            {saving ? "Saving..." : currentRecord ? "Update Option" : "Save Option"}
+            {saving
+              ? "Saving..."
+              : currentRecord
+                ? "Update Option"
+                : "Save Option"}
           </button>
         </div>
       </form>

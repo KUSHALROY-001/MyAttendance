@@ -1,5 +1,12 @@
 const ApiError = require("../utils/ApiError");
 
+// Strip characters that let user-controlled input forge fake log lines
+// (CR/LF let an attacker inject bogus "log entries"; other control chars
+// can corrupt terminals/log viewers). Used only for values that get
+// interpolated into log messages — never for values sent to the client.
+const sanitizeForLog = (value) =>
+  String(value).replace(/[\r\n\t\x00-\x1f\x7f]/g, " ");
+
 // Known Prisma error codes -> safe, user-readable messages.
 // (Raw Prisma errors mention table/column names and internal query details
 // that we never want to send straight to the browser.)
@@ -56,6 +63,23 @@ const toApiError = (err) => {
     );
   }
 
+  // multer (avatar upload, bulk student-import) - these are user-caused
+  // (a file that's too big, or a field name it wasn't expecting), not a
+  // server bug, so they get a clear 400 instead of falling through to
+  // the generic 500 below like any other error with no statusCode of
+  // its own.
+  if (err.name === "MulterError") {
+    if (err.code === "LIMIT_FILE_SIZE") {
+      return new ApiError(400, "That file is too large.", [], err.stack);
+    }
+    return new ApiError(
+      400,
+      "The file couldn't be uploaded. Please try a different file.",
+      [],
+      err.stack,
+    );
+  }
+
   // CORS rejection thrown in app.js
   if (err.message === "Not allowed by CORS") {
     return new ApiError(
@@ -88,7 +112,10 @@ const errorHandler = (err, req, res, next) => {
   // Always log the *original* error server-side (with stack) for debugging,
   // regardless of what the client is shown.
   if (error.statusCode >= 500) {
-    console.error(`[${req.method} ${req.originalUrl}]`, err);
+    console.error(
+      `[${sanitizeForLog(req.method)} ${sanitizeForLog(req.originalUrl)}]`,
+      err,
+    );
   }
 
   // Send the error response.

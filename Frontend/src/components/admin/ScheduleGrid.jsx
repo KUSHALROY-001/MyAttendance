@@ -214,7 +214,15 @@ const ScheduleGrid = ({
                       >
                         {entry ? (
                           <div
+                            role="button"
+                            tabIndex={0}
                             onClick={() => openEntryDetail(entry)}
+                            onKeyDown={(e) => {
+                              if (e.key === "Enter" || e.key === " ") {
+                                e.preventDefault();
+                                openEntryDetail(entry);
+                              }
+                            }}
                             className={`h-full w-full rounded p-2 border-l-2 text-left shadow-sm cursor-pointer ${entry.classType === "lab" ? "bg-amber-50 dark:bg-amber-500/10 border-amber-500" : "bg-indigo-50 dark:bg-indigo-500/10 border-indigo-500"}`}
                           >
                             <p className="font-bold text-[11px] leading-tight text-slate-900 dark:text-white line-clamp-1">
@@ -244,10 +252,19 @@ const ScheduleGrid = ({
                           </div>
                         ) : (
                           <div
+                            role="button"
+                            tabIndex={0}
+                            aria-label="Add schedule entry"
                             className="h-full w-full border border-dashed border-slate-200 dark:border-slate-800 rounded p-2 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer text-xs text-slate-400"
                             onClick={() =>
                               openAssignModal(dayText, period.period)
                             }
+                            onKeyDown={(e) => {
+                              if (e.key === "Enter" || e.key === " ") {
+                                e.preventDefault();
+                                openAssignModal(dayText, period.period);
+                              }
+                            }}
                           >
                             +
                           </div>

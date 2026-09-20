@@ -186,9 +186,17 @@ const RecordDetailPanel = ({
             </button>
 
             <div className="relative z-10 flex items-center gap-4">
-              <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-white dark:bg-gradient-to-br dark:from-blue-600 dark:to-indigo-600 font-extrabold text-xl text-blue-600 dark:text-white shadow-lg shadow-blue-900/30">
-                {initials}
-              </div>
+              {detail?.avatarUrl ? (
+                <img
+                  src={detail.avatarUrl}
+                  alt={displayName}
+                  className="h-16 w-16 shrink-0 rounded-full border-2 border-white/70 object-cover shadow-lg shadow-blue-900/30 dark:border-slate-800"
+                />
+              ) : (
+                <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-white dark:bg-gradient-to-br dark:from-blue-600 dark:to-indigo-600 font-extrabold text-xl text-blue-600 dark:text-white shadow-lg shadow-blue-900/30">
+                  {initials}
+                </div>
+              )}
 
               <div>
                 <h2 className="text-2xl font-bold tracking-tight text-white">

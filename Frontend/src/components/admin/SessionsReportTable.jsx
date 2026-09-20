@@ -93,10 +93,14 @@ const SessionsReportTable = ({
         ]}
         actions={
           <div className="flex items-center gap-2">
-            <label className="whitespace-nowrap text-xs font-semibold text-slate-500 dark:text-slate-400">
+            <label
+              htmlFor="sessionDateFilter"
+              className="whitespace-nowrap text-xs font-semibold text-slate-500 dark:text-slate-400"
+            >
               Date
             </label>
             <input
+              id="sessionDateFilter"
               type="date"
               value={filterSessionDate}
               onChange={(e) => setFilterSessionDate(e.target.value)}

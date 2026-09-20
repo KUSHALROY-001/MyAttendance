@@ -5,11 +5,11 @@ const QuickStats = ({ summaries }) => {
         Quick Stats
       </h2>
       <div className="flex-grow space-y-6">
-        {summaries.map((subject, idx) => {
+        {summaries.map((subject) => {
           const isLow = subject.percentage < 75;
           return (
             <div
-              key={idx}
+              key={subject.courseCode}
               className="mx-[-0.5rem] flex items-center justify-between rounded-lg px-2 py-1 transition-all hover:bg-slate-50 dark:hover:bg-[#1C1C20]"
             >
               <div>

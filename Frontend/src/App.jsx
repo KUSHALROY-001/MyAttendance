@@ -12,7 +12,7 @@ import SignUp from "./pages/SignUp.jsx";
 import RegisterInstitute from "./pages/RegisterInstitute.jsx";
 import Login from "./pages/Login.jsx";
 import EditProfile from "./pages/EditProfile.jsx";
-import { Routes, Route, Outlet } from "react-router-dom";
+import { Routes, Route, Outlet, useLocation } from "react-router-dom";
 import ProtectedRoute from "./components/auth/ProtectedRoute.jsx";
 import PublicOnlyRoute from "./components/auth/PublicOnlyRoute.jsx";
 import RequirePasswordChange from "./components/auth/RequirePasswordChange.jsx";
@@ -38,13 +38,23 @@ import AdminPendingApprovals from "./pages/AdminPendingApprovals.jsx";
 import AdminAcademicOptions from "./pages/AdminAcademicOptions.jsx";
 import AdminPromotions from "./pages/AdminPromotions.jsx";
 
-const MainLayout = () => (
-  <>
-    <Navbar />
-    <Outlet />
-    <Footer />
-  </>
-);
+// The site footer is only shown on these public marketing pages.
+const FOOTER_PATHS = new Set(["/", "/about", "/features", "/library"]);
+
+const MainLayout = () => {
+  const { pathname } = useLocation();
+  // Ignore a trailing slash so "/about/" behaves like "/about".
+  const normalizedPath =
+    pathname.length > 1 ? pathname.replace(/\/+$/, "") : pathname;
+
+  return (
+    <>
+      <Navbar />
+      <Outlet />
+      {FOOTER_PATHS.has(normalizedPath) && <Footer />}
+    </>
+  );
+};
 
 function App() {
   return (

@@ -13,10 +13,14 @@ const PromotionScopeHeader = ({
   return (
     <div className="flex flex-col gap-4 rounded-2xl border border-slate-200 bg-white p-5 dark:border-slate-800 dark:bg-slate-900 sm:flex-row sm:items-end sm:justify-between">
       <div>
-        <label className="mb-1.5 block text-xs font-bold uppercase tracking-wide text-slate-500 dark:text-slate-400">
+        <label
+          htmlFor="promotion-scope-department"
+          className="mb-1.5 block text-xs font-bold uppercase tracking-wide text-slate-500 dark:text-slate-400"
+        >
           Scope
         </label>
         <select
+          id="promotion-scope-department"
           value={department}
           onChange={(e) => setDepartment(e.target.value)}
           className="w-56 rounded-lg border border-slate-300 bg-[#ffffff] px-3 py-2 text-sm text-slate-900 focus:border-indigo-500 focus:outline-none dark:border-slate-700 dark:bg-[#050505] dark:text-white"
