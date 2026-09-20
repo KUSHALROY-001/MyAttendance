@@ -7,6 +7,7 @@ const {
   stampOnUpdate,
   auditActorSelect,
 } = require("../../utils/auditStamp");
+const { resolveAvatarUrl } = require("../../utils/cloudinary");
 
 const formatTeacher = (teacher) => ({
   id: teacher.id,
@@ -192,7 +193,15 @@ const getTeacherDetail = asyncHandler(async (req, res) => {
   const teacher = await prisma.teacher.findFirst({
     where: { id: Number(id), instituteId: req.user.instituteId },
     include: {
-      user: { select: { name: true, email: true, createdAt: true } },
+      user: {
+        select: {
+          name: true,
+          email: true,
+          createdAt: true,
+          avatarPublicId: true,
+          avatarUpdatedAt: true,
+        },
+      },
       createdBy: auditActorSelect,
       updatedBy: auditActorSelect,
       courseAllocations: {
@@ -213,6 +222,10 @@ const getTeacherDetail = asyncHandler(async (req, res) => {
 
   res.status(200).json({
     ...formatTeacher(teacher),
+    avatarUrl: resolveAvatarUrl({
+      avatarPublicId: teacher.user.avatarPublicId,
+      avatarUpdatedAt: teacher.user.avatarUpdatedAt,
+    }),
     accountCreatedAt: teacher.user.createdAt,
     recordCreatedAt: teacher.createdAt,
     recordUpdatedAt: teacher.updatedAt,

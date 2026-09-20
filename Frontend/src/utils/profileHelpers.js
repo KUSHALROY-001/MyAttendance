@@ -22,11 +22,21 @@ export const resolveAvailableSemesters = (currentDeptObj) => {
 export const resolveAvailableSections = (currentSemObj) => {
   if (!currentSemObj || !currentSemObj.sections) return [];
   return currentSemObj.sections.map((sec) =>
-    typeof sec === "object" && sec !== null ? sec.name || sec.value || String(sec) : String(sec),
+    typeof sec === "object" && sec !== null
+      ? sec.name || sec.value || String(sec)
+      : String(sec),
   );
 };
 
 export const formatProfileUpdatePayload = (formData, role) => {
+  // Students and teachers may only change their name and contact number.
+  if (role === "STUDENT" || role === "TEACHER") {
+    return {
+      name: formData.name,
+      contactNumber: formData.contactNumber,
+    };
+  }
+
   return {
     ...formData,
     semester: role === "STUDENT" ? Number(formData.semester || 0) : undefined,

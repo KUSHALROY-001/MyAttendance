@@ -1,8 +1,9 @@
-import React from "react";
+import React, { useState } from "react";
 import { Outlet } from "react-router-dom";
 import useAdminLayout from "../hooks/useAdminLayout";
 import AdminSidebar from "../components/admin/AdminSidebar";
 import AdminHeader from "../components/admin/AdminHeader";
+import ConfirmDialog from "../components/admin/ConfirmDialog";
 
 const AdminLayout = () => {
   const {
@@ -14,6 +15,8 @@ const AdminLayout = () => {
     user,
     handleLogout,
   } = useAdminLayout();
+
+  const [isLogoutConfirmOpen, setIsLogoutConfirmOpen] = useState(false);
 
   return (
     <div className="h-screen w-full">
@@ -38,7 +41,7 @@ const AdminLayout = () => {
           navigate={navigate}
           theme={theme}
           toggleTheme={toggleTheme}
-          handleLogout={handleLogout}
+          handleLogout={() => setIsLogoutConfirmOpen(true)}
         />
 
         <main className="flex min-w-0 flex-1 flex-col overflow-hidden">
@@ -56,6 +59,16 @@ const AdminLayout = () => {
           </div>
         </main>
       </div>
+
+      <ConfirmDialog
+        isOpen={isLogoutConfirmOpen}
+        onClose={() => setIsLogoutConfirmOpen(false)}
+        onConfirm={handleLogout}
+        title="Log Out"
+        message="Are you sure you want to log out of your admin account?"
+        confirmText="Logout"
+        confirmVariant="danger"
+      />
     </div>
   );
 };

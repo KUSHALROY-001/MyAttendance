@@ -63,6 +63,23 @@ const toApiError = (err) => {
     );
   }
 
+  // multer (avatar upload, bulk student-import) - these are user-caused
+  // (a file that's too big, or a field name it wasn't expecting), not a
+  // server bug, so they get a clear 400 instead of falling through to
+  // the generic 500 below like any other error with no statusCode of
+  // its own.
+  if (err.name === "MulterError") {
+    if (err.code === "LIMIT_FILE_SIZE") {
+      return new ApiError(400, "That file is too large.", [], err.stack);
+    }
+    return new ApiError(
+      400,
+      "The file couldn't be uploaded. Please try a different file.",
+      [],
+      err.stack,
+    );
+  }
+
   // CORS rejection thrown in app.js
   if (err.message === "Not allowed by CORS") {
     return new ApiError(

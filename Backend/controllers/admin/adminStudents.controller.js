@@ -3,6 +3,7 @@ const bcrypt = require("bcryptjs");
 const ApiError = require("../../utils/ApiError");
 const asyncHandler = require("../../utils/asyncHandler");
 const { getWhereClause } = require("./adminHelpers");
+const { resolveAvatarUrl } = require("../../utils/cloudinary");
 const {
   stampOnCreate,
   stampOnUpdate,
@@ -332,7 +333,14 @@ const getStudentDetail = asyncHandler(async (req, res) => {
     where: { id: Number(id), instituteId: req.user.instituteId },
     include: {
       user: {
-        select: { name: true, email: true, status: true, createdAt: true },
+        select: {
+          name: true,
+          email: true,
+          status: true,
+          createdAt: true,
+          avatarPublicId: true,
+          avatarUpdatedAt: true,
+        },
       },
       createdBy: auditActorSelect,
       updatedBy: auditActorSelect,
@@ -369,6 +377,10 @@ const getStudentDetail = asyncHandler(async (req, res) => {
 
   res.status(200).json({
     ...formatStudent(student),
+    avatarUrl: resolveAvatarUrl({
+      avatarPublicId: student.user.avatarPublicId,
+      avatarUpdatedAt: student.user.avatarUpdatedAt,
+    }),
     accountStatus: student.user.status,
     accountCreatedAt: student.user.createdAt,
     recordCreatedAt: student.createdAt,

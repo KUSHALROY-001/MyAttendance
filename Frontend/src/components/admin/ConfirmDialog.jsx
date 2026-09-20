@@ -1,4 +1,5 @@
 import React from "react";
+import { createPortal } from "react-dom";
 import { AlertTriangle } from "lucide-react";
 
 const ConfirmDialog = ({
@@ -26,7 +27,12 @@ const ConfirmDialog = ({
       ? "bg-amber-100 dark:bg-amber-500/10 text-amber-600 dark:text-amber-400"
       : "bg-red-100 dark:bg-red-500/10 text-red-600 dark:text-red-500";
 
-  return (
+  // Rendered into document.body via a portal rather than in place - a
+  // `fixed` element inside an ancestor with backdrop-blur/transform/filter
+  // gets positioned relative to that ancestor instead of the viewport (e.g.
+  // Navbar's sticky header has backdrop-blur), which would otherwise pin
+  // this dialog near the top of the page instead of centering it on screen.
+  return createPortal(
     <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
       <div
         role="button"
@@ -69,7 +75,8 @@ const ConfirmDialog = ({
           </button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 };
 

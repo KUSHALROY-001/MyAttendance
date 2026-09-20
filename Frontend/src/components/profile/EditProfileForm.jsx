@@ -1,7 +1,9 @@
 import React from "react";
-import { PencilLine, Save } from "lucide-react";
+import { Info, PencilLine, Save } from "lucide-react";
 import StudentProfileFields from "./StudentProfileFields";
 import TeacherProfileFields from "./TeacherProfileFields";
+import LockedField from "./LockedField";
+import ProfileAvatarUploader from "./ProfileAvatarUploader";
 
 const inputClass =
   "block w-full rounded-lg border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 focus:border-indigo-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20 dark:border-slate-800 dark:bg-[#19191D] dark:text-slate-100 dark:placeholder:text-slate-500 dark:focus:border-indigo-500 dark:focus:bg-[#151518] transition-colors";
@@ -16,19 +18,41 @@ const EditProfileForm = ({
   formData,
   updateField,
   role,
-  academicOptions,
-  handleDeptChange,
-  availableSemesters,
-  handleSemChange,
-  availableSections,
   saving,
+  profile,
+  savingAvatar,
+  handleUploadAvatar,
+  handleRemoveAvatar,
 }) => {
+  const isStudent = role === "STUDENT";
+  // Students and teachers can only edit their name and contact number.
+  const isRestricted = isStudent || role === "TEACHER";
+
   return (
     <div className="w-full rounded-xl border border-slate-200 bg-white p-3 shadow-sm dark:border-slate-800 dark:bg-slate-900 sm:p-8">
+      <ProfileAvatarUploader
+        name={formData.name}
+        avatarUrl={profile?.avatarUrl}
+        hasCustomAvatar={profile?.hasCustomAvatar}
+        savingAvatar={savingAvatar}
+        handleUploadAvatar={handleUploadAvatar}
+        handleRemoveAvatar={handleRemoveAvatar}
+      />
       <form
         onSubmit={handleSubmit}
         className="grid grid-cols-1 gap-5 md:grid-cols-2"
       >
+        {isRestricted ? (
+          <div className="md:col-span-2 flex items-start gap-3 rounded-lg border border-indigo-100 bg-indigo-50/60 px-4 py-3 text-xs text-indigo-800 dark:border-indigo-500/20 dark:bg-indigo-500/10 dark:text-indigo-200 sm:text-sm">
+            <Info size={16} className="mt-0.5 shrink-0" aria-hidden="true" />
+            <p>
+              You can edit your name and contact number here. Your other details
+              are managed by your institute admin - contact them if something
+              needs to be corrected.
+            </p>
+          </div>
+        ) : null}
+
         <div className="space-y-1.5">
           <label htmlFor="name" className={labelClass}>
             Full Name
@@ -43,31 +67,27 @@ const EditProfileForm = ({
           />
         </div>
 
-        <div className="space-y-1.5">
-          <label htmlFor="email" className={labelClass}>
-            Email
-            <Required />
-          </label>
-          <input
-            id="email"
-            type="email"
-            value={formData.email}
-            onChange={updateField("email")}
-            required
-            className={inputClass}
-          />
-        </div>
+        {isRestricted ? (
+          <LockedField id="email" label="Email" value={formData.email} />
+        ) : (
+          <div className="space-y-1.5">
+            <label htmlFor="email" className={labelClass}>
+              Email
+              <Required />
+            </label>
+            <input
+              id="email"
+              type="email"
+              value={formData.email}
+              onChange={updateField("email")}
+              required
+              className={inputClass}
+            />
+          </div>
+        )}
 
-        {role === "STUDENT" ? (
-          <StudentProfileFields
-            formData={formData}
-            updateField={updateField}
-            academicOptions={academicOptions}
-            handleDeptChange={handleDeptChange}
-            availableSemesters={availableSemesters}
-            handleSemChange={handleSemChange}
-            availableSections={availableSections}
-          />
+        {isStudent ? (
+          <StudentProfileFields formData={formData} updateField={updateField} />
         ) : null}
 
         {role === "TEACHER" ? (
