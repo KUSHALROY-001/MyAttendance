@@ -56,7 +56,7 @@ const AttendanceCalendar = ({
           <span>No class</span>
         </div>
         <span className="text-[10px] font-medium text-slate-400 dark:text-slate-500">
-          Periods clockwise: 1st - 2nd - 3rd - 4th
+          One slice per class that day, clockwise from top
         </span>
       </div>
 
@@ -98,8 +98,16 @@ const AttendanceCalendar = ({
             </div>
 
             <div className="pointer-events-none absolute -bottom-16 z-20 whitespace-nowrap rounded bg-slate-900 p-2 text-[10px] text-white opacity-0 shadow-xl transition-all group-hover:opacity-100">
-              P1: {day.periods[0] || "-"} | P2: {day.periods[1] || "-"} <br />
-              P3: {day.periods[2] || "-"} | P4: {day.periods[3] || "-"}
+              {day.periods.length === 0 ? (
+                <span>No class</span>
+              ) : (
+                day.periods.map((p, i) => (
+                  <div key={i}>
+                    {p.courseCode ? `${p.courseCode}: ` : `P${i + 1}: `}
+                    {p.status || "-"}
+                  </div>
+                ))
+              )}
             </div>
           </div>
         ))}
